@@ -3,11 +3,11 @@
   "model_link": "[danish-foundation-models/edda-v0.1](https://huggingface.co/danish-foundation-models/edda-v0.1)",
   "params_b": 0.809,
   "access": "open",
-  "submitted": "2026-09-24",
+  "submitted": "2026-09-26",
   "unicode_form": "NFKC",
   "number_words": true,
   "filler_words": true,
-  "speed_x": 18.6,
+  "speed_x": 33.3,
   "datasets": [
     "coral_conversation",
     "coral_read_aloud",
