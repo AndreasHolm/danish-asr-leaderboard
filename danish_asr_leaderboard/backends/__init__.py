@@ -17,6 +17,7 @@ from danish_asr_leaderboard.backends import (  # noqa: F401,E402
     danstral_backend,
     faster_whisper_backend,
     nemo_backend,
+    nemotron_asr_backend,
     qwen_asr_backend,
     hviske_v6_backend,
     saga2_backend,
@@ -32,6 +33,7 @@ from danish_asr_leaderboard.backends.api import (  # noqa: F401,E402
     google_chirp,
     ordbogen,
     soniox,
+    syv,
 )
 
 __all__ = [
