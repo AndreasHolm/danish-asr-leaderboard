@@ -151,7 +151,9 @@
     }
     /* ── Tabs ──────────────────────────────────────────────────────── */
     .tab-nav {
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 40;
       display: flex;
       align-items: stretch;
       gap: 0;
@@ -169,6 +171,7 @@
       max-width: 100%;
       margin-bottom: 0;
       overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
     }
     .tab-nav::before {
       content: "";
@@ -2589,6 +2592,18 @@ function initBackToTop() {
 initBackToTop();
 
 /* Fade an edge of the tab strip only when there is content beyond it. */
+function centerTabButton(btn) {
+  if (!btn) return;
+  const nav = btn.parentElement;
+  if (nav.scrollWidth > nav.clientWidth) {
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    nav.scrollLeft += btnRect.left - navRect.left - (nav.clientWidth - btnRect.width) / 2;
+  } else {
+    nav.scrollLeft = 0;
+  }
+  updateTabFades();
+}
 function updateTabFades() {
   const nav = document.querySelector('.tab-nav-scroll');
   if (!nav) return;
@@ -2602,7 +2617,8 @@ function initTabFades() {
   if (!nav) return;
   nav.addEventListener('scroll', updateTabFades, { passive: true });
   nav.addEventListener('click', () => setTimeout(updateTabFades, 250));
-  window.addEventListener('resize', () => setTimeout(updateTabFades, 160));
+  window.addEventListener('resize', () => setTimeout(() =>
+    centerTabButton(nav.querySelector('.tab-btn.active')), 160));
   updateTabFades();
 }
 
@@ -4223,13 +4239,7 @@ document.querySelectorAll('.tab-btn').forEach(btn =>
     btn.classList.add('active');
     const tab = btn.dataset.tab;
     document.getElementById('tab-' + tab).classList.add('active');
-    const nav = btn.parentElement;
-    if (nav.scrollWidth > nav.clientWidth) {
-      const navRect = nav.getBoundingClientRect();
-      const btnRect = btn.getBoundingClientRect();
-      nav.scrollLeft += btnRect.left - navRect.left - (nav.clientWidth - btnRect.width) / 2;
-      updateTabFades();
-    }
+    centerTabButton(btn);
     const url = new URL(window.location.href);
     if (tab === 'compare') url.searchParams.set('view', 'compare');
     else if (url.searchParams.get('view') === 'compare') url.searchParams.delete('view');
