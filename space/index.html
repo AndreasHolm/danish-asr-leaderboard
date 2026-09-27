@@ -760,6 +760,115 @@
     .about thead th { cursor: default; text-transform: none; letter-spacing: 0; font-size: 13px; }
     .about tbody td { color: var(--muted); }
 
+    /* ── Methodology ─────────────────────────────────────────────────── */
+    .methodology { max-width: 1040px; counter-reset: method-section; --method-accent: #f47a91; }
+    @media (prefers-color-scheme: light) { .methodology { --method-accent: #aa2140; } }
+    .method-hero {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      padding: 28px 30px;
+      border: 1px solid color-mix(in srgb, var(--red) 28%, var(--border));
+      border-radius: 14px;
+      background:
+        radial-gradient(95% 190% at -6% 118%, rgba(198, 12, 48, .18), transparent 62%),
+        radial-gradient(75% 170% at 100% -40%, rgba(92, 26, 104, .16), transparent 72%),
+        var(--surf);
+    }
+    .method-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .13;
+      background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
+    }
+    .method-hero > * { position: relative; }
+    .methodology .method-eyebrow {
+      margin: 0 0 7px;
+      color: var(--method-accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .methodology .method-hero h2 {
+      margin: 0 0 8px;
+      padding: 0;
+      border: 0;
+      font-size: clamp(23px, 2.5vw, 30px);
+      line-height: 1.2;
+    }
+    .methodology .method-intro { max-width: 64ch; margin-bottom: 17px; color: var(--text); }
+    .method-facts { display: flex; flex-wrap: wrap; gap: 7px; }
+    .method-facts span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surf) 84%, transparent);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .method-facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--method-accent); }
+    .method-card {
+      counter-increment: method-section;
+      margin-top: 15px;
+      padding: 22px 26px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--surf);
+    }
+    .methodology .method-card > h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 16px;
+      font-size: 17px;
+      font-weight: 750;
+    }
+    .method-card > h3::before {
+      content: "0" counter(method-section);
+      flex: none;
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid color-mix(in srgb, var(--red) 25%, var(--border));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--red) 8%, var(--surf));
+      color: var(--method-accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .method-card p, .method-card ol, .method-card ul { color: var(--text); line-height: 1.65; }
+    .method-card li { margin-bottom: 7px; padding-left: 4px; }
+    .method-card li::marker { color: var(--method-accent); font-weight: 700; }
+    .method-card code { overflow-wrap: anywhere; }
+    .method-card blockquote {
+      border-left-color: var(--red);
+      background: color-mix(in srgb, var(--red) 6%, var(--surf2));
+      color: var(--text);
+    }
+    .methodology .method-card h4 { margin-top: 16px; font-size: 14px; }
+    .method-history { margin-top: 20px; }
+    .methodology .changelog { overflow: hidden; background: var(--surf); }
+    .methodology .changelog > summary {
+      padding: 17px 22px;
+      background: radial-gradient(90% 250% at 0% 100%, rgba(198, 12, 48, .09), transparent 65%);
+    }
+    .methodology .changelog-body { padding: 5px 22px 12px; }
+    @media (max-width: 700px) {
+      .method-hero { padding: 22px 20px; }
+      .method-card { padding: 18px 19px; }
+      .methodology .method-card > h3 { font-size: 16px; }
+    }
+
     /* ── Changelog (expandable) ─────────────────────────────────────── */
     .changelog {
       border: 1px solid var(--border);
@@ -1796,9 +1905,19 @@
   </div><!-- /about -->
 
   <!-- Methodology tab -->
-  <div id="tab-methodology" class="tab-pane about">
-    <h2>Methodology</h2>
+  <div id="tab-methodology" class="tab-pane about methodology">
+    <header class="method-hero">
+      <p class="method-eyebrow">How the leaderboard is scored</p>
+      <h2>Methodology</h2>
+      <p class="method-intro">The same scoring pipeline is applied to every model. These are the text rules, metrics, and evaluation conditions behind the results.</p>
+      <div class="method-facts" aria-label="Evaluation at a glance">
+        <span>5 equally weighted test sets</span>
+        <span>WER &amp; CER</span>
+        <span>Local speed on A100</span>
+      </div>
+    </header>
 
+    <section class="method-card">
     <h3>Text normalisation</h3>
     <p>Applied identically to hypothesis and reference before scoring:</p>
     <ol>
@@ -1871,7 +1990,9 @@
       introduce errors. Different Unicode encodings of the <em>same</em> letter
       <em>are</em> unified by NFC.
     </blockquote>
+    </section>
 
+    <section class="method-card">
     <h3>Metric</h3>
     <p><strong>WER</strong> (Word Error Rate, %) and
     <strong>CER</strong> (Character Error Rate, %) — lower is better.</p>
@@ -1886,7 +2007,9 @@
       well above 100 %. This is mathematically correct and a real signal: scores
       above 100 % on a given dataset indicate the model is not usable for that domain.
     </blockquote>
+    </section>
 
+    <section class="method-card">
     <h3>Speed</h3>
     <p><strong>Speed (x)</strong> = total audio duration / total inference time.
     A value of 30x means 30 seconds of audio processed per wall-clock second.
@@ -1912,7 +2035,9 @@
       into the measurement. This slightly <em>understates</em> throughput, more so
       on smaller test sets where the fixed overhead is less amortised.
     </blockquote>
+    </section>
 
+    <section class="method-card">
     <h3>Code &amp; data</h3>
     <p>
       Results dataset:
@@ -1920,6 +2045,9 @@
       Eval code:
       <a href="https://github.com/Rye-A1/danish-asr-leaderboard" target="_blank" rel="noopener">github.com/Rye-A1/danish-asr-leaderboard</a>
     </p>
+    </section>
+
+    <section class="method-card">
     <h3>Adding a model</h3>
     <p>There are two paths, depending on whether you've run the evaluation yourself:</p>
 
@@ -1954,9 +2082,10 @@
       re-evaluate it independently on our own hardware before publishing — to
       confirm the scores reproduce and catch any configuration differences.
     </blockquote>
+    </section>
 
     <!-- Methodology & data changes -->
-  <div style="max-width:800px;margin:32px 0 0">
+  <div class="method-history">
     <details class="changelog">
       <summary>Methodology &amp; data changes</summary>
       <div class="changelog-body">
