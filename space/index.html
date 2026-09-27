@@ -739,7 +739,6 @@
     .sep { opacity: 0.4; }
 
     /* ── About ─────────────────────────────────────────────────────── */
-    .about { max-width: 800px; }
     .about h2 {
       font-size: 17px; font-weight: 700;
       margin: 28px 0 12px;
@@ -780,7 +779,7 @@
     /* ── Methodology ─────────────────────────────────────────────────── */
     .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #f47a91; }
     @media (prefers-color-scheme: light) { .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #aa2140; } }
-    .methodology { max-width: 1040px; counter-reset: method-section; }
+    .methodology { counter-reset: method-section; }
     .page-hero {
       position: relative;
       overflow: hidden;
@@ -983,9 +982,14 @@
       border: 0;
       background: transparent;
       color: var(--text);
+      color-scheme: dark;
       font: inherit;
       font-size: 13px;
       cursor: pointer;
+    }
+    .size-filter select option { background: var(--surf); color: var(--text); }
+    @media (prefers-color-scheme: light) {
+      .size-filter select { color-scheme: light; }
     }
     .size-filter select:focus-visible { outline: 2px solid var(--link); }
 
@@ -1243,9 +1247,6 @@
         max-height: 280px;
         overflow-y: auto;
       }
-      
-      /* About section less cramped */
-      .about { max-width: 100%; }
       
       /* Footer tighter spacing */
       footer { flex-direction: column; gap: 4px; text-align: center; }
