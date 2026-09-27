@@ -14,6 +14,14 @@
   <meta name="twitter:title" content="Open Danish Speech-to-Text Leaderboard">
   <meta name="twitter:description" content="Comparing Danish speech-to-text models across five independent public test sets.">
   <meta name="twitter:image" content="https://huggingface.co/spaces/RyeAI/danish-asr-leaderboard/resolve/main/cover.jpeg">
+  <script>
+    (() => {
+      let saved;
+      try { saved = localStorage.getItem('asr-leaderboard-theme'); } catch (_) {}
+      document.documentElement.dataset.theme = saved === 'light' || saved === 'dark'
+        ? saved : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    })();
+  </script>
   <style>
     /* Custom properties only animate once registered with a type; without this
        the tab-strip fade transition below is silently ignored and the edges
@@ -22,6 +30,7 @@
     @property --fade-r { syntax: '<length>'; inherits: false; initial-value: 0px; }
 
     :root {
+      color-scheme: dark;
       --bg:      #0f1117;
       --surf:    #1a1d27;
       --surf2:   #22263a;
@@ -33,16 +42,15 @@
       --red:     #c60c30;
       --r:       10px;
     }
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg:    #f1f5f9;
-        --surf:  #ffffff;
-        --surf2: #f8fafc;
-        --border:#e2e8f0;
-        --text:  #1e293b;
-        --muted: #64748b;
-        --link:  #2563eb;
-      }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg:    #f1f5f9;
+      --surf:  #ffffff;
+      --surf2: #f8fafc;
+      --border:#e2e8f0;
+      --text:  #1e293b;
+      --muted: #64748b;
+      --link:  #2563eb;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -71,6 +79,7 @@
       padding: 19px max(16px, calc(50vw - 734px));
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 20px;
       margin-bottom: 0;
       position: relative;
@@ -95,101 +104,26 @@
       letter-spacing: .025em;
       text-transform: uppercase;
     }
-    .sticky-header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      height: 46px;
-      padding: 0 10px 0 16px;
-      /* The banner's own mesh, not an approximation of it -- an earlier
-         two-gradient stand-in over a translucent base read noticeably darker.
-         background-size paints it at the banner's height and anchors to the
-         bottom, so this is literally the lower slice of the same artwork
-         rather than the mesh squashed into 46px. */
-      background:
-        radial-gradient(115% 520% at  0% 125%, rgba(216, 20,  58, .56) 0%, rgba(216, 20,  58, 0) 52%),
-        radial-gradient( 95% 460% at 34% 150%, rgba(152, 20,  74, .32) 0%, rgba(152, 20,  74, 0) 58%),
-        radial-gradient( 80% 480% at 74% -55%, rgba( 92, 26, 104, .34) 0%, rgba( 92, 26, 104, 0) 60%),
-        radial-gradient( 85% 520% at 100% -30%, rgba( 58, 24, 106, .48) 0%, rgba( 58, 24, 106, 0) 58%),
-        #09080d;
-      background-size: 100% 160px, 100% 160px, 100% 160px, 100% 160px, auto;
-      background-position: 0 100%;
-      background-repeat: no-repeat;
-      border-bottom: 1px solid rgba(198, 12, 48, 0.22);
-      transform: translateY(-100%);
-      opacity: 0;
-      pointer-events: none;
-      /* visibility, not opacity alone: the bar now holds real buttons, and an
-         invisible control that is still tabbable traps keyboard users before
-         they ever reach the page. Delayed 0s step so the fade still plays. */
-      visibility: hidden;
-      transition: transform .2s ease, opacity .2s ease, visibility 0s linear .2s;
-    }
-    .sticky-header::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: .38;
-      background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
-    }
-    .sticky-header > * { position: relative; z-index: 1; }
-    /* pointer-events returns with visibility: while hidden the bar must not
-       intercept taps, but once shown it has to stop them reaching the row
-       underneath, which the reader cannot see. */
-    .sticky-header.show {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-      transition: transform .2s ease, opacity .2s ease, visibility 0s;
-    }
-    .sticky-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* Flex sibling of the actions. min-width:0 is the part that matters:
-         without it a nowrap item refuses to shrink and the ellipsis never
-         appears -- the title just pushes the icons off the right edge. */
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-     /* Repository shortcut. Muted by default so it sits behind the title rather
-       than competing with it, full white on hover/focus. */
-    .sticky-actions {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      flex: 0 0 auto;
-      margin-left: 10px;
-    }
-    .sticky-act {
+    .banner-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+    .banner-action {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 30px;
-      height: 30px;
+      width: 34px;
+      height: 34px;
       padding: 0;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      color: rgba(255, 255, 255, .62);
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .055);
+      color: rgba(255, 255, 255, .76);
       cursor: pointer;
-      transition: color .15s ease, background .15s ease;
-      -webkit-tap-highlight-color: transparent;
     }
-    .sticky-act:hover { color: #fff; background: rgba(255, 255, 255, .10); }
-    .sticky-act:focus-visible {
-      outline: 2px solid rgba(255, 255, 255, .8);
-      outline-offset: 1px;
-      color: #fff;
-    }
-    .sticky-act svg { width: 16px; height: 16px; display: block; }
+    .banner-action:hover { color: #fff; background: rgba(255, 255, 255, .13); }
+    .banner-action:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .banner-action svg { display: block; width: 17px; height: 17px; }
+    .theme-toggle .theme-icon-dark { display: none; }
+    :root[data-theme="light"] .theme-toggle .theme-icon-light { display: none; }
+    :root[data-theme="light"] .theme-toggle .theme-icon-dark { display: block; }
     .back-to-top {
       position: fixed;
       right: 20px;
@@ -215,15 +149,9 @@
     @media (max-width: 700px) {
       .back-to-top { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
     }
-    @media (prefers-reduced-motion: reduce) {
-      .sticky-header { transition: none; }
-    }
-
     /* ── Tabs ──────────────────────────────────────────────────────── */
     .tab-nav {
-      position: sticky;
-      top: 0;
-      z-index: 45;
+      position: relative;
       display: flex;
       align-items: stretch;
       gap: 0;
@@ -251,7 +179,6 @@
       background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
     }
     .tab-nav-scroll { position: relative; display: flex; align-items: stretch; width: 100%; max-width: 1500px; min-width: 0; margin: 0 auto; padding: 0 16px; }
-    .sticky-header.show ~ .tab-nav { top: 46px; }
     .tab-btn {
       position: relative;
       align-items: center;
@@ -556,9 +483,7 @@
 
     /* Alternating rows */
     tbody tr:nth-child(even) td { background-color: rgba(255,255,255,0.025); }
-    @media (prefers-color-scheme: light) {
-      tbody tr:nth-child(even) td { background-color: rgba(0,0,0,0.03); }
-    }
+    :root[data-theme="light"] tbody tr:nth-child(even) td { background-color: rgba(0,0,0,0.03); }
 
     /* Column classes */
     .c-rank { width: 52px; text-align: center; font-size: 17px; }
@@ -746,7 +671,7 @@
 
     /* ── Methodology ─────────────────────────────────────────────────── */
     .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #f47a91; }
-    @media (prefers-color-scheme: light) { .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #aa2140; } }
+    :root[data-theme="light"] :is(.methodology, #tab-compare, .about-page, .chart-page) { --page-accent: #aa2140; }
     .methodology { counter-reset: method-section; }
     .page-hero {
       position: relative;
@@ -939,9 +864,7 @@
       cursor: pointer;
     }
     .size-filter select option { background: var(--surf); color: var(--text); }
-    @media (prefers-color-scheme: light) {
-      .size-filter select { color-scheme: light; }
-    }
+    :root[data-theme="light"] .size-filter select { color-scheme: light; }
     .size-filter select:focus-visible { outline: 2px solid var(--link); }
 
     /* ── Rank delta cell ────────────────────────────────────────────── */
@@ -1203,8 +1126,8 @@
     @media (max-width: 480px) {
       /* Small phones: more aggressive reductions */
       .app { padding: 12px 8px 0; }
-      .banner { padding: 15px 12px; }
-      .banner h1 { font-size: 15px; }
+      .banner { padding: 15px 12px; gap: 8px; }
+      .banner h1 { font-size: clamp(12px, 3.5vw, 15px); }
       .tab-btn { padding: 10px 11px 9px; font-size: 13px; }
       .filter-summary .search {
         width: 100%;
@@ -1580,21 +1503,6 @@
 </head>
 <body>
 
-<!-- Slim restatement of the banner, revealed once the real one scrolls away.
-     aria-hidden: it duplicates the h1, so screen readers should not hear it twice. -->
-<div class="sticky-header" id="sticky-header">
-  <!-- aria-hidden sits on the title alone, not the bar: the text duplicates
-       the h1 and should not be read twice, but the buttons beside it are real
-       controls and have to stay reachable. -->
-  <span class="sticky-title" aria-hidden="true">🇩🇰 Open Danish ASR Leaderboard</span>
-  <div class="sticky-actions">
-    <a class="sticky-act" href="https://github.com/Rye-A1/danish-asr-leaderboard"
-       target="_blank" rel="noopener" aria-label="Source code on GitHub" title="Source on GitHub">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.4-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C18.6 4 19.6 4.3 19.6 4.3c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
-    </a>
-  </div>
-</div>
-
 <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top" hidden>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 12 6-6 6 6M12 6v12"/></svg>
   Top
@@ -1604,6 +1512,16 @@
   <header class="banner">
     <div>
       <h1>🇩🇰 Open Danish ASR Leaderboard</h1>
+    </div>
+    <div class="banner-actions">
+      <a class="banner-action" href="https://github.com/Rye-A1/danish-asr-leaderboard"
+         target="_blank" rel="noopener" aria-label="Source code on GitHub" title="Source on GitHub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3"/><path d="M14 22v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 18 4.77 5.07 5.07 0 0 0 17.91 1S16.73.65 14 2.48a13.38 13.38 0 0 0-7 0C4.27.65 3.09 1 3.09 1A5.07 5.07 0 0 0 3 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 7 18.13V22"/></svg>
+      </a>
+      <button class="banner-action theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle color theme">
+        <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486A9 9 0 0 1 11.514 3.015 9 9 0 1 0 20.985 12.486Z"/></svg>
+      </button>
     </div>
   </header>
 
@@ -2628,18 +2546,6 @@ NARROW.addEventListener('change', () => {
 /* This script runs at the end of the body, so DOMContentLoaded may already
    have fired -- run now in that case rather than waiting for an event that
    will never arrive. */
-/* Reveal the slim header once the banner has scrolled past. An observer
-   rather than a scroll listener: no work on frames where nothing crossed. */
-function initStickyHeader() {
-  const banner = document.querySelector('.banner');
-  const bar = document.getElementById('sticky-header');
-  if (!banner || !bar || !('IntersectionObserver' in window)) return;
-  new IntersectionObserver(
-    ([e]) => bar.classList.toggle('show', !e.isIntersecting),
-    { rootMargin: '-46px 0px 0px 0px', threshold: 0 }
-  ).observe(banner);
-}
-
 function initBackToTop() {
   const button = document.getElementById('back-to-top');
   const update = () => { button.hidden = window.scrollY < 480; };
@@ -2805,9 +2711,36 @@ function initSortControls() {
   }
 }
 
+function initThemeToggle() {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-toggle');
+  const system = matchMedia('(prefers-color-scheme: light)');
+  let manual = false;
+  try { manual = ['light', 'dark'].includes(localStorage.getItem('asr-leaderboard-theme')); } catch (_) {}
+  const apply = theme => {
+    root.dataset.theme = theme;
+    buttons.forEach(button => {
+      const label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', label);
+      button.setAttribute('aria-pressed', String(theme === 'dark'));
+    });
+  };
+  apply(root.dataset.theme);
+  buttons.forEach(button => button.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    manual = true;
+    try { localStorage.setItem('asr-leaderboard-theme', next); } catch (_) {}
+    apply(next);
+  }));
+  system.addEventListener('change', () => {
+    if (!manual) apply(system.matches ? 'light' : 'dark');
+  });
+}
+
 function initChrome() {
+  initThemeToggle();
   initFilterToggles();
-  initStickyHeader();
   initTabFades();
 }
 if (document.readyState === 'loading') {
