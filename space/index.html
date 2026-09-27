@@ -778,8 +778,8 @@
     .about tbody td { color: var(--muted); }
 
     /* ── Methodology ─────────────────────────────────────────────────── */
-    .methodology, #tab-compare, .about-page { --page-accent: #f47a91; }
-    @media (prefers-color-scheme: light) { .methodology, #tab-compare, .about-page { --page-accent: #aa2140; } }
+    .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #f47a91; }
+    @media (prefers-color-scheme: light) { .methodology, #tab-compare, .about-page, .chart-page { --page-accent: #aa2140; } }
     .methodology { max-width: 1040px; counter-reset: method-section; }
     .page-hero {
       position: relative;
@@ -821,6 +821,46 @@
     .page-hero .page-intro { max-width: 64ch; margin-bottom: 17px; color: var(--text); }
     .page-hero .page-intro:last-child { margin-bottom: 0; }
     .about-page .page-hero { margin-bottom: 18px; }
+    .chart-page .page-hero { margin-bottom: 16px; }
+    .chart-page .page-hero .filter-summary { margin-bottom: 0; }
+    .chart-page .page-hero .toolbar { margin: 12px 0 0; }
+    .chart-page .chart-section {
+      margin: 0;
+      padding: 22px 24px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: radial-gradient(90% 140% at 0% 0%, rgba(198, 12, 48, .035), transparent 60%), var(--surf);
+    }
+    .chart-page .chart-section > h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 16px;
+      font-size: 17px;
+      font-weight: 750;
+    }
+    .chart-page .chart-section > h3::before {
+      content: "01";
+      flex: none;
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid color-mix(in srgb, var(--red) 25%, var(--border));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--red) 8%, var(--surf));
+      color: var(--page-accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .chart-page .chart-plot-wrap,
+    .chart-page .pareto-panel { background: color-mix(in srgb, var(--surf2) 42%, var(--surf)); }
+    .chart-page .pareto-panel-title { color: var(--page-accent); font-weight: 800; }
+    @media (max-width: 700px) {
+      .chart-page .chart-section { padding: 17px 14px; }
+      .chart-page .chart-section > h3 { font-size: 16px; }
+    }
     .method-card {
       counter-increment: method-section;
       margin-top: 15px;
@@ -1729,7 +1769,11 @@
   </div>
 
   <!-- Analysis tab -->
-  <div id="tab-analysis" class="tab-pane">
+  <div id="tab-analysis" class="tab-pane chart-page">
+    <header class="page-hero">
+      <p class="page-eyebrow">Model tradeoffs</p>
+      <h2>Pareto frontier</h2>
+      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric.</p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -1757,7 +1801,8 @@
         </select>
       </label>
     </div>
-    <div class="chart-section" style="margin-top:0">
+    </header>
+    <div class="chart-section">
       <h3 id="analysis-chart-title">Performance vs. Model Size</h3>
       <div class="chart-with-panel">
         <div id="size-chart-wrap-analysis" class="chart-plot-wrap">
@@ -1769,7 +1814,11 @@
   </div>
 
   <!-- Over Time tab -->
-  <div id="tab-time" class="tab-pane">
+  <div id="tab-time" class="tab-pane chart-page">
+    <header class="page-hero">
+      <p class="page-eyebrow">Leaderboard history</p>
+      <h2>Performance over time</h2>
+      <p class="page-intro">Track model scores and the best result available at each plotted date.</p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -1797,7 +1846,8 @@
         </select>
       </label>
     </div>
-    <div class="chart-section" style="margin-top:0">
+    </header>
+    <div class="chart-section">
       <h3 id="time-chart-title">Performance Over Time</h3>
       <div class="chart-legend">
         <span><i class="legend-dot" style="background:var(--link)"></i>Open weights</span>
