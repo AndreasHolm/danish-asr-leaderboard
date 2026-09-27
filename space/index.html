@@ -390,23 +390,7 @@
     .compare-summary th a:hover { color: var(--link); text-decoration: underline; }
     .compare-head-rank { display: block; margin-bottom: 2px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
     .compare-summary td:nth-child(n+2) { font-variant-numeric: tabular-nums; font-weight: 600; }
-    .compare-feature-icons { display: flex; align-items: center; gap: 7px; }
-    .compare-feature-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 5px; color: var(--text); text-decoration: none; }
-    .compare-feature-icon svg { width: 21px; height: 21px; }
-    .compare-feature-icon.partial { color: #d97706; }
-    .compare-feature-icon.no { color: var(--muted); opacity: .4; }
-    .compare-feature-icon.unknown { color: var(--muted); }
-    .compare-feature-icon.unknown::after { content: '?'; position: absolute; top: -5px; right: -4px; padding: 0 2px; border-radius: 3px; background: var(--surf); font-size: 10px; font-weight: 700; }
-    .compare-feature-icon:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
-    .compare-feature-key { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
-    .compare-feature-key[hidden] { display: none; }
     .compare-subheading { margin: 20px 0 10px; font-size: 14px; }
-    .compare-profile-link { color: inherit; text-decoration: none; }
-    .compare-profile-link:hover { color: var(--link); text-decoration: underline; }
-    .compare-profile-state.yes { color: var(--accent); }
-    .compare-profile-state.partial { color: #facc15; }
-    .compare-profile-state.no { color: var(--muted); }
-    .compare-profile-state.unknown { color: var(--muted); }
     .compare-metric { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
     .compare-metric button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
     .compare-metric button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
@@ -1850,7 +1834,6 @@
         <h3>Model attributes</h3>
         <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
         <div class="compare-scroll"><table class="compare-summary" id="compare-summary"><thead><tr id="compare-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-summary-body"></tbody></table></div>
-        <p id="compare-feature-key" class="compare-feature-key" hidden>Feature icons: Aa formatting · clock timestamps · people speakers · signal streaming. Solid = confirmed, amber = partial, faded = no, ? = unknown. Hover for details; linked icons open their sources.</p>
       </section>
       <section class="compare-section">
         <h3>Results</h3>
@@ -1860,12 +1843,6 @@
         <div id="compare-legend" class="compare-legend"></div>
         <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
         <div id="compare-datasets"></div>
-      </section>
-      <section id="compare-profiles" class="compare-section" hidden>
-        <h3>Openness</h3>
-        <p class="compare-note" style="margin-bottom:12px">Reviewed evidence for each model. Unknown means the source did not establish the claim; it does not mean no.</p>
-        <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
-        <div class="compare-scroll"><table class="compare-summary" id="compare-profile-summary"><thead><tr id="compare-profile-head"><th scope="col">Field</th></tr></thead><tbody id="compare-profile-body"></tbody></table></div>
       </section>
       <p class="compare-note" id="compare-caveat"></p>
     </div>
@@ -3820,15 +3797,6 @@ const COMPARE_DATASETS = [
   ['fleurs_da', 'FLEURS (da)'],
   ['ftspeech', 'FTSpeech'],
 ];
-const COMPARE_OPENNESS_FIELDS = [
-  ['weights', 'Open weights'], ['license', 'Open license'],
-  ['data', 'Training data'], ['code', 'Training code'],
-  ['model_card', 'Model card'], ['paper', 'Paper'],
-];
-const COMPARE_FEATURE_FIELDS = [
-  ['punctuation_case', 'Formatting'], ['timestamps', 'Timestamps'],
-  ['diarization', 'Speakers'], ['streaming', 'Streaming'],
-];
 const COMPARE_MAX_MODELS = 4;
 
 function setupCompare(data) {
@@ -3960,7 +3928,7 @@ function setupCompare(data) {
     head.replaceChildren();
     const measure = document.createElement('th');
     measure.scope = 'col';
-    measure.textContent = id === 'compare-profile-head' ? 'Field' : 'Measure';
+    measure.textContent = 'Measure';
     head.appendChild(measure);
     rows.forEach((row, i) => {
       const th = document.createElement('th');
@@ -3998,100 +3966,6 @@ function setupCompare(data) {
     });
     document.getElementById(bodyId).appendChild(tr);
   }
-  function featureIcon(key) {
-    const svg = svgMk('svg', {viewBox:'0 0 24 24', fill:'none', stroke:'currentColor',
-      'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'aria-hidden':'true'});
-    if (key === 'punctuation_case') {
-      svgTx('Aa', {x:12, y:17, fill:'currentColor', stroke:'none',
-        'text-anchor':'middle', 'font-size':13, 'font-weight':700}, svg);
-    } else if (key === 'timestamps') {
-      svgMk('circle', {cx:12, cy:12, r:9}, svg);
-      svgMk('path', {d:'M12 7v5l3 2'}, svg);
-    } else if (key === 'diarization') {
-      svgMk('circle', {cx:9, cy:8, r:3}, svg);
-      svgMk('path', {d:'M3 20v-2a6 6 0 0 1 12 0v2M17 11a3 3 0 0 0-1-6M17 14a5 5 0 0 1 4 5v1'}, svg);
-    } else {
-      svgMk('path', {d:'M4 17h.01M4 13a4 4 0 0 1 4 4M4 9a8 8 0 0 1 8 8M4 5a12 12 0 0 1 12 12'}, svg);
-    }
-    return svg;
-  }
-  function renderFeatures(rows) {
-    const hasFeatures = rows.some(row => row.profile?.features &&
-      Object.keys(row.profile.features).length);
-    document.getElementById('compare-feature-key').hidden = !hasFeatures;
-    if (!hasFeatures) return;
-    const tr = document.createElement('tr');
-    const name = document.createElement('td');
-    name.textContent = 'Features';
-    tr.appendChild(name);
-    const states = {yes:'Confirmed', partial:'Partial', no:'No', unknown:'Unknown'};
-    rows.forEach((row, i) => {
-      const td = document.createElement('td');
-      td.dataset.modelCol = '';
-      td.style.setProperty('--model-color', colors[i]);
-      const icons = document.createElement('div');
-      icons.className = 'compare-feature-icons';
-      for (const [key, label] of COMPARE_FEATURE_FIELDS) {
-        const value = row.profile?.features?.[key];
-        const state = Object.hasOwn(states, value?.state) ? value.state : 'unknown';
-        const el = value?.url?.startsWith('https://')
-          ? document.createElement('a') : document.createElement('span');
-        el.className = `compare-feature-icon ${state}`;
-        const description = `${label}: ${states[state]}. ${value?.detail || ''}`.trim();
-        el.setAttribute('aria-label', description);
-        el.title = description;
-        el.dataset.tip = description;
-        if (el.tagName === 'A') {
-          el.href = value.url;
-          el.target = '_blank';
-          el.rel = 'noopener noreferrer';
-        } else el.setAttribute('role', 'img');
-        el.appendChild(featureIcon(key));
-        icons.appendChild(el);
-      }
-      td.appendChild(icons);
-      tr.appendChild(td);
-    });
-    document.getElementById('compare-summary-body').appendChild(tr);
-  }
-  function renderProfiles(rows) {
-    const section = document.getElementById('compare-profiles');
-    const fields = COMPARE_OPENNESS_FIELDS.filter(([key]) =>
-      rows.some(row => row.profile?.openness?.[key]));
-    section.hidden = !fields.length;
-    if (section.hidden) return;
-    renderHeader('compare-profile-head', rows);
-    const body = document.getElementById('compare-profile-body');
-    body.replaceChildren();
-    const labels = {yes: '✓ Confirmed', partial: '◐ Partial', no: '× No', unknown: '? Unknown'};
-    for (const [key, label] of fields) {
-      const tr = document.createElement('tr');
-      const name = document.createElement('td');
-      name.textContent = label;
-      tr.appendChild(name);
-      for (const [i, row] of rows.entries()) {
-        const value = row.profile?.openness?.[key];
-        const state = Object.hasOwn(labels, value?.state) ? value.state : 'unknown';
-        const td = document.createElement('td');
-        td.dataset.modelCol = '';
-        td.style.setProperty('--model-color', colors[i]);
-        const el = value?.url?.startsWith('https://')
-          ? document.createElement('a') : document.createElement('span');
-        el.className = `compare-profile-state ${state}`;
-        if (el.tagName === 'A') {
-          el.classList.add('compare-profile-link');
-          el.href = value.url;
-          el.target = '_blank';
-          el.rel = 'noopener noreferrer';
-        }
-        el.textContent = labels[state] + (el.tagName === 'A' ? ' ↗' : '');
-        el.title = value?.detail || labels[state];
-        td.appendChild(el);
-        tr.appendChild(td);
-      }
-      body.appendChild(tr);
-    }
-  }
   function render() {
     selected.sort(compareNames);
     renderChips();
@@ -4112,7 +3986,6 @@ function setupCompare(data) {
       row.access === 'open' ? 'Open' : row.access === 'proprietary' ? 'Proprietary API' : '—'));
     addSummaryRow('compare-summary-body', 'License', rows.map(row => row.license || '—'));
     addSummaryRow('compare-summary-body', 'Submitted', rows.map(row => row.submitted || '—'));
-    renderFeatures(rows);
 
     renderHeader('compare-overall-head', rows);
     document.getElementById('compare-overall-body').replaceChildren();
@@ -4126,7 +3999,6 @@ function setupCompare(data) {
     }
     addSummaryRow('compare-overall-body', 'Speed', rows.map(row =>
       Number.isFinite(row.speed_x) ? `${row.speed_x.toFixed(1)}×` : '—'));
-    renderProfiles(rows);
 
     const legend = document.getElementById('compare-legend');
     legend.replaceChildren();
