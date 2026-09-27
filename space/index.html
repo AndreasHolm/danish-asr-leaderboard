@@ -321,7 +321,7 @@
     .compare-intro { color: var(--muted); margin-bottom: 18px; }
     .compare-pickers { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 2px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
-    .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
     .compare-chip button { flex: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
     .compare-chip button:hover { color: var(--text); }
     .compare-picker { position: relative; min-width: min(100%, 250px); }
@@ -353,6 +353,8 @@
     .compare-summary tr:last-child td { border-bottom: 0; }
     .compare-summary th:first-child, .compare-summary td:first-child { width: 160px; color: var(--muted); }
     .compare-summary th:not(:first-child) { border-top: 3px solid var(--model-color); }
+    .compare-summary th[data-model-col], .compare-summary td[data-model-col] { background-color: color-mix(in srgb, var(--model-color) 10%, var(--surf)); }
+    .compare-summary tbody tr:hover td[data-model-col] { background-color: color-mix(in srgb, var(--model-color) 15%, var(--surf)); }
     .compare-summary th a { color: var(--text); text-decoration: none; text-transform: none; overflow-wrap: anywhere; }
     .compare-summary th a:hover { color: var(--link); text-decoration: underline; }
     .compare-summary td:nth-child(n+2) { font-variant-numeric: tabular-nums; font-weight: 600; }
@@ -3782,6 +3784,7 @@ function setupCompare(data) {
     rows.forEach((row, i) => {
       const th = document.createElement('th');
       th.scope = 'col';
+      th.dataset.modelCol = '';
       th.style.setProperty('--model-color', colors[i]);
       const label = document.createElement(row.url ? 'a' : 'span');
       label.textContent = shortName(row.name);
@@ -3802,6 +3805,10 @@ function setupCompare(data) {
     [label, ...values].forEach((text, i) => {
       const td = document.createElement('td');
       td.textContent = text;
+      if (i > 0) {
+        td.dataset.modelCol = '';
+        td.style.setProperty('--model-color', colors[i - 1]);
+      }
       if (i === bestIndex + 1) td.style.color = colors[bestIndex];
       tr.appendChild(td);
     });
@@ -3831,10 +3838,12 @@ function setupCompare(data) {
         const name = document.createElement('td');
         name.textContent = label;
         tr.appendChild(name);
-        for (const row of rows) {
+        for (const [i, row] of rows.entries()) {
           const value = row.profile?.[group.key]?.[key];
           const state = Object.hasOwn(labels, value?.state) ? value.state : 'unknown';
           const td = document.createElement('td');
+          td.dataset.modelCol = '';
+          td.style.setProperty('--model-color', colors[i]);
           const el = value?.url?.startsWith('https://')
             ? document.createElement('a') : document.createElement('span');
           el.className = `compare-profile-state ${state}`;
