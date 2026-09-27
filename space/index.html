@@ -714,8 +714,7 @@
       font-size: 17px;
       font-weight: 750;
     }
-    .chart-page .chart-section > h3::before {
-      content: "01";
+    .chart-title-icon {
       flex: none;
       display: inline-grid;
       place-items: center;
@@ -725,10 +724,8 @@
       border-radius: 8px;
       background: color-mix(in srgb, var(--red) 8%, var(--surf));
       color: var(--page-accent);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .02em;
     }
+    .chart-title-icon svg { width: 17px; height: 17px; }
     .chart-page .chart-plot-wrap,
     .chart-page .pareto-panel { background: color-mix(in srgb, var(--surf2) 42%, var(--surf)); }
     .chart-page .pareto-panel-title { color: var(--page-accent); font-weight: 800; }
@@ -1614,7 +1611,7 @@
     </div>
     </header>
     <div class="chart-section">
-      <h3 id="analysis-chart-title">Performance vs. Model Size</h3>
+      <h3 id="analysis-chart-title"><span class="chart-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 16 4-5 3 3 5-7"/></svg></span><span class="chart-title-text">Performance vs. Model Size</span></h3>
       <div class="chart-with-panel">
         <div id="size-chart-wrap-analysis" class="chart-plot-wrap">
           <svg id="size-chart-analysis" style="width:100%;display:block;overflow:visible"></svg>
@@ -1659,7 +1656,7 @@
     </div>
     </header>
     <div class="chart-section">
-      <h3 id="time-chart-title">Performance Over Time</h3>
+      <h3 id="time-chart-title"><span class="chart-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="chart-title-text">Performance Over Time</span></h3>
       <div class="chart-legend">
         <span><i class="legend-dot" style="background:var(--link)"></i>Open weights</span>
         <span><i class="legend-dot" style="background:#94a3b8"></i>Proprietary API</span>
@@ -4009,7 +4006,7 @@ async function init() {
         .filter(r => r.mean_wer == null || r.mean_wer <= 50);
       document.getElementById('tog-time-wer').classList.toggle('active', isWer);
       document.getElementById('tog-time-cer').classList.toggle('active', !isWer);
-      document.getElementById('time-chart-title').textContent =
+      document.querySelector('#time-chart-title .chart-title-text').textContent =
         `Performance Over Time (${isWer ? 'WER' : 'CER'})`;
       renderTimeChart(rows, metric, methodFor(metric));
       syncMethodBtns();
@@ -4027,7 +4024,7 @@ async function init() {
       };
       document.getElementById('tog-analysis-wer').classList.toggle('active', isWer);
       document.getElementById('tog-analysis-cer').classList.toggle('active', !isWer);
-      document.getElementById('analysis-chart-title').textContent =
+      document.querySelector('#analysis-chart-title .chart-title-text').textContent =
         `Performance vs. Model Size (${isWer ? 'WER' : 'CER'})`;
       renderSizeChart(rows, methodFor(metric), 'analysis');
       syncMethodBtns();
