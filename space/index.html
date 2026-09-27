@@ -320,6 +320,11 @@
 
     /* ── Model comparison ───────────────────────────────────────────── */
     .compare-intro { color: var(--muted); margin-bottom: 18px; }
+    .page-hero.compare-hero { z-index: 2; overflow: visible; }
+    .compare-hero::after { border-radius: inherit; }
+    .compare-hero .compare-pickers { margin-bottom: 14px; }
+    .compare-hero .compare-actions { margin-bottom: 0; }
+    .compare-hero .compare-count { font-weight: 700; }
     .compare-pickers { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 2px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
     .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
@@ -346,8 +351,31 @@
     .compare-copy:disabled { opacity: .45; cursor: not-allowed; }
     .compare-note { color: var(--muted); font-size: 12px; }
     .compare-empty { padding: 48px 18px; border: 1px dashed var(--border); border-radius: var(--r); color: var(--muted); text-align: center; }
-    .compare-section { margin: 20px 0 28px; }
-    .compare-section h3 { margin-bottom: 12px; font-size: 17px; }
+    #compare-results { counter-reset: compare-section; }
+    .compare-section {
+      counter-increment: compare-section;
+      margin: 15px 0;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--surf);
+    }
+    .compare-section > h3 { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; font-size: 17px; font-weight: 750; }
+    .compare-section > h3::before {
+      content: "0" counter(compare-section);
+      flex: none;
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid color-mix(in srgb, var(--red) 25%, var(--border));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--red) 8%, var(--surf));
+      color: var(--page-accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
     .compare-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); }
     .compare-scroll-hint { display: none; margin: -5px 0 9px; color: var(--muted); font-size: 12px; }
     @media (max-width: 1100px) { .compare-scroll-hint { display: block; } }
@@ -397,6 +425,9 @@
     .compare-difference { color: var(--muted); font-size: 12px; text-align: right; }
     @media (max-width: 720px) {
       .compare-picker { width: 100%; }
+      .compare-hero { padding: 20px; }
+      .compare-section { padding: 17px 14px; }
+      .compare-section > h3 { font-size: 16px; }
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
       .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
       .compare-difference { text-align: left; }
@@ -761,9 +792,10 @@
     .about tbody td { color: var(--muted); }
 
     /* ── Methodology ─────────────────────────────────────────────────── */
-    .methodology { max-width: 1040px; counter-reset: method-section; --method-accent: #f47a91; }
-    @media (prefers-color-scheme: light) { .methodology { --method-accent: #aa2140; } }
-    .method-hero {
+    .methodology, #tab-compare { --page-accent: #f47a91; }
+    @media (prefers-color-scheme: light) { .methodology, #tab-compare { --page-accent: #aa2140; } }
+    .methodology { max-width: 1040px; counter-reset: method-section; }
+    .page-hero {
       position: relative;
       overflow: hidden;
       isolation: isolate;
@@ -775,7 +807,7 @@
         radial-gradient(75% 170% at 100% -40%, rgba(92, 26, 104, .16), transparent 72%),
         var(--surf);
     }
-    .method-hero::after {
+    .page-hero::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -784,23 +816,23 @@
       opacity: .13;
       background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
     }
-    .method-hero > * { position: relative; }
-    .methodology .method-eyebrow {
+    .page-hero > * { position: relative; }
+    .page-hero .page-eyebrow {
       margin: 0 0 7px;
-      color: var(--method-accent);
+      color: var(--page-accent);
       font-size: 11px;
       font-weight: 800;
       letter-spacing: .1em;
       text-transform: uppercase;
     }
-    .methodology .method-hero h2 {
+    .page-hero h2 {
       margin: 0 0 8px;
       padding: 0;
       border: 0;
       font-size: clamp(23px, 2.5vw, 30px);
       line-height: 1.2;
     }
-    .methodology .method-intro { max-width: 64ch; margin-bottom: 17px; color: var(--text); }
+    .page-hero .page-intro { max-width: 64ch; margin-bottom: 17px; color: var(--text); }
     .method-facts { display: flex; flex-wrap: wrap; gap: 7px; }
     .method-facts span {
       display: inline-flex;
@@ -814,7 +846,7 @@
       font-size: 12px;
       font-weight: 600;
     }
-    .method-facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--method-accent); }
+    .method-facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--page-accent); }
     .method-card {
       counter-increment: method-section;
       margin-top: 15px;
@@ -841,14 +873,14 @@
       border: 1px solid color-mix(in srgb, var(--red) 25%, var(--border));
       border-radius: 8px;
       background: color-mix(in srgb, var(--red) 8%, var(--surf));
-      color: var(--method-accent);
+      color: var(--page-accent);
       font-size: 11px;
       font-weight: 800;
       letter-spacing: .02em;
     }
     .method-card p, .method-card ol, .method-card ul { color: var(--text); line-height: 1.65; }
     .method-card li { margin-bottom: 7px; padding-left: 4px; }
-    .method-card li::marker { color: var(--method-accent); font-weight: 700; }
+    .method-card li::marker { color: var(--page-accent); font-weight: 700; }
     .method-card code { overflow-wrap: anywhere; }
     .method-card blockquote {
       border-left-color: var(--red);
@@ -864,7 +896,7 @@
     }
     .methodology .changelog-body { padding: 5px 22px 12px; }
     @media (max-width: 700px) {
-      .method-hero { padding: 22px 20px; }
+      .page-hero { padding: 22px 20px; }
       .method-card { padding: 18px 19px; }
       .methodology .method-card > h3 { font-size: 16px; }
     }
@@ -1810,15 +1842,19 @@
 
   <!-- Model comparison tab -->
   <div id="tab-compare" class="tab-pane">
-    <p class="compare-intro">Add up to four models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
-    <div class="compare-pickers" id="compare-pickers">
-      <button id="compare-add" class="compare-add" type="button">+ Add model</button>
-      <div class="compare-picker" id="compare-picker" hidden>
-        <div class="compare-input-wrap"><input id="compare-search" type="search" role="combobox" aria-label="Search models to compare" aria-autocomplete="list" placeholder="Search models…" autocomplete="off" aria-controls="compare-options" aria-expanded="false"></div>
-        <div id="compare-options" class="compare-options" role="listbox" hidden></div>
+    <section class="page-hero compare-hero" aria-labelledby="compare-title">
+      <p class="page-eyebrow">Side by side</p>
+      <h2 id="compare-title">Compare models</h2>
+      <p class="page-intro compare-intro">Add up to four models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
+      <div class="compare-pickers" id="compare-pickers">
+        <button id="compare-add" class="compare-add" type="button">+ Add model</button>
+        <div class="compare-picker" id="compare-picker" hidden>
+          <div class="compare-input-wrap"><input id="compare-search" type="search" role="combobox" aria-label="Search models to compare" aria-autocomplete="list" placeholder="Search models…" autocomplete="off" aria-controls="compare-options" aria-expanded="false"></div>
+          <div id="compare-options" class="compare-options" role="listbox" hidden></div>
+        </div>
       </div>
-    </div>
-    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+      <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+    </section>
     <div id="compare-empty" class="compare-empty">Add at least two models to see their scores side by side.</div>
     <div id="compare-results" hidden>
       <section class="compare-section">
@@ -1906,10 +1942,10 @@
 
   <!-- Methodology tab -->
   <div id="tab-methodology" class="tab-pane about methodology">
-    <header class="method-hero">
-      <p class="method-eyebrow">How the leaderboard is scored</p>
+    <header class="page-hero">
+      <p class="page-eyebrow">How the leaderboard is scored</p>
       <h2>Methodology</h2>
-      <p class="method-intro">The same scoring pipeline is applied to every model. These are the text rules, metrics, and evaluation conditions behind the results.</p>
+      <p class="page-intro">The same scoring pipeline is applied to every model. These are the text rules, metrics, and evaluation conditions behind the results.</p>
       <div class="method-facts" aria-label="Evaluation at a glance">
         <span>5 equally weighted test sets</span>
         <span>WER &amp; CER</span>
