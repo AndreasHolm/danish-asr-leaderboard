@@ -320,7 +320,7 @@
     /* ── Model comparison ───────────────────────────────────────────── */
     .compare-intro { color: var(--muted); margin-bottom: 18px; }
     .compare-pickers { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 1px solid var(--border); border-left: 3px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
+    .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 2px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
     .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .compare-chip button { flex: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
     .compare-chip button:hover { color: var(--text); }
@@ -338,10 +338,8 @@
     .compare-option-empty { padding: 8px 10px; color: var(--muted); }
     .compare-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 22px; }
     .compare-count { color: var(--muted); font-size: 12px; }
-    .compare-clear-all { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
-    .compare-clear-all:hover { color: var(--text); text-decoration: underline; }
-    .compare-copy { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
-    .compare-copy:hover { border-color: var(--link); }
+    .compare-clear-all, .compare-copy { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
+    .compare-clear-all:hover, .compare-copy:hover { border-color: var(--link); }
     .compare-copy:disabled { opacity: .45; cursor: not-allowed; }
     .compare-note { color: var(--muted); font-size: 12px; }
     .compare-empty { padding: 48px 18px; border: 1px dashed var(--border); border-radius: var(--r); color: var(--muted); text-align: center; }
@@ -382,9 +380,6 @@
     .compare-fill { height: 100%; border-radius: 99px; }
     .compare-bar-value { text-align: right; font-size: 12px; }
     .compare-difference { color: var(--muted); font-size: 12px; text-align: right; }
-    .compare-speech-note { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
-    .compare-speech-plot { max-width: 680px; padding: 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surf); }
-    .compare-speech-plot svg { display: block; width: 100%; height: auto; }
     @media (max-width: 720px) {
       .compare-picker { width: 100%; }
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
@@ -1709,9 +1704,6 @@
         <h3>Results by test set</h3>
         <div id="compare-legend" class="compare-legend"></div>
         <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
-        <h3>Read speech vs conversation</h3>
-        <p class="compare-speech-note">CoRal v3 read-aloud (horizontal) and conversation (vertical). Each number matches a model in the legend. Lower left is better.</p>
-        <div id="compare-speech-plot" class="compare-speech-plot"></div>
         <div id="compare-datasets"></div>
       </section>
       <section id="compare-profiles" class="compare-section" hidden>
@@ -3861,59 +3853,6 @@ function setupCompare(data) {
       }
     }
   }
-  function renderSpeechPlot(rows) {
-    const container = document.getElementById('compare-speech-plot');
-    container.replaceChildren();
-    const points = rows.map((row, i) => ({
-      row, i, read: row[`coral_read_aloud_${metric}`],
-      conversation: row[`coral_conversation_${metric}`],
-    })).filter(point => Number.isFinite(point.read) && Number.isFinite(point.conversation));
-    if (!points.length) {
-      container.textContent = 'No selected models have scores for both CoRal speech types.';
-      return;
-    }
-    const domain = values => {
-      const low = Math.min(...values);
-      const high = Math.max(...values);
-      const padding = Math.max(0.5, (high - low) * 0.15);
-      return [Math.max(0, low - padding), high + padding];
-    };
-    const [xMin, xMax] = domain(points.map(point => point.read));
-    const [yMin, yMax] = domain(points.map(point => point.conversation));
-    const width = 540, height = 330;
-    const left = 58, right = 20, top = 18, bottom = 54;
-    const plotW = width - left - right, plotH = height - top - bottom;
-    const xPos = value => left + (value - xMin) / (xMax - xMin) * plotW;
-    const yPos = value => top + plotH - (value - yMin) / (yMax - yMin) * plotH;
-    const svg = svgMk('svg', {viewBox: `0 0 ${width} ${height}`, role: 'img',
-      'aria-label': `${metric.toUpperCase()} scatter plot: CoRal read-aloud on the horizontal axis and CoRal conversation on the vertical axis. ${points.map(point => `${point.row.name}: read ${score(point.read)}, conversation ${score(point.conversation)}`).join('; ')}`});
-    for (let tick = 0; tick <= 4; tick++) {
-      const x = left + tick / 4 * plotW;
-      const y = top + tick / 4 * plotH;
-      svgMk('line', {x1:x, y1:top, x2:x, y2:top + plotH, stroke:'var(--border)'}, svg);
-      svgMk('line', {x1:left, y1:y, x2:left + plotW, y2:y, stroke:'var(--border)'}, svg);
-      svgTx(`${(xMin + tick / 4 * (xMax - xMin)).toFixed(1)}%`,
-        {x, y:top + plotH + 21, fill:'var(--muted)', 'text-anchor':'middle', 'font-size':11}, svg);
-      svgTx(`${(yMax - tick / 4 * (yMax - yMin)).toFixed(1)}%`,
-        {x:left - 9, y:y + 4, fill:'var(--muted)', 'text-anchor':'end', 'font-size':11}, svg);
-    }
-    svgTx(`Read-aloud ${metric.toUpperCase()}`, {x:left + plotW / 2, y:height - 7,
-      fill:'var(--text)', 'text-anchor':'middle', 'font-size':12}, svg);
-    svgTx(`Conversation ${metric.toUpperCase()}`, {x:15, y:top + plotH / 2,
-      fill:'var(--text)', 'text-anchor':'middle', 'font-size':12,
-      transform:`rotate(-90 15 ${top + plotH / 2})`}, svg);
-    for (const point of points) {
-      const group = svgMk('g', {}, svg);
-      const title = svgMk('title', {}, group);
-      title.textContent = `${point.row.name}: read-aloud ${score(point.read)}, conversation ${score(point.conversation)}`;
-      svgMk('circle', {cx:xPos(point.read), cy:yPos(point.conversation), r:13,
-        fill:colors[point.i], stroke:'var(--surf)', 'stroke-width':2}, group);
-      svgTx(String(point.i + 1), {x:xPos(point.read), y:yPos(point.conversation) + 4,
-        fill:'#111827', 'text-anchor':'middle', 'font-size':12, 'font-weight':700,
-        'pointer-events':'none'}, group);
-    }
-    container.appendChild(svg);
-  }
   function render() {
     renderChips();
     const rows = selected.map(name => models.get(name));
@@ -3960,7 +3899,6 @@ function setupCompare(data) {
       document.getElementById(`compare-${key}`).classList.toggle('active', metric === key);
       document.getElementById(`compare-${key}`).setAttribute('aria-pressed', String(metric === key));
     }
-    renderSpeechPlot(rows);
     const values = COMPARE_DATASETS.flatMap(([key]) => rows.map(row => row[`${key}_${metric}`]))
       .filter(Number.isFinite);
     const max = Math.max(1, ...values);
