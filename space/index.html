@@ -415,6 +415,7 @@
     .compare-legend span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
     .compare-legend i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
     .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr) minmax(120px, 170px); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
+    .compare-dataset.single-model { grid-template-columns: minmax(125px, 190px) minmax(0, 1fr); }
     .compare-dataset:first-child { border-radius: var(--r) var(--r) 0 0; }
     .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
     .compare-dataset-name { font-weight: 700; }
@@ -432,6 +433,7 @@
       .compare-section > h3 { font-size: 16px; }
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
       .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
+      .compare-dataset.single-model { grid-template-columns: 1fr; }
       .compare-difference { text-align: left; }
     }
 
@@ -1845,17 +1847,17 @@
       </div>
       <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
     </section>
-    <div id="compare-empty" class="compare-empty">Add at least two models to see their scores side by side.</div>
+    <div id="compare-empty" class="compare-empty">Add a model to see its results.</div>
     <div id="compare-results" hidden>
       <section class="compare-section">
         <h3>Model attributes</h3>
-        <p class="compare-scroll-hint">Swipe sideways to see more models, if needed.</p>
+        <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
         <div class="compare-scroll"><table class="compare-summary" id="compare-summary"><thead><tr id="compare-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-summary-body"></tbody></table></div>
         <p id="compare-feature-key" class="compare-feature-key" hidden>Feature icons: Aa formatting · clock timestamps · people speakers · signal streaming. Solid = confirmed, amber = partial, faded = no, ? = unknown. Hover for details; linked icons open their sources.</p>
       </section>
       <section class="compare-section">
         <h3>Results</h3>
-        <p class="compare-scroll-hint">Swipe sideways to see more models, if needed.</p>
+        <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
         <div class="compare-scroll"><table class="compare-summary" id="compare-overall-summary"><thead><tr id="compare-overall-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-overall-body"></tbody></table></div>
         <h4 class="compare-subheading">By test set</h4>
         <div id="compare-legend" class="compare-legend"></div>
@@ -1865,7 +1867,7 @@
       <section id="compare-profiles" class="compare-section" hidden>
         <h3>Openness</h3>
         <p class="compare-note" style="margin-bottom:12px">Reviewed evidence for each model. Unknown means the source did not establish the claim; it does not mean no.</p>
-        <p class="compare-scroll-hint">Swipe sideways to see more models, if needed.</p>
+        <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
         <div class="compare-scroll"><table class="compare-summary" id="compare-profile-summary"><thead><tr id="compare-profile-head"><th scope="col">Field</th></tr></thead><tbody id="compare-profile-body"></tbody></table></div>
       </section>
       <p class="compare-note" id="compare-caveat"></p>
@@ -3952,7 +3954,7 @@ function setupCompare(data) {
     if (add.hidden) { picker.hidden = true; hideOptions(); }
     document.getElementById('compare-count').textContent = `${selected.length} / ${COMPARE_MAX_MODELS} models`;
     clearAll.hidden = selected.length === 0;
-    copy.disabled = selected.length < 2;
+    copy.disabled = selected.length === 0;
   }
   function renderHeader(id, rows) {
     const head = document.getElementById(id);
@@ -4095,13 +4097,11 @@ function setupCompare(data) {
     selected.sort(compareNames);
     renderChips();
     const rows = selected.map(name => models.get(name));
-    const ready = rows.length >= 2;
+    const ready = rows.length >= 1;
     document.getElementById('compare-empty').hidden = ready;
     document.getElementById('compare-results').hidden = !ready;
     if (!ready) {
-      document.getElementById('compare-empty').textContent = rows.length
-        ? 'Add one more model to see their scores side by side.'
-        : 'Add at least two models to see their scores side by side.';
+      document.getElementById('compare-empty').textContent = 'Add a model to see its results.';
       return;
     }
 
@@ -4120,7 +4120,7 @@ function setupCompare(data) {
     for (const key of ['wer', 'cer']) {
       const complete = rows.every(row => count(row, key) === 5 && Number.isFinite(row[`mean_${key}`]));
       const minimum = complete ? Math.min(...rows.map(row => row[`mean_${key}`])) : null;
-      const best = complete && rows.filter(row => row[`mean_${key}`] === minimum).length === 1
+      const best = rows.length > 1 && complete && rows.filter(row => row[`mean_${key}`] === minimum).length === 1
         ? rows.findIndex(row => row[`mean_${key}`] === minimum) : -1;
       addSummaryRow('compare-overall-body', `Mean ${key.toUpperCase()}`, rows.map(row =>
         `${score(row[`mean_${key}`])} (${count(row, key)}/5 sets)`), best);
@@ -4151,10 +4151,11 @@ function setupCompare(data) {
       const scores = rows.map(row => row[`${key}_${metric}`]);
       const finite = scores.filter(Number.isFinite);
       const minimum = finite.length ? Math.min(...finite) : null;
-      const best = finite.length && scores.filter(value => value === minimum).length === 1
+      const best = rows.length > 1 && finite.length && scores.filter(value => value === minimum).length === 1
         ? scores.indexOf(minimum) : -1;
       const row = document.createElement('div');
       row.className = 'compare-dataset';
+      if (rows.length === 1) row.classList.add('single-model');
       const name = document.createElement('div');
       name.className = 'compare-dataset-name';
       name.textContent = label;
@@ -4183,13 +4184,16 @@ function setupCompare(data) {
         line.append(tag, track, number);
         bars.appendChild(line);
       });
-      const winner = document.createElement('div');
-      winner.className = 'compare-difference';
-      if (best >= 0) {
-        winner.textContent = `Best: ${shortName(rows[best].name)}`;
-        winner.style.color = colors[best];
-      } else winner.textContent = finite.length ? 'Tie for best' : 'No scores';
-      row.append(name, bars, winner);
+      row.append(name, bars);
+      if (rows.length > 1) {
+        const winner = document.createElement('div');
+        winner.className = 'compare-difference';
+        if (best >= 0) {
+          winner.textContent = `Best: ${shortName(rows[best].name)}`;
+          winner.style.color = colors[best];
+        } else winner.textContent = finite.length ? 'Tie for best' : 'No scores';
+        row.appendChild(winner);
+      }
       container.appendChild(row);
     }
     document.getElementById('compare-caveat').textContent =
