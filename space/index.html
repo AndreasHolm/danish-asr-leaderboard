@@ -382,6 +382,9 @@
     .compare-fill { height: 100%; border-radius: 99px; }
     .compare-bar-value { text-align: right; font-size: 12px; }
     .compare-difference { color: var(--muted); font-size: 12px; text-align: right; }
+    .compare-speech-note { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
+    .compare-speech-plot { max-width: 680px; padding: 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surf); }
+    .compare-speech-plot svg { display: block; width: 100%; height: auto; }
     @media (max-width: 720px) {
       .compare-picker { width: 100%; }
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
@@ -1686,7 +1689,7 @@
 
   <!-- Model comparison tab -->
   <div id="tab-compare" class="tab-pane">
-    <p class="compare-intro">Add up to five models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
+    <p class="compare-intro">Add up to four models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
     <div class="compare-pickers" id="compare-pickers">
       <button id="compare-add" class="compare-add" type="button">+ Add model</button>
       <div class="compare-picker" id="compare-picker" hidden>
@@ -1694,7 +1697,7 @@
         <div id="compare-options" class="compare-options" role="listbox" hidden></div>
       </div>
     </div>
-    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 5 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden>Clear all</button><button class="compare-copy" id="compare-copy" type="button">Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden>Clear all</button><button class="compare-copy" id="compare-copy" type="button">Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
     <div id="compare-empty" class="compare-empty">Add at least two models to see their scores side by side.</div>
     <div id="compare-results" hidden>
       <section class="compare-section">
@@ -1706,6 +1709,9 @@
         <h3>Results by test set</h3>
         <div id="compare-legend" class="compare-legend"></div>
         <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
+        <h3>Read speech vs conversation</h3>
+        <p class="compare-speech-note">CoRal v3 read-aloud (horizontal) and conversation (vertical). Each number matches a model in the legend. Lower left is better.</p>
+        <div id="compare-speech-plot" class="compare-speech-plot"></div>
         <div id="compare-datasets"></div>
       </section>
       <section id="compare-profiles" class="compare-section" hidden>
@@ -3660,13 +3666,14 @@ const COMPARE_PROFILE_GROUPS = [
     ['diarization', 'Speakers'], ['streaming', 'Streaming'],
   ]},
 ];
+const COMPARE_MAX_MODELS = 4;
 
 function setupCompare(data) {
   const models = new Map();
   for (const row of data.cer) models.set(row.name, { ...row });
   for (const row of data.wer) models.set(row.name, { ...models.get(row.name), ...row });
   const names = [...models.keys()].sort((a, b) => a.localeCompare(b));
-  const colors = ['#60a5fa', '#a78bfa', '#22d3ee', '#fbbf24', '#f472b6'];
+  const colors = ['#60a5fa', '#a78bfa', '#22d3ee', '#fbbf24'];
   const selected = [];
   const pickers = document.getElementById('compare-pickers');
   const add = document.getElementById('compare-add');
@@ -3733,7 +3740,7 @@ function setupCompare(data) {
     input.setAttribute('aria-expanded', 'true');
   }
   function choose(name) {
-    if (selected.length >= 5 || selected.includes(name) || !models.has(name)) return;
+    if (selected.length >= COMPARE_MAX_MODELS || selected.includes(name) || !models.has(name)) return;
     selected.push(name);
     input.value = '';
     hideOptions();
@@ -3767,9 +3774,9 @@ function setupCompare(data) {
       chip.append(label, close);
       pickers.insertBefore(chip, add);
     });
-    add.hidden = selected.length >= 5;
+    add.hidden = selected.length >= COMPARE_MAX_MODELS;
     if (add.hidden) { picker.hidden = true; hideOptions(); }
-    document.getElementById('compare-count').textContent = `${selected.length} / 5 models`;
+    document.getElementById('compare-count').textContent = `${selected.length} / ${COMPARE_MAX_MODELS} models`;
     clearAll.hidden = selected.length === 0;
     copy.disabled = selected.length < 2;
   }
@@ -3854,6 +3861,59 @@ function setupCompare(data) {
       }
     }
   }
+  function renderSpeechPlot(rows) {
+    const container = document.getElementById('compare-speech-plot');
+    container.replaceChildren();
+    const points = rows.map((row, i) => ({
+      row, i, read: row[`coral_read_aloud_${metric}`],
+      conversation: row[`coral_conversation_${metric}`],
+    })).filter(point => Number.isFinite(point.read) && Number.isFinite(point.conversation));
+    if (!points.length) {
+      container.textContent = 'No selected models have scores for both CoRal speech types.';
+      return;
+    }
+    const domain = values => {
+      const low = Math.min(...values);
+      const high = Math.max(...values);
+      const padding = Math.max(0.5, (high - low) * 0.15);
+      return [Math.max(0, low - padding), high + padding];
+    };
+    const [xMin, xMax] = domain(points.map(point => point.read));
+    const [yMin, yMax] = domain(points.map(point => point.conversation));
+    const width = 540, height = 330;
+    const left = 58, right = 20, top = 18, bottom = 54;
+    const plotW = width - left - right, plotH = height - top - bottom;
+    const xPos = value => left + (value - xMin) / (xMax - xMin) * plotW;
+    const yPos = value => top + plotH - (value - yMin) / (yMax - yMin) * plotH;
+    const svg = svgMk('svg', {viewBox: `0 0 ${width} ${height}`, role: 'img',
+      'aria-label': `${metric.toUpperCase()} scatter plot: CoRal read-aloud on the horizontal axis and CoRal conversation on the vertical axis. ${points.map(point => `${point.row.name}: read ${score(point.read)}, conversation ${score(point.conversation)}`).join('; ')}`});
+    for (let tick = 0; tick <= 4; tick++) {
+      const x = left + tick / 4 * plotW;
+      const y = top + tick / 4 * plotH;
+      svgMk('line', {x1:x, y1:top, x2:x, y2:top + plotH, stroke:'var(--border)'}, svg);
+      svgMk('line', {x1:left, y1:y, x2:left + plotW, y2:y, stroke:'var(--border)'}, svg);
+      svgTx(`${(xMin + tick / 4 * (xMax - xMin)).toFixed(1)}%`,
+        {x, y:top + plotH + 21, fill:'var(--muted)', 'text-anchor':'middle', 'font-size':11}, svg);
+      svgTx(`${(yMax - tick / 4 * (yMax - yMin)).toFixed(1)}%`,
+        {x:left - 9, y:y + 4, fill:'var(--muted)', 'text-anchor':'end', 'font-size':11}, svg);
+    }
+    svgTx(`Read-aloud ${metric.toUpperCase()}`, {x:left + plotW / 2, y:height - 7,
+      fill:'var(--text)', 'text-anchor':'middle', 'font-size':12}, svg);
+    svgTx(`Conversation ${metric.toUpperCase()}`, {x:15, y:top + plotH / 2,
+      fill:'var(--text)', 'text-anchor':'middle', 'font-size':12,
+      transform:`rotate(-90 15 ${top + plotH / 2})`}, svg);
+    for (const point of points) {
+      const group = svgMk('g', {}, svg);
+      const title = svgMk('title', {}, group);
+      title.textContent = `${point.row.name}: read-aloud ${score(point.read)}, conversation ${score(point.conversation)}`;
+      svgMk('circle', {cx:xPos(point.read), cy:yPos(point.conversation), r:13,
+        fill:colors[point.i], stroke:'var(--surf)', 'stroke-width':2}, group);
+      svgTx(String(point.i + 1), {x:xPos(point.read), y:yPos(point.conversation) + 4,
+        fill:'#111827', 'text-anchor':'middle', 'font-size':12, 'font-weight':700,
+        'pointer-events':'none'}, group);
+    }
+    container.appendChild(svg);
+  }
   function render() {
     renderChips();
     const rows = selected.map(name => models.get(name));
@@ -3900,6 +3960,7 @@ function setupCompare(data) {
       document.getElementById(`compare-${key}`).classList.toggle('active', metric === key);
       document.getElementById(`compare-${key}`).setAttribute('aria-pressed', String(metric === key));
     }
+    renderSpeechPlot(rows);
     const values = COMPARE_DATASETS.flatMap(([key]) => rows.map(row => row[`${key}_${metric}`]))
       .filter(Number.isFinite);
     const max = Math.max(1, ...values);
@@ -4000,7 +4061,7 @@ function setupCompare(data) {
   });
 
   const url = new URL(window.location.href);
-  for (const name of url.searchParams.getAll('model').slice(0, 5)) {
+  for (const name of url.searchParams.getAll('model').slice(0, COMPARE_MAX_MODELS)) {
     if (models.has(name) && !selected.includes(name)) selected.push(name);
   }
   render();
