@@ -328,6 +328,7 @@
     .compare-pickers { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 2px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
     .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+    .compare-rank { flex: none; padding: 2px 5px; border-radius: 4px; background: color-mix(in srgb, var(--model-color) 13%, var(--surf)); color: var(--text); font-size: 10px; font-weight: 800; white-space: nowrap; }
     .compare-chip button { flex: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
     .compare-chip button:hover { color: var(--text); }
     .compare-picker { position: relative; min-width: min(100%, 250px); }
@@ -388,6 +389,7 @@
     .compare-summary tbody tr:hover td[data-model-col] { background-color: color-mix(in srgb, var(--model-color) 15%, var(--surf)); }
     .compare-summary th a { color: var(--text); text-decoration: none; text-transform: none; overflow-wrap: anywhere; }
     .compare-summary th a:hover { color: var(--link); text-decoration: underline; }
+    .compare-head-rank { display: block; margin-bottom: 2px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
     .compare-summary td:nth-child(n+2) { font-variant-numeric: tabular-nums; font-weight: 600; }
     .compare-feature-icons { display: flex; align-items: center; gap: 7px; }
     .compare-feature-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 5px; color: var(--text); text-decoration: none; }
@@ -417,7 +419,7 @@
     .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
     .compare-dataset-name { font-weight: 700; }
     .compare-bars { display: grid; gap: 5px; }
-    .compare-bar { display: grid; grid-template-columns: 16px minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+    .compare-bar { display: grid; grid-template-columns: 25px minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
     .compare-bar-tag { font-size: 11px; font-weight: 800; }
     .compare-track { height: 9px; background: var(--surf2); border-radius: 99px; overflow: hidden; }
     .compare-fill { height: 100%; border-radius: 99px; }
@@ -1833,7 +1835,7 @@
     <section class="page-hero compare-hero" aria-labelledby="compare-title">
       <p class="page-eyebrow">Side by side</p>
       <h2 id="compare-title">Compare models</h2>
-      <p class="page-intro compare-intro">Add up to four models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
+      <p class="page-intro compare-intro">Compare up to four models on the same Danish test sets, ordered by Mean WER leaderboard rank. Lower WER and CER are better.</p>
       <div class="compare-pickers" id="compare-pickers">
         <button id="compare-add" class="compare-add" type="button">+ Add model</button>
         <div class="compare-picker" id="compare-picker" hidden>
@@ -3831,10 +3833,16 @@ const COMPARE_FEATURE_FIELDS = [
 const COMPARE_MAX_MODELS = 4;
 
 function setupCompare(data) {
+  const werRanks = new Map(data.wer.map(row => [row.name, row.rank]));
+  const rankOf = name => werRanks.get(name) ?? Infinity;
+  const rankLabel = name => Number.isFinite(rankOf(name)) ? `WER #${rankOf(name)}` : 'Unranked';
+  const shortRank = name => Number.isFinite(rankOf(name)) ? `#${rankOf(name)}` : '—';
+  const compareNames = (a, b) => rankOf(a) === rankOf(b)
+    ? a.localeCompare(b) : rankOf(a) - rankOf(b);
   const models = new Map();
   for (const row of data.cer) models.set(row.name, { ...row });
   for (const row of data.wer) models.set(row.name, { ...models.get(row.name), ...row });
-  const names = [...models.keys()].sort((a, b) => a.localeCompare(b));
+  const names = [...models.keys()].sort(compareNames);
   const colors = ['#60a5fa', '#a78bfa', '#22d3ee', '#fbbf24'];
   const selected = [];
   const pickers = document.getElementById('compare-pickers');
@@ -3885,7 +3893,7 @@ function setupCompare(data) {
       option.type = 'button';
       option.className = 'compare-option';
       option.setAttribute('role', 'option');
-      option.textContent = name;
+      option.textContent = `${rankLabel(name)} · ${name}`;
       option.addEventListener('click', () => choose(name));
       option.addEventListener('keydown', event => {
         if (event.key === 'Escape') { input.focus(); hideOptions(); }
@@ -3904,6 +3912,7 @@ function setupCompare(data) {
   function choose(name) {
     if (selected.length >= COMPARE_MAX_MODELS || selected.includes(name) || !models.has(name)) return;
     selected.push(name);
+    selected.sort(compareNames);
     input.value = '';
     hideOptions();
     picker.hidden = true;
@@ -3925,7 +3934,10 @@ function setupCompare(data) {
       const chip = document.createElement('div');
       chip.className = 'compare-chip';
       chip.style.setProperty('--model-color', colors[i]);
-      chip.title = name;
+      chip.title = `${name} · ${rankLabel(name)} on the Mean WER leaderboard`;
+      const rank = document.createElement('small');
+      rank.className = 'compare-rank';
+      rank.textContent = rankLabel(name);
       const label = document.createElement('span');
       label.textContent = shortName(name);
       const close = document.createElement('button');
@@ -3933,7 +3945,7 @@ function setupCompare(data) {
       close.setAttribute('aria-label', `Remove ${name}`);
       close.textContent = '×';
       close.addEventListener('click', () => remove(name));
-      chip.append(label, close);
+      chip.append(rank, label, close);
       pickers.insertBefore(chip, add);
     });
     add.hidden = selected.length >= COMPARE_MAX_MODELS;
@@ -3954,6 +3966,9 @@ function setupCompare(data) {
       th.scope = 'col';
       th.dataset.modelCol = '';
       th.style.setProperty('--model-color', colors[i]);
+      const rank = document.createElement('small');
+      rank.className = 'compare-head-rank';
+      rank.textContent = rankLabel(row.name);
       const label = document.createElement(row.url ? 'a' : 'span');
       label.textContent = shortName(row.name);
       label.title = row.name;
@@ -3962,7 +3977,7 @@ function setupCompare(data) {
         label.target = '_blank';
         label.rel = 'noopener noreferrer';
       }
-      th.appendChild(label);
+      th.append(rank, label);
       head.appendChild(th);
     });
     const table = head.closest('table');
@@ -4077,6 +4092,7 @@ function setupCompare(data) {
     }
   }
   function render() {
+    selected.sort(compareNames);
     renderChips();
     const rows = selected.map(name => models.get(name));
     const ready = rows.length >= 2;
@@ -4119,7 +4135,7 @@ function setupCompare(data) {
       const item = document.createElement('span');
       const dot = document.createElement('i');
       dot.style.background = colors[i];
-      item.append(dot, document.createTextNode(`${i + 1} · ${row.name}`));
+      item.append(dot, document.createTextNode(`${rankLabel(row.name)} · ${row.name}`));
       legend.appendChild(item);
     });
     for (const key of ['wer', 'cer']) {
@@ -4147,11 +4163,11 @@ function setupCompare(data) {
       scores.forEach((value, i) => {
         const line = document.createElement('div');
         line.className = 'compare-bar';
-        line.title = rows[i].name;
+        line.title = `${rows[i].name} · ${rankLabel(rows[i].name)} on the Mean WER leaderboard`;
         const tag = document.createElement('span');
         tag.className = 'compare-bar-tag';
         tag.style.color = colors[i];
-        tag.textContent = String(i + 1);
+        tag.textContent = shortRank(rows[i].name);
         const track = document.createElement('div');
         track.className = 'compare-track';
         if (Number.isFinite(value)) {
