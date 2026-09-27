@@ -292,6 +292,78 @@
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
 
+    /* ── Model comparison ───────────────────────────────────────────── */
+    .compare-intro { color: var(--muted); margin-bottom: 18px; }
+    .compare-pickers { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .compare-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 9px; border: 1px solid var(--border); border-left: 3px solid var(--model-color); border-radius: 8px; background: var(--surf); font-size: 13px; }
+    .compare-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .compare-chip button { flex: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+    .compare-chip button:hover { color: var(--text); }
+    .compare-picker { position: relative; min-width: min(100%, 250px); }
+    .compare-add { min-height: 38px; padding: 7px 12px; border: 1px dashed var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
+    .compare-add:hover { border-color: var(--link); }
+    .compare-add[hidden], .compare-picker[hidden] { display: none; }
+    .compare-input-wrap { display: flex; align-items: center; background: var(--surf); border: 1px solid var(--border); border-radius: 8px; }
+    .compare-picker:focus-within .compare-input-wrap { border-color: var(--link); }
+    .compare-input-wrap input { flex: 1; min-width: 0; height: 38px; padding: 0 11px; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; }
+    .compare-options { position: absolute; z-index: 50; top: 100%; left: 0; right: 0; max-height: 300px; overflow-y: auto; margin-top: 4px; padding: 4px; background: var(--surf); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+    .compare-options[hidden] { display: none; }
+    .compare-option { display: block; width: 100%; padding: 8px 10px; border: 0; border-radius: 5px; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
+    .compare-option:hover, .compare-option:focus-visible { background: var(--surf2); outline: none; }
+    .compare-option-empty { padding: 8px 10px; color: var(--muted); }
+    .compare-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 22px; }
+    .compare-count { color: var(--muted); font-size: 12px; }
+    .compare-clear-all { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+    .compare-clear-all:hover { color: var(--text); text-decoration: underline; }
+    .compare-copy { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
+    .compare-copy:hover { border-color: var(--link); }
+    .compare-copy:disabled { opacity: .45; cursor: not-allowed; }
+    .compare-note { color: var(--muted); font-size: 12px; }
+    .compare-empty { padding: 48px 18px; border: 1px dashed var(--border); border-radius: var(--r); color: var(--muted); text-align: center; }
+    .compare-section { margin: 20px 0 28px; }
+    .compare-section h3 { margin-bottom: 12px; font-size: 17px; }
+    .compare-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); }
+    .compare-scroll-hint { display: none; margin: -5px 0 9px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 1100px) { .compare-scroll-hint { display: block; } }
+    .compare-summary { width: 100%; table-layout: fixed; white-space: normal; border-collapse: separate; border-spacing: 0; }
+    .compare-summary th, .compare-summary td { padding: 11px 14px; border-bottom: 1px solid var(--border); text-align: left; }
+    .compare-summary tr:last-child td { border-bottom: 0; }
+    .compare-summary th:first-child, .compare-summary td:first-child { width: 160px; color: var(--muted); }
+    .compare-summary th:not(:first-child) { border-top: 3px solid var(--model-color); }
+    .compare-summary th a { color: var(--text); text-decoration: none; text-transform: none; overflow-wrap: anywhere; }
+    .compare-summary th a:hover { color: var(--link); text-decoration: underline; }
+    .compare-summary td:nth-child(n+2) { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .compare-profile-group th { background: var(--surf2); color: var(--text); font-size: 12px; text-transform: none; }
+    .compare-profile-link { color: inherit; text-decoration: none; }
+    .compare-profile-link:hover { color: var(--link); text-decoration: underline; }
+    .compare-profile-state.yes { color: var(--accent); }
+    .compare-profile-state.partial { color: #facc15; }
+    .compare-profile-state.no { color: var(--muted); }
+    .compare-profile-state.unknown { color: var(--muted); }
+    .compare-metric { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
+    .compare-metric button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
+    .compare-metric button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
+    .compare-legend { display: flex; flex-wrap: wrap; gap: 5px 18px; margin-bottom: 14px; color: var(--muted); font-size: 12px; }
+    .compare-legend span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+    .compare-legend i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr) minmax(120px, 170px); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
+    .compare-dataset:first-child { border-radius: var(--r) var(--r) 0 0; }
+    .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
+    .compare-dataset-name { font-weight: 700; }
+    .compare-bars { display: grid; gap: 5px; }
+    .compare-bar { display: grid; grid-template-columns: 16px minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+    .compare-bar-tag { font-size: 11px; font-weight: 800; }
+    .compare-track { height: 9px; background: var(--surf2); border-radius: 99px; overflow: hidden; }
+    .compare-fill { height: 100%; border-radius: 99px; }
+    .compare-bar-value { text-align: right; font-size: 12px; }
+    .compare-difference { color: var(--muted); font-size: 12px; text-align: right; }
+    @media (max-width: 720px) {
+      .compare-picker { width: 100%; }
+      .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
+      .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
+      .compare-difference { text-align: left; }
+    }
+
     /* ── Toolbar ───────────────────────────────────────────────────── */
     /* One control height (34px) and one radius (8px) across the whole toolbar:
        search, segmented control and toggles previously rendered at 32/34/30px
@@ -1387,6 +1459,18 @@
       tbody td[data-tip]::after { display: none; }
     }
 
+    /* The leaderboard becomes cards on phones; keep the comparison a table. */
+    @media (max-width: 700px) {
+      #tab-compare .compare-summary { display: table; width: 100%; min-width: 0; }
+      #tab-compare .compare-summary thead { display: table-header-group; }
+      #tab-compare .compare-summary tbody { display: table-row-group; }
+      #tab-compare .compare-summary tr { display: table-row; padding: 0; border: 0; background: transparent; }
+      #tab-compare .compare-summary tr::before { content: none; }
+      #tab-compare .compare-summary tr::after { content: none; }
+      #tab-compare .compare-summary td { display: table-cell; padding: 9px 7px; border-bottom: 1px solid var(--border); }
+      #tab-compare .compare-summary th { display: table-cell; padding: 9px 7px; }
+    }
+
   </style>
 </head>
 <body>
@@ -1439,6 +1523,7 @@
     <button class="tab-btn active" data-tab="wer"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M5 6H3v2a4 4 0 0 0 4 4M19 6h2v2a4 4 0 0 1-4 4"/></svg>Leaderboard</button>
     <button class="tab-btn" data-tab="analysis"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 16 4-5 3 3 5-7"/></svg>Pareto</button>
     <button class="tab-btn" data-tab="time"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Over Time</button>
+    <button class="tab-btn" data-tab="compare"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16M9 4v16M15 4v16"/></svg>Compare</button>
     <button class="tab-btn" data-tab="methodology"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Methodology</button>
     <button class="tab-btn" data-tab="about"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>About</button>
   </nav>
@@ -1566,6 +1651,40 @@
         </div>
         <div id="record-panel-time" class="pareto-panel"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Model comparison tab -->
+  <div id="tab-compare" class="tab-pane">
+    <p class="compare-intro">Add up to five models to compare results on the same Danish test sets. Lower WER and CER are better.</p>
+    <div class="compare-pickers" id="compare-pickers">
+      <button id="compare-add" class="compare-add" type="button">+ Add model</button>
+      <div class="compare-picker" id="compare-picker" hidden>
+        <div class="compare-input-wrap"><input id="compare-search" type="search" role="combobox" aria-label="Search models to compare" aria-autocomplete="list" placeholder="Search models…" autocomplete="off" aria-controls="compare-options" aria-expanded="false"></div>
+        <div id="compare-options" class="compare-options" role="listbox" hidden></div>
+      </div>
+    </div>
+    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 5 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden>Clear all</button><button class="compare-copy" id="compare-copy" type="button">Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+    <div id="compare-empty" class="compare-empty">Add at least two models to see their scores side by side.</div>
+    <div id="compare-results" hidden>
+      <section class="compare-section">
+        <h3>Model attributes and overall results</h3>
+        <p class="compare-scroll-hint">Swipe sideways to see more models, if needed.</p>
+        <div class="compare-scroll"><table class="compare-summary" id="compare-summary"><thead><tr id="compare-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-summary-body"></tbody></table></div>
+      </section>
+      <section class="compare-section">
+        <h3>Results by test set</h3>
+        <div id="compare-legend" class="compare-legend"></div>
+        <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
+        <div id="compare-datasets"></div>
+      </section>
+      <section id="compare-profiles" class="compare-section" hidden>
+        <h3>Openness and features</h3>
+        <p class="compare-note" style="margin-bottom:12px">Reviewed evidence for each model. Unknown means the source did not establish the claim; it does not mean no.</p>
+        <p class="compare-scroll-hint">Swipe sideways to see more models, if needed.</p>
+        <div class="compare-scroll"><table class="compare-summary" id="compare-profile-summary"><thead><tr id="compare-profile-head"><th scope="col">Field</th></tr></thead><tbody id="compare-profile-body"></tbody></table></div>
+      </section>
+      <p class="compare-note" id="compare-caveat"></p>
     </div>
   </div>
 
@@ -3481,6 +3600,372 @@ window.addEventListener('resize', () => {
   }, 150);
 });
 
+const COMPARE_DATASETS = [
+  ['coral_conversation', 'CoRal conversation'],
+  ['coral_read_aloud', 'CoRal read-aloud'],
+  ['cv17_da', 'CV (da)'],
+  ['fleurs_da', 'FLEURS (da)'],
+  ['ftspeech', 'FTSpeech'],
+];
+const COMPARE_PROFILE_GROUPS = [
+  {key: 'openness', title: 'Openness', fields: [
+    ['weights', 'Open weights'], ['license', 'Open license'],
+    ['data', 'Training data'], ['code', 'Training code'],
+    ['model_card', 'Model card'], ['paper', 'Paper'],
+  ]},
+  {key: 'features', title: 'Features', fields: [
+    ['punctuation_case', 'Formatting'], ['timestamps', 'Timestamps'],
+    ['diarization', 'Speakers'], ['streaming', 'Streaming'],
+  ]},
+];
+
+function setupCompare(data) {
+  const models = new Map();
+  for (const row of data.cer) models.set(row.name, { ...row });
+  for (const row of data.wer) models.set(row.name, { ...models.get(row.name), ...row });
+  const names = [...models.keys()].sort((a, b) => a.localeCompare(b));
+  const colors = ['#60a5fa', '#a78bfa', '#22d3ee', '#fbbf24', '#f472b6'];
+  const selected = [];
+  const pickers = document.getElementById('compare-pickers');
+  const add = document.getElementById('compare-add');
+  const picker = document.getElementById('compare-picker');
+  const input = document.getElementById('compare-search');
+  const list = document.getElementById('compare-options');
+  const status = document.getElementById('compare-status');
+  const copy = document.getElementById('compare-copy');
+  const clearAll = document.getElementById('compare-clear-all');
+  let metric = new URL(window.location.href).searchParams.get('metric') === 'cer' ? 'cer' : 'wer';
+
+  const score = value => Number.isFinite(value) ? `${value.toFixed(2)}%` : '—';
+  const count = (row, suffix) => COMPARE_DATASETS.filter(([key]) =>
+    Number.isFinite(row?.[`${key}_${suffix}`])).length;
+  const shortName = name => name.split('/').at(-1);
+
+  function shareURL() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'compare');
+    if (metric === 'cer') url.searchParams.set('metric', 'cer');
+    else url.searchParams.delete('metric');
+    url.searchParams.delete('model');
+    selected.forEach(name => url.searchParams.append('model', name));
+    return url;
+  }
+  function syncURL() {
+    window.history.replaceState(null, '', shareURL());
+    status.textContent = '';
+  }
+  function hideOptions() {
+    list.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+  }
+  function showOptions() {
+    list.replaceChildren();
+    const query = input.value.trim().toLocaleLowerCase();
+    const matches = names.filter(name => !selected.includes(name) &&
+      name.toLocaleLowerCase().includes(query)).slice(0, 16);
+    if (!matches.length) {
+      const empty = document.createElement('div');
+      empty.className = 'compare-option-empty';
+      empty.textContent = 'No matching models';
+      list.appendChild(empty);
+    }
+    for (const name of matches) {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.className = 'compare-option';
+      option.setAttribute('role', 'option');
+      option.textContent = name;
+      option.addEventListener('click', () => choose(name));
+      option.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { input.focus(); hideOptions(); }
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          const options = [...list.querySelectorAll('button')];
+          const next = (options.indexOf(option) + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length;
+          options[next].focus();
+        }
+      });
+      list.appendChild(option);
+    }
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+  }
+  function choose(name) {
+    if (selected.length >= 5 || selected.includes(name) || !models.has(name)) return;
+    selected.push(name);
+    input.value = '';
+    hideOptions();
+    picker.hidden = true;
+    syncURL();
+    render();
+    if (!add.hidden) add.focus();
+  }
+  function remove(name) {
+    const index = selected.indexOf(name);
+    if (index < 0) return;
+    selected.splice(index, 1);
+    syncURL();
+    render();
+    add.focus();
+  }
+  function renderChips() {
+    pickers.querySelectorAll('.compare-chip').forEach(chip => chip.remove());
+    selected.forEach((name, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'compare-chip';
+      chip.style.setProperty('--model-color', colors[i]);
+      chip.title = name;
+      const label = document.createElement('span');
+      label.textContent = `${i + 1}. ${shortName(name)}`;
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.setAttribute('aria-label', `Remove ${name}`);
+      close.textContent = '×';
+      close.addEventListener('click', () => remove(name));
+      chip.append(label, close);
+      pickers.insertBefore(chip, add);
+    });
+    add.hidden = selected.length >= 5;
+    if (add.hidden) { picker.hidden = true; hideOptions(); }
+    document.getElementById('compare-count').textContent = `${selected.length} / 5 models`;
+    clearAll.hidden = selected.length === 0;
+    copy.disabled = selected.length < 2;
+  }
+  function renderHeader(id, rows) {
+    const head = document.getElementById(id);
+    head.replaceChildren();
+    const measure = document.createElement('th');
+    measure.scope = 'col';
+    measure.textContent = id === 'compare-head' ? 'Measure' : 'Field';
+    head.appendChild(measure);
+    rows.forEach((row, i) => {
+      const th = document.createElement('th');
+      th.scope = 'col';
+      th.style.setProperty('--model-color', colors[i]);
+      const label = document.createElement(row.url ? 'a' : 'span');
+      label.textContent = shortName(row.name);
+      label.title = row.name;
+      if (row.url) {
+        label.href = row.url;
+        label.target = '_blank';
+        label.rel = 'noopener noreferrer';
+      }
+      th.appendChild(label);
+      head.appendChild(th);
+    });
+    const table = head.closest('table');
+    table.style.minWidth = `${160 + rows.length * 180}px`;
+  }
+  function addSummaryRow(label, values, bestIndex = -1) {
+    const tr = document.createElement('tr');
+    [label, ...values].forEach((text, i) => {
+      const td = document.createElement('td');
+      td.textContent = text;
+      if (i === bestIndex + 1) td.style.color = colors[bestIndex];
+      tr.appendChild(td);
+    });
+    document.getElementById('compare-summary-body').appendChild(tr);
+  }
+  function renderProfiles(rows) {
+    const section = document.getElementById('compare-profiles');
+    section.hidden = !rows.some(row => row.profile);
+    if (section.hidden) return;
+    renderHeader('compare-profile-head', rows);
+    const body = document.getElementById('compare-profile-body');
+    body.replaceChildren();
+    const labels = {yes: '✓ Confirmed', partial: '◐ Partial', no: '× No', unknown: '? Unknown'};
+    for (const group of COMPARE_PROFILE_GROUPS) {
+      const fields = group.fields.filter(([key]) =>
+        rows.some(row => row.profile?.[group.key]?.[key]));
+      if (!fields.length) continue;
+      const heading = document.createElement('tr');
+      heading.className = 'compare-profile-group';
+      const th = document.createElement('th');
+      th.colSpan = rows.length + 1;
+      th.textContent = group.title;
+      heading.appendChild(th);
+      body.appendChild(heading);
+      for (const [key, label] of fields) {
+        const tr = document.createElement('tr');
+        const name = document.createElement('td');
+        name.textContent = label;
+        tr.appendChild(name);
+        for (const row of rows) {
+          const value = row.profile?.[group.key]?.[key];
+          const state = Object.hasOwn(labels, value?.state) ? value.state : 'unknown';
+          const td = document.createElement('td');
+          const el = value?.url?.startsWith('https://')
+            ? document.createElement('a') : document.createElement('span');
+          el.className = `compare-profile-state ${state}`;
+          if (el.tagName === 'A') {
+            el.classList.add('compare-profile-link');
+            el.href = value.url;
+            el.target = '_blank';
+            el.rel = 'noopener noreferrer';
+          }
+          el.textContent = labels[state] + (el.tagName === 'A' ? ' ↗' : '');
+          el.title = value?.detail || labels[state];
+          td.appendChild(el);
+          tr.appendChild(td);
+        }
+        body.appendChild(tr);
+      }
+    }
+  }
+  function render() {
+    renderChips();
+    const rows = selected.map(name => models.get(name));
+    const ready = rows.length >= 2;
+    document.getElementById('compare-empty').hidden = ready;
+    document.getElementById('compare-results').hidden = !ready;
+    if (!ready) {
+      document.getElementById('compare-empty').textContent = rows.length
+        ? 'Add one more model to see their scores side by side.'
+        : 'Add at least two models to see their scores side by side.';
+      return;
+    }
+
+    renderHeader('compare-head', rows);
+    document.getElementById('compare-summary-body').replaceChildren();
+    for (const key of ['wer', 'cer']) {
+      const complete = rows.every(row => count(row, key) === 5 && Number.isFinite(row[`mean_${key}`]));
+      const minimum = complete ? Math.min(...rows.map(row => row[`mean_${key}`])) : null;
+      const best = complete && rows.filter(row => row[`mean_${key}`] === minimum).length === 1
+        ? rows.findIndex(row => row[`mean_${key}`] === minimum) : -1;
+      addSummaryRow(`Mean ${key.toUpperCase()}`, rows.map(row =>
+        `${score(row[`mean_${key}`])} (${count(row, key)}/5 sets)`), best);
+    }
+    addSummaryRow('Speed', rows.map(row =>
+      Number.isFinite(row.speed_x) ? `${row.speed_x.toFixed(1)}×` : '—'));
+    addSummaryRow('Parameters', rows.map(row =>
+      Number.isFinite(parseFloat(row.size)) ? `${row.size}B` : '—'));
+    addSummaryRow('Weights', rows.map(row =>
+      row.access === 'open' ? 'Open' : row.access === 'proprietary' ? 'Proprietary API' : '—'));
+    addSummaryRow('License', rows.map(row => row.license || '—'));
+    addSummaryRow('Submitted', rows.map(row => row.submitted || '—'));
+    renderProfiles(rows);
+
+    const legend = document.getElementById('compare-legend');
+    legend.replaceChildren();
+    rows.forEach((row, i) => {
+      const item = document.createElement('span');
+      const dot = document.createElement('i');
+      dot.style.background = colors[i];
+      item.append(dot, document.createTextNode(`${i + 1} · ${row.name}`));
+      legend.appendChild(item);
+    });
+    for (const key of ['wer', 'cer']) {
+      document.getElementById(`compare-${key}`).classList.toggle('active', metric === key);
+      document.getElementById(`compare-${key}`).setAttribute('aria-pressed', String(metric === key));
+    }
+    const values = COMPARE_DATASETS.flatMap(([key]) => rows.map(row => row[`${key}_${metric}`]))
+      .filter(Number.isFinite);
+    const max = Math.max(1, ...values);
+    const container = document.getElementById('compare-datasets');
+    container.replaceChildren();
+    for (const [key, label] of COMPARE_DATASETS) {
+      const scores = rows.map(row => row[`${key}_${metric}`]);
+      const finite = scores.filter(Number.isFinite);
+      const minimum = finite.length ? Math.min(...finite) : null;
+      const best = finite.length && scores.filter(value => value === minimum).length === 1
+        ? scores.indexOf(minimum) : -1;
+      const row = document.createElement('div');
+      row.className = 'compare-dataset';
+      const name = document.createElement('div');
+      name.className = 'compare-dataset-name';
+      name.textContent = label;
+      const bars = document.createElement('div');
+      bars.className = 'compare-bars';
+      scores.forEach((value, i) => {
+        const line = document.createElement('div');
+        line.className = 'compare-bar';
+        line.title = rows[i].name;
+        const tag = document.createElement('span');
+        tag.className = 'compare-bar-tag';
+        tag.style.color = colors[i];
+        tag.textContent = String(i + 1);
+        const track = document.createElement('div');
+        track.className = 'compare-track';
+        if (Number.isFinite(value)) {
+          const fill = document.createElement('div');
+          fill.className = 'compare-fill';
+          fill.style.width = `${Math.max(0, Math.min(100, value / max * 100))}%`;
+          fill.style.background = colors[i];
+          track.appendChild(fill);
+        }
+        const number = document.createElement('span');
+        number.className = 'compare-bar-value';
+        number.textContent = score(value);
+        line.append(tag, track, number);
+        bars.appendChild(line);
+      });
+      const winner = document.createElement('div');
+      winner.className = 'compare-difference';
+      if (best >= 0) {
+        winner.textContent = `Best: ${shortName(rows[best].name)}`;
+        winner.style.color = colors[best];
+      } else winner.textContent = finite.length ? 'Tie for best' : 'No scores';
+      row.append(name, bars, winner);
+      container.appendChild(row);
+    }
+    document.getElementById('compare-caveat').textContent =
+      (rows.some(row => count(row, metric) < 5)
+        ? 'Mean scores with fewer than five test sets are not directly comparable. ' : '') +
+      'Speed reflects the measured hardware and serving stack; compare it with that context in mind.';
+  }
+
+  add.addEventListener('click', () => {
+    picker.hidden = false;
+    input.value = '';
+    input.focus();
+    showOptions();
+  });
+  input.addEventListener('focus', showOptions);
+  input.addEventListener('input', showOptions);
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      hideOptions();
+      picker.hidden = true;
+      add.focus();
+    }
+    if (event.key === 'ArrowDown') {
+      const first = list.querySelector('button');
+      if (first) { event.preventDefault(); first.focus(); }
+    }
+    if (event.key === 'Enter') {
+      const first = list.querySelector('button');
+      if (first && !list.hidden) { event.preventDefault(); first.click(); }
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!picker.contains(event.target) && event.target !== add) hideOptions();
+  });
+  clearAll.addEventListener('click', () => {
+    selected.length = 0;
+    syncURL();
+    render();
+    add.focus();
+  });
+  ['wer', 'cer'].forEach(key => document.getElementById(`compare-${key}`)
+    .addEventListener('click', () => { metric = key; syncURL(); render(); }));
+  copy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareURL().href);
+      status.textContent = 'Link copied';
+    } catch {
+      status.textContent = 'Copy the link from your browser address bar';
+    }
+  });
+
+  const url = new URL(window.location.href);
+  for (const name of url.searchParams.getAll('model').slice(0, 5)) {
+    if (models.has(name) && !selected.includes(name)) selected.push(name);
+  }
+  render();
+  if (url.searchParams.get('view') === 'compare')
+    document.querySelector('[data-tab="compare"]').click();
+}
+
 async function init() {
   try {
     const data = await fetch('leaderboard.json', {cache: 'no-cache'}).then(r => r.json());
@@ -3695,6 +4180,8 @@ async function init() {
       });
     });
 
+    setupCompare(data);
+
     /* Last updated */
     if (data.updated) {
       const [y, mo, d] = data.updated.split('-');
@@ -3717,6 +4204,17 @@ document.querySelectorAll('.tab-btn').forEach(btn =>
     btn.classList.add('active');
     const tab = btn.dataset.tab;
     document.getElementById('tab-' + tab).classList.add('active');
+    const nav = btn.parentElement;
+    if (nav.scrollWidth > nav.clientWidth) {
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      nav.scrollLeft += btnRect.left - navRect.left - (nav.clientWidth - btnRect.width) / 2;
+      updateTabFades();
+    }
+    const url = new URL(window.location.href);
+    if (tab === 'compare') url.searchParams.set('view', 'compare');
+    else if (url.searchParams.get('view') === 'compare') url.searchParams.delete('view');
+    window.history.replaceState(null, '', url);
     if (tab === 'analysis') {
       document.getElementById('tog-analysis-wer').classList.toggle('active', _chartState.analysis.sourceTab === 'wer');
       document.getElementById('tog-analysis-cer').classList.toggle('active', _chartState.analysis.sourceTab === 'cer');
