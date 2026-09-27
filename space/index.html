@@ -332,11 +332,10 @@
     .compare-chip button { flex: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
     .compare-chip button:hover { color: var(--text); }
     .compare-picker { position: relative; min-width: min(100%, 250px); }
-    .compare-add { min-height: 38px; padding: 7px 12px; border: 1px dashed var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
-    .compare-add:hover { border-color: var(--link); }
-    .compare-add[hidden], .compare-picker[hidden] { display: none; }
-    .compare-input-wrap { display: flex; align-items: center; background: var(--surf); border: 1px solid var(--border); border-radius: 8px; }
-    .compare-picker:focus-within .compare-input-wrap { border-color: var(--link); }
+    .compare-picker[hidden] { display: none; }
+    .compare-input-wrap { display: flex; align-items: center; background: var(--surf); border: 1px dashed var(--border); border-radius: 8px; }
+    .compare-input-wrap:hover { border-color: var(--link); }
+    .compare-picker:focus-within .compare-input-wrap { border-color: var(--link); border-style: solid; }
     .compare-input-wrap input { flex: 1; min-width: 0; height: 38px; padding: 0 11px; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; }
     .compare-options { position: absolute; z-index: 50; top: 100%; left: 0; right: 0; max-height: 300px; overflow-y: auto; margin-top: 4px; padding: 4px; background: var(--surf); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
     .compare-options[hidden] { display: none; }
@@ -1841,9 +1840,8 @@
       <h2 id="compare-title">Compare models</h2>
       <p class="page-intro compare-intro">Compare up to four models on the same Danish test sets, ordered by Mean WER leaderboard rank. Lower WER and CER are better.</p>
       <div class="compare-pickers" id="compare-pickers">
-        <button id="compare-add" class="compare-add" type="button">+ Add model</button>
-        <div class="compare-picker" id="compare-picker" hidden>
-          <div class="compare-input-wrap"><input id="compare-search" type="search" role="combobox" aria-label="Search models to compare" aria-autocomplete="list" placeholder="Search models…" autocomplete="off" aria-controls="compare-options" aria-expanded="false"></div>
+        <div class="compare-picker" id="compare-picker">
+          <div class="compare-input-wrap"><input id="compare-search" type="search" role="combobox" aria-label="Add model to comparison" aria-autocomplete="list" placeholder="+ Add model" autocomplete="off" aria-controls="compare-options" aria-expanded="false"></div>
           <div id="compare-options" class="compare-options" role="listbox" hidden></div>
         </div>
       </div>
@@ -3850,7 +3848,6 @@ function setupCompare(data) {
   const colors = ['#60a5fa', '#a78bfa', '#22d3ee', '#fbbf24'];
   const selected = [];
   const pickers = document.getElementById('compare-pickers');
-  const add = document.getElementById('compare-add');
   const picker = document.getElementById('compare-picker');
   const input = document.getElementById('compare-search');
   const list = document.getElementById('compare-options');
@@ -3885,7 +3882,7 @@ function setupCompare(data) {
     list.replaceChildren();
     const query = input.value.trim().toLocaleLowerCase();
     const matches = names.filter(name => !selected.includes(name) &&
-      name.toLocaleLowerCase().includes(query)).slice(0, 16);
+      name.toLocaleLowerCase().includes(query));
     if (!matches.length) {
       const empty = document.createElement('div');
       empty.className = 'compare-option-empty';
@@ -3925,10 +3922,9 @@ function setupCompare(data) {
     selected.sort(compareNames);
     input.value = '';
     hideOptions();
-    picker.hidden = true;
     syncURL();
     render();
-    if (!add.hidden) add.focus();
+    if (!picker.hidden) { input.focus(); hideOptions(); }
   }
   function remove(name) {
     const index = selected.indexOf(name);
@@ -3936,7 +3932,8 @@ function setupCompare(data) {
     selected.splice(index, 1);
     syncURL();
     render();
-    add.focus();
+    input.focus();
+    hideOptions();
   }
   function renderChips() {
     pickers.querySelectorAll('.compare-chip').forEach(chip => chip.remove());
@@ -3956,10 +3953,10 @@ function setupCompare(data) {
       close.textContent = '×';
       close.addEventListener('click', () => remove(name));
       chip.append(rank, label, close);
-      pickers.insertBefore(chip, add);
+      pickers.insertBefore(chip, picker);
     });
-    add.hidden = selected.length >= COMPARE_MAX_MODELS;
-    if (add.hidden) { picker.hidden = true; hideOptions(); }
+    picker.hidden = selected.length >= COMPARE_MAX_MODELS;
+    if (picker.hidden) hideOptions();
     document.getElementById('compare-count').textContent = `${selected.length} / ${COMPARE_MAX_MODELS} models`;
     clearAll.hidden = selected.length === 0;
     copy.disabled = selected.length === 0;
@@ -4210,19 +4207,15 @@ function setupCompare(data) {
       'Speed reflects the measured hardware and serving stack; compare it with that context in mind.';
   }
 
-  add.addEventListener('click', () => {
-    picker.hidden = false;
-    input.value = '';
-    input.focus();
-    showOptions();
-  });
   input.addEventListener('focus', showOptions);
+  input.addEventListener('click', showOptions);
   input.addEventListener('input', showOptions);
   input.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
+      event.preventDefault();
+      input.value = '';
       hideOptions();
-      picker.hidden = true;
-      add.focus();
+      input.blur();
     }
     if (event.key === 'ArrowDown') {
       const first = list.querySelector('button');
@@ -4234,13 +4227,14 @@ function setupCompare(data) {
     }
   });
   document.addEventListener('click', event => {
-    if (!picker.contains(event.target) && event.target !== add) hideOptions();
+    if (!picker.contains(event.target)) hideOptions();
   });
   clearAll.addEventListener('click', () => {
     selected.length = 0;
     syncURL();
     render();
-    add.focus();
+    input.focus();
+    hideOptions();
   });
   ['wer', 'cer'].forEach(key => document.getElementById(`compare-${key}`)
     .addEventListener('click', () => { metric = key; syncURL(); render(); }));
