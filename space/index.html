@@ -792,8 +792,8 @@
     .about tbody td { color: var(--muted); }
 
     /* ── Methodology ─────────────────────────────────────────────────── */
-    .methodology, #tab-compare { --page-accent: #f47a91; }
-    @media (prefers-color-scheme: light) { .methodology, #tab-compare { --page-accent: #aa2140; } }
+    .methodology, #tab-compare, .about-page { --page-accent: #f47a91; }
+    @media (prefers-color-scheme: light) { .methodology, #tab-compare, .about-page { --page-accent: #aa2140; } }
     .methodology { max-width: 1040px; counter-reset: method-section; }
     .page-hero {
       position: relative;
@@ -833,20 +833,8 @@
       line-height: 1.2;
     }
     .page-hero .page-intro { max-width: 64ch; margin-bottom: 17px; color: var(--text); }
-    .method-facts { display: flex; flex-wrap: wrap; gap: 7px; }
-    .method-facts span {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--surf) 84%, transparent);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .method-facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--page-accent); }
+    .page-hero .page-intro:last-child { margin-bottom: 0; }
+    .about-page .page-hero { margin-bottom: 18px; }
     .method-card {
       counter-increment: method-section;
       margin-top: 15px;
@@ -1883,15 +1871,18 @@
   </div>
 
   <!-- About tab -->
-  <div id="tab-about" class="tab-pane about">
-
-    <p>
-      An open, reproducible benchmark for <strong>Danish speech-to-text</strong>.
-      Every model is transcribed and scored the same way on the same five public
-      Danish test sets, so the numbers compare directly: Word Error Rate (WER)
-      and Character Error Rate (CER) — lower is better — plus speed. Open-weight
-      models you can run yourself and hosted transcription APIs are both included.
-    </p>
+  <div id="tab-about" class="tab-pane about about-page">
+    <header class="page-hero">
+      <p class="page-eyebrow">The benchmark</p>
+      <h2>About</h2>
+      <p class="page-intro">
+        An open, reproducible benchmark for <strong>Danish speech-to-text</strong>.
+        Every model is transcribed and scored the same way on the same five public
+        Danish test sets, so the numbers compare directly: Word Error Rate (WER)
+        and Character Error Rate (CER) — lower is better — plus speed. Open-weight
+        models you can run yourself and hosted transcription APIs are both included.
+      </p>
+    </header>
     <p lang="da">
       <strong>Åben benchmark for dansk tale til tekst.</strong> Sammenlign hvor
       præcist forskellige modeller til dansk talegenkendelse omsætter tale til
@@ -1946,11 +1937,6 @@
       <p class="page-eyebrow">How the leaderboard is scored</p>
       <h2>Methodology</h2>
       <p class="page-intro">The same scoring pipeline is applied to every model. These are the text rules, metrics, and evaluation conditions behind the results.</p>
-      <div class="method-facts" aria-label="Evaluation at a glance">
-        <span>5 equally weighted test sets</span>
-        <span>WER &amp; CER</span>
-        <span>Local speed on A100</span>
-      </div>
     </header>
 
     <section class="method-card">
