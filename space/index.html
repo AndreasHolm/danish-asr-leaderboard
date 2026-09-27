@@ -338,7 +338,9 @@
     .compare-option-empty { padding: 8px 10px; color: var(--muted); }
     .compare-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 22px; }
     .compare-count { color: var(--muted); font-size: 12px; }
-    .compare-clear-all, .compare-copy { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
+    .compare-clear-all, .compare-copy { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surf); color: var(--text); font: inherit; cursor: pointer; }
+    .compare-clear-all[hidden] { display: none; }
+    .compare-action-icon { width: 14px; height: 14px; flex: none; }
     .compare-clear-all:hover, .compare-copy:hover { border-color: var(--link); }
     .compare-copy:disabled { opacity: .45; cursor: not-allowed; }
     .compare-note { color: var(--muted); font-size: 12px; }
@@ -1694,7 +1696,7 @@
         <div id="compare-options" class="compare-options" role="listbox" hidden></div>
       </div>
     </div>
-    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden>Clear all</button><button class="compare-copy" id="compare-copy" type="button">Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+    <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
     <div id="compare-empty" class="compare-empty">Add at least two models to see their scores side by side.</div>
     <div id="compare-results" hidden>
       <section class="compare-section">
@@ -3759,7 +3761,7 @@ function setupCompare(data) {
       chip.style.setProperty('--model-color', colors[i]);
       chip.title = name;
       const label = document.createElement('span');
-      label.textContent = `${i + 1}. ${shortName(name)}`;
+      label.textContent = shortName(name);
       const close = document.createElement('button');
       close.type = 'button';
       close.setAttribute('aria-label', `Remove ${name}`);
