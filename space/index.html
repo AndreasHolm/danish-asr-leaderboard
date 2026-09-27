@@ -366,9 +366,17 @@
     .compare-metric { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
     .compare-metric button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
     .compare-metric button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
+    .compare-view { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 0 0 14px 12px; }
+    .compare-view button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
+    .compare-view button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
+    .compare-view button:focus-visible { outline: 2px solid var(--link); outline-offset: -2px; }
     .compare-legend { display: flex; flex-wrap: wrap; gap: 5px 18px; margin-bottom: 14px; color: var(--muted); font-size: 12px; }
     .compare-legend span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
     .compare-legend i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .compare-radar-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .compare-radar { max-width: 600px; margin: 0 auto 16px; }
+    .compare-radar svg { display: block; width: 100%; height: auto; }
+    .compare-radar-empty { padding: 24px; border: 1px dashed var(--border); border-radius: var(--r); color: var(--muted); text-align: center; }
     .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr) minmax(120px, 170px); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
     .compare-dataset:first-child { border-radius: var(--r) var(--r) 0 0; }
     .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
@@ -1701,10 +1709,13 @@
         <div class="compare-scroll"><table class="compare-summary" id="compare-summary"><thead><tr id="compare-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-summary-body"></tbody></table></div>
       </section>
       <section class="compare-section">
-        <h3>Results by test set</h3>
+        <h3>Performance by dataset</h3>
         <div id="compare-legend" class="compare-legend"></div>
         <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
+        <div class="compare-view" aria-label="Dataset display"><button id="compare-view-radar" class="active" type="button" aria-pressed="true">Radar</button><button id="compare-view-bar" type="button" aria-pressed="false">Bar</button><button id="compare-view-table" type="button" aria-pressed="false">Table</button></div>
+        <div id="compare-radar-view"><p class="compare-radar-note">Relative score on each dataset: the best selected model is 100. Farther out is better. Scores update when models change; Table shows the exact percentages.</p><div id="compare-radar" class="compare-radar"></div></div>
         <div id="compare-datasets"></div>
+        <div id="compare-dataset-table" class="compare-scroll" hidden><table class="compare-summary"><thead><tr id="compare-dataset-head"><th scope="col">Test set</th></tr></thead><tbody id="compare-dataset-body"></tbody></table></div>
       </section>
       <section id="compare-profiles" class="compare-section" hidden>
         <h3>Openness and features</h3>
@@ -3675,7 +3686,10 @@ function setupCompare(data) {
   const status = document.getElementById('compare-status');
   const copy = document.getElementById('compare-copy');
   const clearAll = document.getElementById('compare-clear-all');
-  let metric = new URL(window.location.href).searchParams.get('metric') === 'cer' ? 'cer' : 'wer';
+  const initialParams = new URL(window.location.href).searchParams;
+  let metric = initialParams.get('metric') === 'cer' ? 'cer' : 'wer';
+  let display = ['radar', 'bar', 'table'].includes(initialParams.get('display'))
+    ? initialParams.get('display') : 'radar';
 
   const score = value => Number.isFinite(value) ? `${value.toFixed(2)}%` : '—';
   const count = (row, suffix) => COMPARE_DATASETS.filter(([key]) =>
@@ -3687,6 +3701,8 @@ function setupCompare(data) {
     url.searchParams.set('view', 'compare');
     if (metric === 'cer') url.searchParams.set('metric', 'cer');
     else url.searchParams.delete('metric');
+    if (display === 'radar') url.searchParams.delete('display');
+    else url.searchParams.set('display', display);
     url.searchParams.delete('model');
     selected.forEach(name => url.searchParams.append('model', name));
     return url;
@@ -3777,7 +3793,8 @@ function setupCompare(data) {
     head.replaceChildren();
     const measure = document.createElement('th');
     measure.scope = 'col';
-    measure.textContent = id === 'compare-head' ? 'Measure' : 'Field';
+    measure.textContent = id === 'compare-head' ? 'Measure'
+      : id === 'compare-dataset-head' ? 'Test set' : 'Field';
     head.appendChild(measure);
     rows.forEach((row, i) => {
       const th = document.createElement('th');
@@ -3853,6 +3870,92 @@ function setupCompare(data) {
       }
     }
   }
+  function renderRadar(rows) {
+    const container = document.getElementById('compare-radar');
+    container.replaceChildren();
+    const complete = rows.map((row, i) => ({row, i})).filter(({row}) =>
+      COMPARE_DATASETS.every(([key]) => Number.isFinite(row[`${key}_${metric}`])));
+    if (!complete.length) {
+      const empty = document.createElement('div');
+      empty.className = 'compare-radar-empty';
+      empty.textContent = 'No selected model has scores on all five datasets. Bar and Table show the available scores.';
+      container.appendChild(empty);
+      return;
+    }
+    const best = COMPARE_DATASETS.map(([key]) => Math.min(...rows.map(row => row[`${key}_${metric}`])
+      .filter(Number.isFinite)));
+    const relative = (value, minimum) => minimum === 0
+      ? (value === 0 ? 100 : 0) : Math.min(100, 100 * minimum / value);
+    const width = 560, height = 490, cx = 280, cy = 245, radius = 170;
+    const angle = i => -Math.PI / 2 + i * 2 * Math.PI / COMPARE_DATASETS.length;
+    const point = (i, fraction) => [cx + Math.cos(angle(i)) * radius * fraction,
+      cy + Math.sin(angle(i)) * radius * fraction];
+    const svg = svgMk('svg', {viewBox:`0 0 ${width} ${height}`, role:'img',
+      'aria-label': `${metric.toUpperCase()} radar chart. Each axis uses the best selected score as 100, with farther out better. ${complete.map(({row}) => `${row.name}: ${COMPARE_DATASETS.map(([key, label]) => `${label} ${score(row[`${key}_${metric}`])}`).join(', ')}`).join('; ')}`});
+    const title = svgMk('title', {}, svg);
+    title.textContent = `Performance by dataset (${metric.toUpperCase()})`;
+    for (const level of [25, 50, 75, 100]) {
+      svgMk('polygon', {points:COMPARE_DATASETS.map((_, i) => point(i, level / 100).join(',')).join(' '),
+        fill:'none', stroke:'var(--border)', 'stroke-width':1}, svg);
+      svgTx(String(level), {x:cx - 8, y:cy - radius * level / 100 - 4,
+        fill:'var(--muted)', 'text-anchor':'end', 'font-size':12}, svg);
+    }
+    const axisLabels = ['CoRal conv.', 'CoRal read', 'CV (da)', 'FLEURS (da)', 'FTSpeech'];
+    COMPARE_DATASETS.forEach((_, i) => {
+      const [x, y] = point(i, 1);
+      svgMk('line', {x1:cx, y1:cy, x2:x, y2:y, stroke:'var(--border)', 'stroke-width':1}, svg);
+      const labelX = cx + Math.cos(angle(i)) * (radius + 16);
+      const labelY = cy + Math.sin(angle(i)) * (radius + 16);
+      svgTx(axisLabels[i], {x:labelX, y:labelY + 4, fill:'var(--text)',
+        'text-anchor':Math.abs(labelX - cx) < 8 ? 'middle' : labelX > cx ? 'start' : 'end',
+        'font-size':16}, svg);
+    });
+    for (const {row, i} of complete) {
+      const vertices = COMPARE_DATASETS.map(([key], axis) => {
+        const value = row[`${key}_${metric}`];
+        return point(axis, relative(value, best[axis]) / 100);
+      });
+      const series = svgMk('g', {}, svg);
+      const seriesTitle = svgMk('title', {}, series);
+      seriesTitle.textContent = row.name;
+      svgMk('polygon', {points:vertices.map(vertex => vertex.join(',')).join(' '),
+        fill:colors[i], 'fill-opacity':0.12, stroke:colors[i], 'stroke-width':2.5,
+        'stroke-linejoin':'round'}, series);
+      vertices.forEach((vertex, axis) => {
+        const dot = svgMk('circle', {cx:vertex[0], cy:vertex[1], r:4,
+          fill:colors[i], stroke:'var(--surf)', 'stroke-width':1}, series);
+        const dotTitle = svgMk('title', {}, dot);
+        dotTitle.textContent = `${row.name}: ${COMPARE_DATASETS[axis][1]} ${score(row[`${COMPARE_DATASETS[axis][0]}_${metric}`])}`;
+      });
+    }
+    container.appendChild(svg);
+    if (complete.length < rows.length) {
+      const note = document.createElement('p');
+      note.className = 'compare-radar-note';
+      note.textContent = 'Models without all five scores are omitted here; Bar and Table show their available scores.';
+      container.appendChild(note);
+    }
+  }
+  function renderDatasetTable(rows) {
+    renderHeader('compare-dataset-head', rows);
+    const body = document.getElementById('compare-dataset-body');
+    body.replaceChildren();
+    for (const [key, label] of COMPARE_DATASETS) {
+      const values = rows.map(row => row[`${key}_${metric}`]);
+      const finite = values.filter(Number.isFinite);
+      const minimum = finite.length ? Math.min(...finite) : null;
+      const best = finite.length && values.filter(value => value === minimum).length === 1
+        ? values.indexOf(minimum) : -1;
+      const tr = document.createElement('tr');
+      [label, ...values.map(score)].forEach((value, i) => {
+        const td = document.createElement('td');
+        td.textContent = value;
+        if (i === best + 1) td.style.color = colors[best];
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    }
+  }
   function render() {
     renderChips();
     const rows = selected.map(name => models.get(name));
@@ -3899,6 +4002,16 @@ function setupCompare(data) {
       document.getElementById(`compare-${key}`).classList.toggle('active', metric === key);
       document.getElementById(`compare-${key}`).setAttribute('aria-pressed', String(metric === key));
     }
+    for (const view of ['radar', 'bar', 'table']) {
+      const button = document.getElementById(`compare-view-${view}`);
+      button.classList.toggle('active', display === view);
+      button.setAttribute('aria-pressed', String(display === view));
+    }
+    document.getElementById('compare-radar-view').hidden = display !== 'radar';
+    document.getElementById('compare-datasets').hidden = display !== 'bar';
+    document.getElementById('compare-dataset-table').hidden = display !== 'table';
+    if (display === 'radar') renderRadar(rows);
+    if (display === 'table') renderDatasetTable(rows);
     const values = COMPARE_DATASETS.flatMap(([key]) => rows.map(row => row[`${key}_${metric}`]))
       .filter(Number.isFinite);
     const max = Math.max(1, ...values);
@@ -3989,6 +4102,8 @@ function setupCompare(data) {
   });
   ['wer', 'cer'].forEach(key => document.getElementById(`compare-${key}`)
     .addEventListener('click', () => { metric = key; syncURL(); render(); }));
+  ['radar', 'bar', 'table'].forEach(view => document.getElementById(`compare-view-${view}`)
+    .addEventListener('click', () => { display = view; syncURL(); render(); }));
   copy.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(shareURL().href);
