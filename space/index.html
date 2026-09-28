@@ -309,7 +309,9 @@
     .compare-track { height: 9px; background: var(--surf2); border-radius: 99px; overflow: hidden; }
     .compare-fill { height: 100%; border-radius: 99px; }
     .compare-bar-value { text-align: right; font-size: 12px; }
-    .compare-difference { color: var(--muted); font-size: 12px; text-align: right; }
+    .compare-difference { display: flex; align-items: center; justify-content: flex-end; gap: 5px; min-width: 0; color: var(--muted); font-size: 12px; }
+    .compare-winner-icon { width: 14px; height: 14px; flex: none; }
+    .compare-winner-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     @media (max-width: 720px) {
       .compare-hero { padding: 8px 4px 20px; }
       .compare-section { padding: 17px 14px; }
@@ -318,7 +320,7 @@
       .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
       .compare-dataset.single-model { grid-template-columns: 1fr; }
       .compare-bar { grid-template-columns: minmax(85px, 125px) minmax(0, 1fr) 58px; }
-      .compare-difference { text-align: left; }
+      .compare-difference { justify-content: flex-start; }
     }
 
     /* ── Toolbar ───────────────────────────────────────────────────── */
@@ -3953,7 +3955,15 @@ function setupCompare(data) {
         const winner = document.createElement('div');
         winner.className = 'compare-difference';
         if (best >= 0) {
-          winner.textContent = `Best: ${shortName(rows[best].name)}`;
+          const modelName = document.createElement('span');
+          modelName.className = 'compare-winner-name';
+          modelName.textContent = shortName(rows[best].name);
+          winner.append(_icon([
+            'M8 21h8', 'M12 17v4', 'M7 4h10v5a5 5 0 0 1-10 0V4Z',
+            'M5 6H3v2a4 4 0 0 0 4 4', 'M19 6h2v2a4 4 0 0 1-4 4',
+          ], 'compare-winner-icon'), modelName);
+          winner.setAttribute('aria-label', `Best: ${rows[best].name}`);
+          winner.title = `Best: ${rows[best].name}`;
           winner.style.color = colors[best];
         } else winner.textContent = finite.length ? 'Tie for best' : 'No scores';
         row.appendChild(winner);
