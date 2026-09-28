@@ -365,6 +365,26 @@
       min-width: 0;
       max-width: 300px;
     }
+    .download-csv {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surf);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .download-csv:hover:not(:disabled) { border-color: var(--accent); }
+    .download-csv:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .download-csv:disabled { opacity: 0.5; cursor: not-allowed; }
+    .download-csv svg { width: 14px; height: 14px; flex: 0 0 auto; }
     @media (max-width: 700px) {
       .filter-summary .search-wrap { display: none; }
       .filter-summary.open .search-wrap { display: block; }
@@ -1600,6 +1620,7 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
+      <button class="download-csv" id="download-csv" type="button" title="Download visible models in their current order, with WER and CER test set scores" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg>Download CSV</button>
     </div>
     <div class="table-scroll"><table id="table-wer"></table></div>
     <p style="font-size:12px;color:var(--muted);margin-top:10px">
@@ -2205,6 +2226,51 @@ const CER_COLS = [
     tip:'Date the evaluation results were submitted to the leaderboard.' },
 ];
 
+/* A flat export of the current leaderboard view. Both test-set metrics are
+   included even when the table is showing just one of them. */
+const LEADERBOARD_CSV_FIELDS = [
+  ['rank', 'rank'], ['rank_metric', 'rank_metric'], ['rank_method', 'rank_method'],
+  ['rank_score', 'rank_score'],
+  ['model', 'model'], ['model_url', 'url'], ['access', 'access'], ['license', 'license'],
+  ['size_b', 'size_b'], ['mean_wer_percent', 'mean_wer'],
+  ['mean_cer_percent', 'mean_cer'], ['speed_x', 'speed_x'],
+  ['hf_downloads', 'hf_downloads'],
+  ...['coral_conversation', 'coral_read_aloud', 'ftspeech', 'cv17_da', 'fleurs_da']
+    .flatMap(set => [
+      [`${set}_wer_percent`, `${set}_wer`],
+      [`${set}_cer_percent`, `${set}_cer`],
+    ]),
+  ['released', 'released'], ['submitted', 'submitted'],
+];
+
+function csvCell(value) {
+  if (value == null || (typeof value === 'number' && !Number.isFinite(value))) return '';
+  let cell = String(value);
+  // Spreadsheet apps can execute formulas in imported text cells.
+  if (typeof value !== 'number' && /^\s*[=+\-@]/.test(cell)) cell = "'" + cell;
+  return /[",\r\n]/.test(cell) ? '"' + cell.replace(/"/g, '""') + '"' : cell;
+}
+
+function makeLeaderboardCsv(data, viewRows, metric, method) {
+  const werByName = new Map(data.wer.map(row => [row.name, row]));
+  const cerByName = new Map(data.cer.map(row => [row.name, row]));
+  const lines = [LEADERBOARD_CSV_FIELDS.map(([header]) => header).join(',')];
+  for (const { name, rank } of viewRows) {
+    const rankingRow = (metric === 'wer' ? werByName : cerByName).get(name);
+    const model = { ...werByName.get(name), ...cerByName.get(name) };
+    const size = parseFloat(model.size);
+    const row = {
+      ...model, rank, rank_metric: metric.toUpperCase(),
+      rank_method: { mean: 'mean', borda: 'average_rank', bt: 'win_rate' }[method],
+      rank_score: method === 'mean' ? rankingRow?.[`mean_${metric}`]
+        : rankingRow?.[method === 'borda' ? 'borda_score' : 'bt_score'],
+      model: name, size_b: Number.isFinite(size) ? size : null,
+    };
+    lines.push(LEADERBOARD_CSV_FIELDS.map(([, key]) => csvCell(row[key])).join(','));
+  }
+  return lines.join('\r\n') + '\r\n';
+}
+
 /* Score cell: number + inline bar. Color: green <15, yellow <25, red ≥25 */
 function scoreCell(td, v, max) {
   if (v == null) { td.textContent = '—'; return; }
@@ -2345,6 +2411,8 @@ function buildHead(cols) {
 function buildRow(row, cols, maxVals) {
   const tr = document.createElement('tr');
   tr.dataset.n = row.name.toLowerCase();
+  tr.dataset.model = row.name;
+  tr.dataset.rank = row.rank;
 
   for (const c of cols) {
     const td = document.createElement('td');
@@ -2559,6 +2627,8 @@ function initFilterToggles() {
 
     summary.append(btn);
     if (searchWrap) summary.append(searchWrap);
+    const download = bar.querySelector('.download-csv');
+    if (download) summary.append(download);
     bar.parentNode.insertBefore(summary, bar);
     const search = summary.querySelector('.search');
     if (search) search.addEventListener('input', label);
@@ -2861,6 +2931,7 @@ function renderTable(el, rows, cols, maxVals) {
     sortKey = key; sortDir = dir;
     markHead(key, dir);
     paint(sortRows(key, dir, readFn));
+    el.refreshSearch?.();
   };
   el.sortState = () => ({ key: sortKey, dir: sortDir });
 
@@ -2888,7 +2959,10 @@ function wireSearch(searchId, countId, tableId) {
     const filtered = vis !== total;
     cnt.textContent = filtered ? vis + ' / ' + total + ' models' : '';
     cnt.hidden = !filtered;   /* .hidden here is scoped to table rows */
+    const download = document.getElementById('download-csv');
+    if (tableId === 'table-wer' && download) download.disabled = vis === 0;
   };
+  tbl.refreshSearch = refresh;
   if (!inp.dataset.searchWired) {
     inp.addEventListener('input', refresh);
     inp.dataset.searchWired = '1';
@@ -4031,6 +4105,19 @@ async function init() {
     let lbMetric = 'wer', analysisMetric = 'wer', timeMetric = 'wer';
 
     const methodFor = (metric) => (metric === 'wer' ? werMethod : cerMethod);
+    document.getElementById('download-csv').addEventListener('click', () => {
+      const viewRows = [...werEl.tBodies[0].rows]
+        .filter(tr => !tr.classList.contains('hidden'))
+        .map(tr => ({ name: tr.dataset.model, rank: Number(tr.dataset.rank) }));
+      if (!viewRows.length) return;
+      const csv = makeLeaderboardCsv(data, viewRows, lbMetric, methodFor(lbMetric));
+      const blobUrl = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `danish-asr-leaderboard-${data.updated || 'results'}.csv`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    });
     /* Which metric each tab is showing; its Rank by group acts on that one. */
     const tabMetric = () => ({ wer: lbMetric, analysis: analysisMetric, time: timeMetric });
 
