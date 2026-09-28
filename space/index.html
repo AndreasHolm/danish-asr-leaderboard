@@ -1659,6 +1659,7 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
+      <button class="download-csv" id="download-pareto" type="button" aria-label="Download Pareto CSV" data-tip="Download plotted Pareto data as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
     </header>
     <div class="chart-section">
@@ -1704,6 +1705,7 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
+      <button class="download-csv" id="download-time" type="button" aria-label="Download Over Time CSV" data-tip="Download plotted history as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
     </header>
     <div class="chart-section">
@@ -1735,7 +1737,7 @@
           <div id="compare-options" class="compare-options" role="listbox" hidden></div>
         </div>
       </div>
-      <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span></div>
+      <div class="compare-actions"><span id="compare-count" class="compare-count">0 / 4 models</span><button class="compare-clear-all" id="compare-clear-all" type="button" hidden><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>Clear all</button><button class="compare-copy" id="compare-copy" type="button"><svg class="compare-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy comparison link</button><span class="compare-note" id="compare-status" role="status"></span><button class="download-csv" id="download-compare" type="button" aria-label="Download comparison CSV" data-tip="Download selected models as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button></div>
     </section>
     <div id="compare-empty" class="compare-empty">Add a model to see its results.</div>
     <div id="compare-results" hidden>
@@ -2250,24 +2252,38 @@ function csvCell(value) {
   return /[",\r\n]/.test(cell) ? '"' + cell.replace(/"/g, '""') + '"' : cell;
 }
 
+function makeCsv(fields, rows) {
+  const lines = [fields.map(([header]) => header).join(',')];
+  for (const row of rows)
+    lines.push(fields.map(([, key]) => csvCell(row[key])).join(','));
+  return lines.join('\r\n') + '\r\n';
+}
+
+function downloadCsv(csv, filename) {
+  const blobUrl = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+}
+
 function makeLeaderboardCsv(data, viewRows, metric, method) {
   const werByName = new Map(data.wer.map(row => [row.name, row]));
   const cerByName = new Map(data.cer.map(row => [row.name, row]));
-  const lines = [LEADERBOARD_CSV_FIELDS.map(([header]) => header).join(',')];
-  for (const { name, rank } of viewRows) {
+  const rows = viewRows.map(({ name, rank }) => {
     const rankingRow = (metric === 'wer' ? werByName : cerByName).get(name);
     const model = { ...werByName.get(name), ...cerByName.get(name) };
     const size = parseFloat(model.size);
-    const row = {
+    return {
       ...model, rank, rank_metric: metric.toUpperCase(),
       rank_method: { mean: 'mean', borda: 'average_rank', bt: 'win_rate' }[method],
       rank_score: method === 'mean' ? rankingRow?.[`mean_${metric}`]
         : rankingRow?.[method === 'borda' ? 'borda_score' : 'bt_score'],
       model: name, size_b: Number.isFinite(size) ? size : null,
     };
-    lines.push(LEADERBOARD_CSV_FIELDS.map(([, key]) => csvCell(row[key])).join(','));
-  }
-  return lines.join('\r\n') + '\r\n';
+  });
+  return makeCsv(LEADERBOARD_CSV_FIELDS, rows);
 }
 
 /* Score cell: number + inline bar. Color: green <15, yellow <25, red ≥25 */
@@ -3298,6 +3314,40 @@ function computePareto(pts, yUp) {
   return front;
 }
 
+const CHART_METHOD_NAMES = { mean: 'mean', borda: 'average_rank', bt: 'win_rate' };
+const CHART_SCORE_UNIT = { mean: 'percent', borda: 'rank', bt: 'percent' };
+function chartScoreKey(metric, method) {
+  return method === 'mean' ? `mean_${metric}` : method === 'borda' ? 'borda_score' : 'bt_score';
+}
+function sizeChartPoints(rows, metric, method) {
+  const key = chartScoreKey(metric, method);
+  return rows.map(r => ({ r, sz: parseFloat(r.size), yv: r[key] }))
+    .filter(({ sz, yv }) => Number.isFinite(sz) && sz > 0 && Number.isFinite(yv));
+}
+
+const PARETO_CSV_FIELDS = [
+  ['model', 'model'], ['model_url', 'url'], ['access', 'access'],
+  ['size_b', 'size_b'], ['metric', 'metric'], ['rank_method', 'rank_method'],
+  ['score', 'score'], ['score_unit', 'score_unit'],
+  ['ci_low', 'ci_low'], ['ci_high', 'ci_high'], ['pareto_optimal', 'pareto_optimal'],
+];
+function makeParetoCsv(rows, metric, method, includeCI) {
+  const pts = sizeChartPoints(rows, metric, method);
+  const frontier = new Set(computePareto(pts.filter(p => p.r.access === 'open'), method === 'bt')
+    .map(p => p.r.name));
+  const ciKey = chartScoreKey(metric, method) + '_ci';
+  return makeCsv(PARETO_CSV_FIELDS, pts
+    .sort((a, b) => a.sz - b.sz || a.r.name.localeCompare(b.r.name))
+    .map(({ r, sz, yv }) => ({
+      model: r.name, url: r.url, access: r.access, size_b: sz,
+      metric: metric.toUpperCase(), rank_method: CHART_METHOD_NAMES[method],
+      score: yv, score_unit: CHART_SCORE_UNIT[method],
+      ci_low: includeCI ? r[ciKey]?.lo : null,
+      ci_high: includeCI ? r[ciKey]?.hi : null,
+      pareto_optimal: frontier.has(r.name),
+    })));
+}
+
 function updateParetoPanel(pareto, tab, yLbl, method) {
   const panel = document.getElementById(`pareto-panel-${tab}`);
   if (!panel) return;
@@ -3343,15 +3393,13 @@ function _drawChart(rows, method, tab) {
   const metricTab = tab === 'analysis' ? (_chartState.analysis.sourceTab || 'wer') : tab;
   const meanKey = metricTab === 'cer' ? 'mean_cer' : 'mean_wer';
   const meanLbl = metricTab === 'cer' ? 'Mean CER' : 'Mean WER';
-  const yKey   = method === 'mean' ? meanKey         : method === 'borda' ? 'borda_score'    : 'bt_score';
-  const yCIKey = method === 'mean' ? meanKey + '_ci' : method === 'borda' ? 'borda_score_ci' : 'bt_score_ci';
+  const yKey   = chartScoreKey(metricTab, method);
+  const yCIKey = yKey + '_ci';
   const yLbl   = method === 'mean' ? (metricTab === 'cer' ? 'Mean CER (%)' : 'Mean WER (%)') : method === 'borda' ? 'Avg. Rank' : 'Win Rate (%)';
   const yUp    = method === 'bt';
   const fmt    = v => method === 'borda' ? v.toFixed(1) : method === 'bt' ? v.toFixed(1) + '%' : v.toFixed(2) + '%';
 
-  const pts = rows
-    .map(r => ({ r, sz: parseFloat(r.size), yv: r[yKey] }))
-    .filter(({ sz, yv }) => !isNaN(sz) && sz > 0 && yv != null);
+  const pts = sizeChartPoints(rows, metricTab, method);
 
   if (pts.length < 2) {
     tx('Not enough size data to plot.', { x: W / 2, y: H / 2, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': '13' }, svgEl);
@@ -3545,6 +3593,40 @@ function computeRecords(pts, yUp) {
   return records;
 }
 
+function timeChartData(rows, metric, method) {
+  const key = chartScoreKey(metric, method);
+  const yUp = method === 'bt';
+  const dated = rows.map(r => ({ r, t: parseISODate(r.released), yv: r[key] }))
+    .filter(({ yv }) => Number.isFinite(yv));
+  return {
+    undated: dated.filter(p => p.t == null).length,
+    pts: dated.filter(p => p.t != null)
+      .sort((a, b) => a.t - b.t || (yUp ? b.yv - a.yv : a.yv - b.yv)),
+  };
+}
+
+const TIME_CSV_FIELDS = [
+  ['date', 'date'], ['date_basis', 'date_basis'],
+  ['model', 'model'], ['model_url', 'url'], ['access', 'access'],
+  ['metric', 'metric'], ['rank_method', 'rank_method'],
+  ['score', 'score'], ['score_unit', 'score_unit'],
+  ['ci_low', 'ci_low'], ['ci_high', 'ci_high'], ['record_at_date', 'record_at_date'],
+];
+function makeTimeCsv(rows, metric, method, includeCI) {
+  const { pts } = timeChartData(rows, metric, method);
+  const records = new Set(computeRecords(pts, method === 'bt'));
+  const ciKey = chartScoreKey(metric, method) + '_ci';
+  return makeCsv(TIME_CSV_FIELDS, pts.map(p => ({
+    date: new Date(p.t).toISOString().slice(0, 10), date_basis: p.r.date_basis,
+    model: p.r.name, url: p.r.url, access: p.r.access,
+    metric: metric.toUpperCase(), rank_method: CHART_METHOD_NAMES[method],
+    score: p.yv, score_unit: CHART_SCORE_UNIT[method],
+    ci_low: includeCI ? p.r[ciKey]?.lo : null,
+    ci_high: includeCI ? p.r[ciKey]?.hi : null,
+    record_at_date: records.has(p),
+  })));
+}
+
 function updateRecordPanel(records, metricLbl, fmt, method, undated = 0) {
   const yUp = method === 'bt';
   const panel = document.getElementById('record-panel-time');
@@ -3613,8 +3695,8 @@ function _drawTimeChart(rows, metric, method) {
   /* Same keys, labels and formatting as the size chart, so a reader moving
      between the two tabs is looking at the same quantity under the same name. */
   const meanKey = metric === 'cer' ? 'mean_cer' : 'mean_wer';
-  const yKey    = method === 'mean' ? meanKey         : method === 'borda' ? 'borda_score'    : 'bt_score';
-  const yCIKey  = method === 'mean' ? meanKey + '_ci' : method === 'borda' ? 'borda_score_ci' : 'bt_score_ci';
+  const yKey    = chartScoreKey(metric, method);
+  const yCIKey  = yKey + '_ci';
   const meanLbl   = metric === 'cer' ? 'Mean CER' : 'Mean WER';
   const metricLbl = method === 'mean' ? meanLbl : method === 'borda' ? 'Avg. Rank' : 'Win Rate';
   const yLbl    = method === 'mean' ? metricLbl + ' (%)' : method === 'borda' ? 'Avg. Rank' : 'Win Rate (%)';
@@ -3624,12 +3706,7 @@ function _drawTimeChart(rows, metric, method) {
   /* Ties on a date are ordered best-first so the day's best model is the one
      that takes the record, instead of a worse model on the same day taking it
      and producing two steps at the same x. */
-  const dated = rows
-    .map(r => ({ r, t: parseISODate(r.released), yv: r[yKey] }))
-    .filter(({ yv }) => yv != null);
-  const undated = dated.filter(p => p.t == null).length;
-  const pts = dated.filter(p => p.t != null)
-    .sort((a, b) => a.t - b.t || (yUp ? b.yv - a.yv : a.yv - b.yv));
+  const { pts, undated } = timeChartData(rows, metric, method);
 
   if (pts.length < 2) {
     tx('Not enough release dates to plot.', { x: W / 2, y: H / 2, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': '13' }, svgEl);
@@ -3771,6 +3848,33 @@ const COMPARE_DATASETS = [
   ['ftspeech', 'FTSpeech'],
 ];
 const COMPARE_MAX_MODELS = 4;
+const COMPARE_CSV_FIELDS = [
+  ['leaderboard_wer_rank', 'wer_rank'], ['model', 'name'],
+  ['model_url', 'url'], ['access', 'access'], ['license', 'license'],
+  ['size_b', 'size_b'], ['submitted', 'submitted'],
+  ['selected_metric', 'selected_metric'],
+  ['mean_wer_percent', 'mean_wer'], ['wer_sets', 'wer_sets'],
+  ['mean_cer_percent', 'mean_cer'], ['cer_sets', 'cer_sets'],
+  ['speed_x', 'speed_x'],
+  ...COMPARE_DATASETS.flatMap(([key]) => [
+    [`${key}_wer_percent`, `${key}_wer`],
+    [`${key}_cer_percent`, `${key}_cer`],
+  ]),
+];
+function makeCompareCsv(rows, rankOf, metric) {
+  return makeCsv(COMPARE_CSV_FIELDS, rows.map(row => {
+    const size = parseFloat(row.size);
+    const count = suffix => COMPARE_DATASETS.filter(([key]) =>
+      Number.isFinite(row[`${key}_${suffix}`])).length;
+    return {
+      ...row,
+      wer_rank: Number.isFinite(rankOf(row.name)) ? rankOf(row.name) : null,
+      size_b: Number.isFinite(size) ? size : null,
+      selected_metric: metric.toUpperCase(),
+      wer_sets: count('wer'), cer_sets: count('cer'),
+    };
+  }));
+}
 
 function setupCompare(data) {
   const werRanks = new Map(data.wer.map(row => [row.name, row.rank]));
@@ -3791,6 +3895,7 @@ function setupCompare(data) {
   const status = document.getElementById('compare-status');
   const copy = document.getElementById('compare-copy');
   const clearAll = document.getElementById('compare-clear-all');
+  const downloadCompare = document.getElementById('download-compare');
   let metric = new URL(window.location.href).searchParams.get('metric') === 'cer' ? 'cer' : 'wer';
 
   const score = value => Number.isFinite(value) ? `${value.toFixed(2)}%` : '—';
@@ -3894,6 +3999,7 @@ function setupCompare(data) {
     document.getElementById('compare-count').textContent = `${selected.length} / ${COMPARE_MAX_MODELS} models`;
     clearAll.hidden = selected.length === 0;
     copy.disabled = selected.length === 0;
+    downloadCompare.disabled = selected.length === 0;
   }
   function renderHeader(id, rows) {
     const head = document.getElementById(id);
@@ -4065,6 +4171,12 @@ function setupCompare(data) {
       status.textContent = 'Copy the link from your browser address bar';
     }
   });
+  downloadCompare.addEventListener('click', () => {
+    if (!selected.length) return;
+    const rows = selected.map(name => models.get(name));
+    downloadCsv(makeCompareCsv(rows, rankOf, metric),
+      `danish-asr-comparison-${data.updated || 'results'}.csv`);
+  });
 
   const url = new URL(window.location.href);
   for (const name of url.searchParams.getAll('model').slice(0, COMPARE_MAX_MODELS)) {
@@ -4110,12 +4222,19 @@ async function init() {
         .map(tr => ({ name: tr.dataset.model, rank: Number(tr.dataset.rank) }));
       if (!viewRows.length) return;
       const csv = makeLeaderboardCsv(data, viewRows, lbMetric, methodFor(lbMetric));
-      const blobUrl = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `danish-asr-leaderboard-${data.updated || 'results'}.csv`;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      downloadCsv(csv, `danish-asr-leaderboard-${data.updated || 'results'}.csv`);
+    });
+    document.getElementById('download-pareto').addEventListener('click', () => {
+      const { rows, method, sourceTab } = _chartState.analysis;
+      if (!rows || sizeChartPoints(rows, sourceTab, method).length < 2) return;
+      downloadCsv(makeParetoCsv(rows, sourceTab, method, showCI),
+        `danish-asr-pareto-${data.updated || 'results'}.csv`);
+    });
+    document.getElementById('download-time').addEventListener('click', () => {
+      const { rows, method, sourceTab } = _chartState.time;
+      if (!rows || timeChartData(rows, sourceTab, method).pts.length < 2) return;
+      downloadCsv(makeTimeCsv(rows, sourceTab, method, showCI),
+        `danish-asr-over-time-${data.updated || 'results'}.csv`);
     });
     /* Which metric each tab is showing; its Rank by group acts on that one. */
     const tabMetric = () => ({ wer: lbMetric, analysis: analysisMetric, time: timeMetric });
@@ -4135,6 +4254,8 @@ async function init() {
       document.getElementById('tog-time-cer').classList.toggle('active', !isWer);
       document.querySelector('#time-chart-title .chart-title-text').textContent =
         `Performance Over Time (${isWer ? 'WER' : 'CER'})`;
+      document.getElementById('download-time').disabled =
+        timeChartData(rows, metric, methodFor(metric)).pts.length < 2;
       renderTimeChart(rows, metric, methodFor(metric));
       syncMethodBtns();
     }
@@ -4153,6 +4274,8 @@ async function init() {
       document.getElementById('tog-analysis-cer').classList.toggle('active', !isWer);
       document.querySelector('#analysis-chart-title .chart-title-text').textContent =
         `Performance vs. Model Size (${isWer ? 'WER' : 'CER'})`;
+      document.getElementById('download-pareto').disabled =
+        sizeChartPoints(rows, metric, methodFor(metric)).length < 2;
       renderSizeChart(rows, methodFor(metric), 'analysis');
       syncMethodBtns();
     }
