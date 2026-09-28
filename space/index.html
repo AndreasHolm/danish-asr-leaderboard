@@ -386,6 +386,8 @@
     .download-csv:disabled { opacity: 0.5; cursor: not-allowed; }
     .download-csv svg { width: 14px; height: 14px; flex: 0 0 auto; }
     @media (max-width: 700px) {
+      .download-csv { width: 34px; padding: 0; justify-content: center; }
+      .download-csv-label { display: none; }
       .filter-summary .search-wrap { display: none; }
       .filter-summary.open .search-wrap { display: block; }
     }
@@ -1620,7 +1622,7 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
-      <button class="download-csv" id="download-csv" type="button" title="Download visible models in their current order, with WER and CER test set scores" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg>Download CSV</button>
+      <button class="download-csv" id="download-csv" type="button" aria-label="Download CSV" title="Download visible models in their current order, with WER and CER test set scores" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg><span class="download-csv-label">Download CSV</span></button>
     </div>
     <div class="table-scroll"><table id="table-wer"></table></div>
     <p style="font-size:12px;color:var(--muted);margin-top:10px">
@@ -2625,10 +2627,10 @@ function initFilterToggles() {
     bar.addEventListener('input', label);
     bar.addEventListener('click', () => setTimeout(label, 0));
 
-    summary.append(btn);
-    if (searchWrap) summary.append(searchWrap);
     const download = bar.querySelector('.download-csv');
     if (download) summary.append(download);
+    summary.append(btn);
+    if (searchWrap) summary.append(searchWrap);
     bar.parentNode.insertBefore(summary, bar);
     const search = summary.querySelector('.search');
     if (search) search.addEventListener('input', label);
