@@ -298,29 +298,25 @@
     .compare-metric { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
     .compare-metric button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
     .compare-metric button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
-    .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr) minmax(120px, 170px); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
-    .compare-dataset.single-model { grid-template-columns: minmax(125px, 190px) minmax(0, 1fr); }
+    .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
     .compare-dataset:first-child { border-radius: var(--r) var(--r) 0 0; }
     .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
     .compare-dataset-name { font-weight: 700; }
     .compare-bars { display: grid; gap: 5px; }
     .compare-bar { display: grid; grid-template-columns: minmax(105px, 160px) minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
-    .compare-bar-tag { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; }
+    .compare-bar-tag { display: inline-flex; align-items: center; gap: 4px; min-width: 0; font-size: 12px; font-weight: 800; }
+    .compare-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .compare-track { height: 9px; background: var(--surf2); border-radius: 99px; overflow: hidden; }
     .compare-fill { height: 100%; border-radius: 99px; }
     .compare-bar-value { text-align: right; font-size: 12px; }
-    .compare-difference { display: flex; align-items: center; justify-content: flex-end; gap: 5px; min-width: 0; color: var(--muted); font-size: 12px; }
     .compare-winner-icon { width: 14px; height: 14px; flex: none; }
-    .compare-winner-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     @media (max-width: 720px) {
       .compare-hero { padding: 8px 4px 20px; }
       .compare-section { padding: 17px 14px; }
       .compare-section > h3 { font-size: 16px; }
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
       .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
-      .compare-dataset.single-model { grid-template-columns: 1fr; }
       .compare-bar { grid-template-columns: minmax(85px, 125px) minmax(0, 1fr) 58px; }
-      .compare-difference { justify-content: flex-start; }
     }
 
     /* ── Toolbar ───────────────────────────────────────────────────── */
@@ -3920,7 +3916,6 @@ function setupCompare(data) {
         ? scores.indexOf(minimum) : -1;
       const row = document.createElement('div');
       row.className = 'compare-dataset';
-      if (rows.length === 1) row.classList.add('single-model');
       const name = document.createElement('div');
       name.className = 'compare-dataset-name';
       name.textContent = label;
@@ -3933,8 +3928,18 @@ function setupCompare(data) {
         const tag = document.createElement('span');
         tag.className = 'compare-bar-tag';
         tag.style.color = colors[i];
-        tag.textContent = shortName(rows[i].name);
-        tag.title = rows[i].name;
+        const modelName = document.createElement('span');
+        modelName.className = 'compare-bar-label';
+        modelName.textContent = shortName(rows[i].name);
+        if (i === best) {
+          tag.appendChild(_icon([
+            'M8 21h8', 'M12 17v4', 'M7 4h10v5a5 5 0 0 1-10 0V4Z',
+            'M5 6H3v2a4 4 0 0 0 4 4', 'M19 6h2v2a4 4 0 0 1-4 4',
+          ], 'compare-winner-icon'));
+          tag.setAttribute('aria-label', `Best: ${rows[i].name}`);
+        }
+        tag.appendChild(modelName);
+        tag.title = i === best ? `Best: ${rows[i].name}` : rows[i].name;
         const track = document.createElement('div');
         track.className = 'compare-track';
         if (Number.isFinite(value)) {
@@ -3951,23 +3956,6 @@ function setupCompare(data) {
         bars.appendChild(line);
       });
       row.append(name, bars);
-      if (rows.length > 1) {
-        const winner = document.createElement('div');
-        winner.className = 'compare-difference';
-        if (best >= 0) {
-          const modelName = document.createElement('span');
-          modelName.className = 'compare-winner-name';
-          modelName.textContent = shortName(rows[best].name);
-          winner.append(_icon([
-            'M8 21h8', 'M12 17v4', 'M7 4h10v5a5 5 0 0 1-10 0V4Z',
-            'M5 6H3v2a4 4 0 0 0 4 4', 'M19 6h2v2a4 4 0 0 1-4 4',
-          ], 'compare-winner-icon'), modelName);
-          winner.setAttribute('aria-label', `Best: ${rows[best].name}`);
-          winner.title = `Best: ${rows[best].name}`;
-          winner.style.color = colors[best];
-        } else winner.textContent = finite.length ? 'Tie for best' : 'No scores';
-        row.appendChild(winner);
-      }
       container.appendChild(row);
     }
     document.getElementById('compare-caveat').textContent =
