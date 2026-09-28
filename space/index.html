@@ -368,18 +368,16 @@
     .download-csv {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       margin-left: auto;
-      gap: 7px;
+      flex: 0 0 34px;
+      width: 34px;
       height: 34px;
-      padding: 0 12px;
+      padding: 0;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--surf);
       color: var(--text);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
       cursor: pointer;
     }
     .download-csv:hover:not(:disabled) { border-color: var(--accent); }
@@ -387,8 +385,6 @@
     .download-csv:disabled { opacity: 0.5; cursor: not-allowed; }
     .download-csv svg { width: 14px; height: 14px; flex: 0 0 auto; }
     @media (max-width: 700px) {
-      .download-csv { width: 34px; padding: 0; justify-content: center; }
-      .download-csv-label { display: none; }
       .filter-summary .search-wrap { display: none; }
       .filter-summary.open .search-wrap { display: block; }
     }
@@ -1623,7 +1619,7 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
-      <button class="download-csv" id="download-csv" type="button" aria-label="Download CSV" title="Download visible models in their current order, with WER and CER test set scores" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg><span class="download-csv-label">Download CSV</span></button>
+      <button class="download-csv" id="download-csv" type="button" aria-label="Download CSV" title="Download CSV of visible models" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
     <div class="table-scroll"><table id="table-wer"></table></div>
     <p style="font-size:12px;color:var(--muted);margin-top:10px">
