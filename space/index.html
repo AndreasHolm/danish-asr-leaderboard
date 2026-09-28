@@ -368,6 +368,7 @@
     .download-csv {
       display: inline-flex;
       align-items: center;
+      margin-left: auto;
       gap: 7px;
       height: 34px;
       padding: 0 12px;
@@ -2627,10 +2628,10 @@ function initFilterToggles() {
     bar.addEventListener('input', label);
     bar.addEventListener('click', () => setTimeout(label, 0));
 
-    const download = bar.querySelector('.download-csv');
-    if (download) summary.append(download);
     summary.append(btn);
     if (searchWrap) summary.append(searchWrap);
+    const download = bar.querySelector('.download-csv');
+    if (download) summary.append(download);
     bar.parentNode.insertBefore(summary, bar);
     const search = summary.querySelector('.search');
     if (search) search.addEventListener('input', label);
