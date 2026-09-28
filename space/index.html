@@ -298,17 +298,14 @@
     .compare-metric { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
     .compare-metric button { padding: 6px 14px; border: 0; background: var(--surf); color: var(--muted); font: inherit; cursor: pointer; }
     .compare-metric button.active { background: var(--surf2); color: var(--text); font-weight: 700; }
-    .compare-legend { display: flex; flex-wrap: wrap; gap: 5px 18px; margin-bottom: 14px; color: var(--muted); font-size: 12px; }
-    .compare-legend span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
-    .compare-legend i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
     .compare-dataset { display: grid; grid-template-columns: minmax(125px, 190px) minmax(0, 1fr) minmax(120px, 170px); gap: 14px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-bottom: 0; background: var(--surf); }
     .compare-dataset.single-model { grid-template-columns: minmax(125px, 190px) minmax(0, 1fr); }
     .compare-dataset:first-child { border-radius: var(--r) var(--r) 0 0; }
     .compare-dataset:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
     .compare-dataset-name { font-weight: 700; }
     .compare-bars { display: grid; gap: 5px; }
-    .compare-bar { display: grid; grid-template-columns: 25px minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
-    .compare-bar-tag { font-size: 11px; font-weight: 800; }
+    .compare-bar { display: grid; grid-template-columns: minmax(105px, 160px) minmax(0, 1fr) 58px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+    .compare-bar-tag { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; }
     .compare-track { height: 9px; background: var(--surf2); border-radius: 99px; overflow: hidden; }
     .compare-fill { height: 100%; border-radius: 99px; }
     .compare-bar-value { text-align: right; font-size: 12px; }
@@ -320,6 +317,7 @@
       .compare-summary th, .compare-summary td { padding: 9px 7px; font-size: 12px; }
       .compare-dataset { grid-template-columns: 1fr; gap: 8px; }
       .compare-dataset.single-model { grid-template-columns: 1fr; }
+      .compare-bar { grid-template-columns: minmax(85px, 125px) minmax(0, 1fr) 58px; }
       .compare-difference { text-align: left; }
     }
 
@@ -1733,7 +1731,6 @@
         <p class="compare-scroll-hint">Swipe sideways to see the full table, if needed.</p>
         <div class="compare-scroll"><table class="compare-summary" id="compare-overall-summary"><thead><tr id="compare-overall-head"><th scope="col">Measure</th></tr></thead><tbody id="compare-overall-body"></tbody></table></div>
         <h4 class="compare-subheading">By test set</h4>
-        <div id="compare-legend" class="compare-legend"></div>
         <div class="compare-metric" aria-label="Comparison metric"><button id="compare-wer" class="active" type="button" aria-pressed="true">WER</button><button id="compare-cer" type="button" aria-pressed="false">CER</button></div>
         <div id="compare-datasets"></div>
       </section>
@@ -3708,7 +3705,6 @@ function setupCompare(data) {
   const werRanks = new Map(data.wer.map(row => [row.name, row.rank]));
   const rankOf = name => werRanks.get(name) ?? Infinity;
   const rankLabel = name => Number.isFinite(rankOf(name)) ? `WER #${rankOf(name)}` : 'Unranked';
-  const shortRank = name => Number.isFinite(rankOf(name)) ? `#${rankOf(name)}` : '—';
   const compareNames = (a, b) => rankOf(a) === rankOf(b)
     ? a.localeCompare(b) : rankOf(a) - rankOf(b);
   const models = new Map();
@@ -3905,15 +3901,6 @@ function setupCompare(data) {
     addSummaryRow('compare-overall-body', 'Speed', rows.map(row =>
       Number.isFinite(row.speed_x) ? `${row.speed_x.toFixed(1)}×` : '—'));
 
-    const legend = document.getElementById('compare-legend');
-    legend.replaceChildren();
-    rows.forEach((row, i) => {
-      const item = document.createElement('span');
-      const dot = document.createElement('i');
-      dot.style.background = colors[i];
-      item.append(dot, document.createTextNode(`${rankLabel(row.name)} · ${row.name}`));
-      legend.appendChild(item);
-    });
     for (const key of ['wer', 'cer']) {
       document.getElementById(`compare-${key}`).classList.toggle('active', metric === key);
       document.getElementById(`compare-${key}`).setAttribute('aria-pressed', String(metric === key));
@@ -3944,7 +3931,8 @@ function setupCompare(data) {
         const tag = document.createElement('span');
         tag.className = 'compare-bar-tag';
         tag.style.color = colors[i];
-        tag.textContent = shortRank(rows[i].name);
+        tag.textContent = shortName(rows[i].name);
+        tag.title = rows[i].name;
         const track = document.createElement('div');
         track.className = 'compare-track';
         if (Number.isFinite(value)) {
