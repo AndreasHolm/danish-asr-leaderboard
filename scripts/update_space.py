@@ -61,6 +61,7 @@ PROVIDER_DOCS = {
     "soniox": "https://soniox.com/docs/stt/get-started/transcribe-audio-file",
     "azure": "https://learn.microsoft.com/azure/ai-services/openai/concepts/models",
     "syv-transcribe": "https://syv.ai",
+    "saga-2-l": "https://capacit.com/da",
     "ordbogen": "https://odincore.ai/docs/models/ordbogen-whisper",
     # Distinct from the "gpt-4o" key above: gpt-transcribe is a separate model
     # with its own docs page, and its name contains no "gpt-4o" substring, so
