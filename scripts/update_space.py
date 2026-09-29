@@ -83,7 +83,9 @@ PROVIDER_LOGO = {
 
 # API models that have an HF org — fall back to that org's avatar when there is
 # no explicit PROVIDER_LOGO entry (which takes precedence).
-PROVIDER_HF_ORG: dict[str, str] = {}
+PROVIDER_HF_ORG: dict[str, str] = {
+    "saga-2-l": "capacit-ai",
+}
 
 # Hand-maintained model release dates; see CONTRIBUTING.md for the format.
 RELEASE_DATES = json.loads(
