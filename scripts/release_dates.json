@@ -133,6 +133,11 @@
     "released": "2026-01-28",
     "source": "huggingface"
   },
+  "saga-2-l": {
+    "released": "2026-09-29",
+    "source": "best guess",
+    "note": "Provisional date supplied for this hosted model; provider website: https://capacit.com"
+  },
   "scribe_v2": {
     "released": "2026-01-09",
     "source": "published",
