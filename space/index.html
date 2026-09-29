@@ -511,6 +511,21 @@
 
     /* Column classes */
     .c-rank { width: 52px; text-align: center; font-size: 17px; }
+    .rank-number {
+      display: inline-grid;
+      place-items: center;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 4px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--surf2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
     .c-submitted { width: 96px; white-space: nowrap; font-size: 12px; opacity: 0.6; }
     .c-model { min-width: 220px; max-width: 360px; }
     .c-model a {
@@ -1231,16 +1246,19 @@
       }
       tbody tr:last-child { border-bottom: none; }
       tbody tr:nth-child(even) td { background-color: transparent; }
+      :root[data-theme="light"] tbody tr:nth-child(even) td:is([data-key="#"], [data-key="model"]) {
+        background-color: transparent;
+      }
       tbody tr:hover td { background-image: none; }
       tbody td { padding: 0; }
 
       /* 1 -- rank leads the title line, then the icon and name. The rank is a
-         fixed 24px and the name takes `100% - (24px + the 6px row gap)`, so the
+         fixed 26px and the name takes `100% - (26px + the 6px row gap)`, so the
          two fill the line exactly and the meta line below always wraps onto its
          own row -- it cannot ride up beside a short model name. */
       tbody tr td[data-key="#"] {
         order: 1;
-        flex: 0 0 24px;
+        flex: 0 0 26px;
         /* .c-rank centres and widens the cell for the desktop table; neither
            applies once the cell is a flex item in a card. */
         width: auto;
@@ -1255,7 +1273,7 @@
 
       tbody td[data-key="model"] {
         order: 1;
-        flex: 1 1 calc(100% - 30px);
+        flex: 1 1 calc(100% - 32px);
         min-width: 0;
       }
       /* size / access / licence now live inside the model cell, so the card's
@@ -2439,7 +2457,13 @@ function buildRow(row, cols, maxVals) {
     const v = row[c.key];
 
     if (c.key === '#') {
-      td.textContent = row.rank <= 3 ? MEDALS[row.rank - 1] : String(row.rank);
+      if (row.rank <= 3) td.textContent = MEDALS[row.rank - 1];
+      else {
+        const badge = document.createElement('span');
+        badge.className = 'rank-number';
+        badge.textContent = String(row.rank);
+        td.appendChild(badge);
+      }
 
     } else if (c.key === 'borda_delta' || c.key === 'bt_delta') {
       const d = row[c.key];
