@@ -1,0 +1,18 @@
+{
+  "model": "saga-2-l",
+  "model_link": "saga-2-l",
+  "params_b": 0.0,
+  "access": "proprietary",
+  "submitted": "2026-09-28",
+  "unicode_form": "NFKC",
+  "number_words": true,
+  "filler_words": true,
+  "speed_x": 43.5,
+  "datasets": [
+    "coral_conversation",
+    "coral_read_aloud",
+    "cv17_da",
+    "fleurs_da",
+    "ftspeech"
+  ]
+}
