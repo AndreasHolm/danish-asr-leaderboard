@@ -46,7 +46,8 @@
   "gpt-4o-mini-transcribe": {
     "released": "2025-03-20",
     "source": "published",
-    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/"
+    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "plot_by": "submitted"
   },
   "gpt-4o-mini-transcribe-benchmark": {
     "released": "2025-03-20",
@@ -56,7 +57,8 @@
   "gpt-4o-transcribe": {
     "released": "2025-03-20",
     "source": "published",
-    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/"
+    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "plot_by": "submitted"
   },
   "gpt-4o-transcribe-benchmark": {
     "released": "2025-03-20",
