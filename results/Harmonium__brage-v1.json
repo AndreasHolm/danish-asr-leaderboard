@@ -1,0 +1,19 @@
+{
+  "model": "[Harmonium/brage-v1](https://huggingface.co/Harmonium/brage-v1)",
+  "params_b": 1.543,
+  "coral_conversation_wer": 15.93,
+  "coral_read_aloud_wer": 9.02,
+  "cv17_da_wer": 5.91,
+  "fleurs_da_wer": 6.47,
+  "ftspeech_wer": 5.58,
+  "mean_wer": 8.58,
+  "coral_conversation_cer": 9.17,
+  "coral_read_aloud_cer": 3.55,
+  "cv17_da_cer": 2.0,
+  "fleurs_da_cer": 2.6,
+  "ftspeech_cer": 3.09,
+  "mean_cer": 4.08,
+  "speed_x": 19.2,
+  "submitted": "2026-10-05",
+  "access": "open"
+}
