@@ -13,6 +13,7 @@ from danish_asr_leaderboard.backends.base import (
 
 # Import for side effect: each module calls register() at import time.
 from danish_asr_leaderboard.backends import (  # noqa: F401,E402
+    brage_backend,
     cohere_backend,
     danstral_backend,
     faster_whisper_backend,

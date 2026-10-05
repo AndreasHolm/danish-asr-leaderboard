@@ -51,6 +51,7 @@ uv pip install -e ".[nemotron-asr]"    # Nemotron 3.5 ASR (transformers, no NeMo
 uv pip install -e ".[faster-whisper]"
 uv pip install -e ".[qwen-asr]"
 uv pip install -e ".[saga2]"           # capacit-ai/saga-2-*
+uv pip install -e ".[brage]"           # Harmonium/brage-v1
 uv pip install -e ".[voxtral]"
 uv pip install -e ".[elevenlabs]"      # API backends
 uv pip install -e ".[azure-openai]"
@@ -60,7 +61,7 @@ uv pip install -e ".[soniox]"
 
 Available extras match the `--backend` names: `transformers`, `wav2vec2`,
 `faster-whisper`, `qwen-asr`, `saga2`, `nemo`, `nemotron-asr`, `voxtral`, `danstral`, `seamless`, `cohere-asr`,
-`vibevoice`, `elevenlabs`, `azure-openai`, `google-chirp`, `soniox`, `syv`.
+`vibevoice`, `brage`, `elevenlabs`, `azure-openai`, `google-chirp`, `soniox`, `syv`.
 
 > **NeMo note:** install `nemo_toolkit[asr]` *first* to avoid
 > dependency-resolver conflicts: `uv pip install "nemo_toolkit[asr]"` then
@@ -123,6 +124,12 @@ danish-asr-eval --model mistralai/Voxtral-Mini-3B-2507 --backend voxtral
 # Saga 2 (inference package is loaded from the model repo itself)
 danish-asr-eval --model capacit-ai/saga-2-m --backend saga2
 
+# Brage (runs the decoding module shipped in the gated model repo: accept its terms on the Hub
+# and run `hf auth login` first). Needs about 15 GiB of free GPU memory: if its "brage
+# settings" line lists batch size 1, the run fell back to one clip at a time and is not the
+# reference decode.
+danish-asr-eval --model Harmonium/brage-v1 --backend brage
+
 # API backends (params not applicable → defaults to 0.0)
 danish-asr-eval --model chirp_3 --backend google-chirp --google-cloud-project my-gcp-project
 danish-asr-eval --model soniox-v1 --backend soniox --soniox-api-key "$SONIOX_API_KEY"
@@ -154,8 +161,8 @@ Run `danish-asr-eval --help` for all options (device, batch size, beam/KenLM,
 per-API credentials, `--access open|proprietary`, …). Available backends:
 
 `transformers`, `wav2vec2`, `faster-whisper`, `qwen-asr`, `saga2`, `nemo`, `nemo-salm`, `nemotron-asr`,
-`voxtral`, `danstral`, `seamless`, `cohere-asr`, `vibevoice`, `elevenlabs`, `azure-openai`,
-`google-chirp`, `soniox`, `syv`.
+`voxtral`, `danstral`, `seamless`, `cohere-asr`, `vibevoice`, `brage`, `elevenlabs`,
+`azure-openai`, `google-chirp`, `soniox`, `syv`.
 
 Each run writes `results/<model-slug>.json` with per-dataset WER/CER, the core
 means, speed, and metadata. It also persists the **raw, un-normalised** per-sample
