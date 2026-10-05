@@ -3,7 +3,7 @@
   "model_link": "[danish-foundation-models/edda-v0.2](https://huggingface.co/danish-foundation-models/edda-v0.2)",
   "params_b": 0.809,
   "access": "open",
-  "submitted": "2026-10-02",
+  "submitted": "2026-10-05",
   "unicode_form": "NFKC",
   "number_words": true,
   "filler_words": true,
