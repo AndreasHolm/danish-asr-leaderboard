@@ -1,0 +1,19 @@
+{
+  "model": "gpt-4o-mini-transcribe",
+  "model_link": "[gpt-4o-mini-transcribe](https://huggingface.co/gpt-4o-mini-transcribe)",
+  "params_b": 0.0,
+  "access": "proprietary",
+  "submitted": "2026-10-04",
+  "unicode_form": "NFKC",
+  "number_words": true,
+  "spoken_numbers": true,
+  "filler_words": true,
+  "speed_x": 61.91,
+  "datasets": [
+    "coral_conversation",
+    "coral_read_aloud",
+    "fleurs_da",
+    "ftspeech",
+    "cv17_da"
+  ]
+}

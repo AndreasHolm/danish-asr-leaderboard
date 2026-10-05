@@ -46,7 +46,8 @@
   "gpt-4o-mini-transcribe": {
     "released": "2025-03-20",
     "source": "published",
-    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/"
+    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "plot_by": "submitted"
   },
   "gpt-4o-mini-transcribe-benchmark": {
     "released": "2025-03-20",
@@ -56,7 +57,8 @@
   "gpt-4o-transcribe": {
     "released": "2025-03-20",
     "source": "published",
-    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/"
+    "note": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "plot_by": "submitted"
   },
   "gpt-4o-transcribe-benchmark": {
     "released": "2025-03-20",
@@ -66,7 +68,8 @@
   "gpt-transcribe": {
     "released": "2026-07-29",
     "source": "published",
-    "note": "Announcement date; OpenAI publishes no release date. https://community.openai.com/t/gpt-live-transcribe-and-gpt-transcribe-two-new-transcription-models-in-the-api/1388318"
+    "note": "Announcement date; OpenAI publishes no release date. https://community.openai.com/t/gpt-live-transcribe-and-gpt-transcribe-two-new-transcription-models-in-the-api/1388318",
+    "plot_by": "submitted"
   },
   "hinge/danstral-v1": {
     "released": "2025-09-19",
