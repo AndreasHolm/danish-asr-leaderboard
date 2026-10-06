@@ -1,14 +1,17 @@
 """Backend for Harmonium/brage-v1. Eval infrastructure, not part of the model repo.
 
-The decoding (beam 5 n-best, 4-gram LM rescoring, loop guard, long-clip chunking) ships in
-the model repo as brage_decode.py; this backend loads it from the snapshot, as the hviske-v6
-backend does, and passes it the harness's own normaliser, which the LM scores with.
+The decoding (beam 5 n-best rescored with a 4-gram and the neural LM
+danish-foundation-models/munin-7b-alpha, loop guard, long-clip chunking) ships in the model
+repo as brage_decode.py; this backend loads it from the snapshot, as the hviske-v6 backend
+does, and passes it the harness's own normaliser, which the 4-gram scores with.
 
 The model repo is gated: accept its terms on the model page and run `hf auth login` before
-the first run. The submitted scores were decoded with the harness defaults
-(--batch-size 16), in float16 on CUDA, which needs about 15 GiB of free GPU memory. If a batch
-runs out of memory, the harness redoes the dataset one clip at a time; a run whose
-"brage settings" lines list batch size 1 took that fallback and is not the reference decode.
+the first run. The neural LM (about 14.5 GB) is downloaded from the Hub on first use. Whisper
+and the neural LM each need about 15 GiB of GPU memory and take turns on the GPU, so the
+whole dataset goes to the module in one call and they swap places once per dataset; with the
+model that waits on the CPU, the process uses about 22 GB of RAM. If that call fails (usually
+out of memory), the dataset is redone at batch size 1; a run whose "brage settings" lines list
+batch size 1 took that fallback and is not the reference decode.
 """
 from __future__ import annotations
 
@@ -25,6 +28,9 @@ MODULE_FILE = "brage_decode.py"
 
 class BrageBackend(Backend):
     name = "brage"
+    # A failed whole-dataset call is redone in chunks of this many clips at batch size 1, so the
+    # neural LM still moves onto the GPU once per chunk rather than once per clip.
+    FALLBACK_CHUNK = 64
 
     def __init__(self, model, *, options: LoadOptions | None = None, model_ref: str = ""):
         super().__init__(model, options=options)
@@ -54,6 +60,27 @@ class BrageBackend(Backend):
             print(f"  brage: {counts['greedy_fallbacks']} clip(s) with only runaway "
                   "candidates, decoded greedily with the temperature fallback")
         return texts
+
+    def transcribe(self, audio_paths, *, batch_size):
+        """The whole dataset in one call to the module, so Whisper and the neural LM swap
+        places on the GPU once. If that call fails, the dataset is redone at batch size 1 in
+        chunks of FALLBACK_CHUNK clips, and a chunk that fails again one clip at a time."""
+        paths = list(audio_paths)
+        try:
+            return self.transcribe_batch(paths, batch_size=batch_size)
+        except Exception as exc:  # noqa: BLE001 - the same broad fallback as Backend.transcribe
+            print(f"  WARNING: brage failed on the whole dataset ({exc}); redoing it at batch "
+                  f"size 1 in chunks of {self.FALLBACK_CHUNK} clips", file=sys.stderr)
+        hyps: list[str] = []
+        for start in range(0, len(paths), self.FALLBACK_CHUNK):
+            chunk = paths[start:start + self.FALLBACK_CHUNK]
+            try:
+                hyps += self.transcribe_batch(chunk, batch_size=1)
+            except Exception as exc:  # noqa: BLE001
+                print(f"  WARNING: brage failed on clips {start} to {start + len(chunk) - 1} "
+                      f"({exc}); redoing them one at a time", file=sys.stderr)
+                hyps += self._sequential(chunk)
+        return hyps
 
     def transcribe_one(self, audio_path):
         return self.transcribe_batch([audio_path], batch_size=1)[0]

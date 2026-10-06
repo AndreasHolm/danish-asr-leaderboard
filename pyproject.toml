@@ -65,9 +65,9 @@ seamless       = ["torch>=2.0.0", "transformers>=4.54.0"]
 cohere-asr     = ["torch>=2.0.0", "transformers>=4.54", "librosa>=0.10", "sentencepiece>=0.1.99"]
 vibevoice      = ["torch>=2.0.0", "transformers>=5.3.0"]
 # Harmonium/brage-v1: the decoding module (brage_decode.py: beam 5 n-best rescored with
-# the 4-gram KenLM in lm/brage-4gram.bin) ships in the model repo. Verified with torch 2.14,
-# transformers 5.17 and 5.18, kenlm 0.2 and 0.3. The n-best list relies on transformers'
-# generic beam search internals, hence the upper bound.
+# the 4-gram KenLM in lm/brage-4gram.bin and the neural LM munin-7b-alpha) ships in the
+# model repo. Verified with torch 2.14, transformers 5.17 and 5.18, kenlm 0.2 and 0.3. The
+# n-best list relies on transformers' generic beam search internals, hence the upper bound.
 brage          = ["torch>=2.0.0", "transformers>=5.17.0,<6", "kenlm>=0.2.0",
                   "huggingface_hub>=0.23.0", "soundfile>=0.12.1", "numpy"]
 elevenlabs     = ["elevenlabs>=1.0.0"]

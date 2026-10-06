@@ -18,6 +18,7 @@ SR = 16000
 
 FAKE_MODULE = '''
 CALLS = []
+FAIL_OVER = None  # a call with more clips than this raises, like running out of memory
 
 
 class BrageASR:
@@ -35,6 +36,8 @@ class BrageASR:
 
     def transcribe(self, audio, batch_size=16):
         CALLS.append(("transcribe", [len(a) // 16000 for a in audio], batch_size))
+        if FAIL_OVER is not None and len(audio) > FAIL_OVER:
+            raise RuntimeError("CUDA out of memory")
         long = sum(1 for a in audio if len(a) > 30 * 16000)
         self.last_counts = {"clips": len(audio), "long_clips": long, "pieces": 2 * long,
                             "greedy_fallbacks": 1 if long else 0}
@@ -190,3 +193,35 @@ def test_a_short_answer_from_the_module_is_an_error(snapshot, monkeypatch):
     monkeypatch.setattr(backend.model, "transcribe", lambda audio, batch_size: ["only one"])
     with pytest.raises(RuntimeError, match="1 transcripts for 2 inputs"):
         backend.transcribe_batch(["a.wav", "b.wav"], batch_size=16)
+
+
+def test_a_whole_dataset_goes_to_the_module_in_one_call(snapshot, monkeypatch, capsys):
+    paths = {f"{i}.wav": 1 + i % 7 for i in range(150)}
+    backend = _backend(snapshot, monkeypatch, paths)
+    out = backend.transcribe(list(paths), batch_size=16)
+    assert out == [f"text{s}" for s in paths.values()]
+    assert _calls()[1:] == [("transcribe", list(paths.values()), 16)]  # one call, batch as is
+    assert [s["batch_sizes"] for s in _settings_lines(capsys.readouterr().out)] == [[16]]
+
+
+def test_a_failed_dataset_is_redone_at_batch_size_1_in_chunks(snapshot, monkeypatch, capsys):
+    paths = {f"{i}.wav": 1 + i % 7 for i in range(150)}
+    backend = _backend(snapshot, monkeypatch, paths)
+    sys.modules["brage_decode"].FAIL_OVER = 64
+    out = backend.transcribe(list(paths), batch_size=16)
+    assert out == [f"text{s}" for s in paths.values()]
+    calls = [(len(c[1]), c[2]) for c in _calls()[1:]]
+    assert calls == [(150, 16), (64, 1), (64, 1), (22, 1)]  # one neural LM swap per chunk
+    captured = capsys.readouterr()
+    assert "redoing it at batch size 1 in chunks of 64 clips" in captured.err
+    assert [s["batch_sizes"] for s in _settings_lines(captured.out)] == [[16], [1, 16]]
+
+
+def test_a_chunk_that_fails_again_is_done_one_clip_at_a_time(snapshot, monkeypatch, capsys):
+    paths = {"a.wav": 3, "b.wav": 4, "c.wav": 5}
+    backend = _backend(snapshot, monkeypatch, paths)
+    sys.modules["brage_decode"].FAIL_OVER = 1
+    assert backend.transcribe(list(paths), batch_size=16) == ["text3", "text4", "text5"]
+    calls = [(c[1], c[2]) for c in _calls()[1:]]
+    assert calls == [([3, 4, 5], 16), ([3, 4, 5], 1), ([3], 1), ([4], 1), ([5], 1)]
+    assert "redoing them one at a time" in capsys.readouterr().err

@@ -125,7 +125,8 @@ danish-asr-eval --model mistralai/Voxtral-Mini-3B-2507 --backend voxtral
 danish-asr-eval --model capacit-ai/saga-2-m --backend saga2
 
 # Brage (runs the decoding module shipped in the gated model repo: accept its terms on the Hub
-# and run `hf auth login` first). Needs about 15 GiB of free GPU memory: if its "brage
+# and run `hf auth login` first; the 14.5 GB neural LM it rescores with is downloaded on
+# first use). Needs about 15 GiB of free GPU memory and 22 GB of RAM: if its "brage
 # settings" line lists batch size 1, the run fell back to one clip at a time and is not the
 # reference decode.
 danish-asr-eval --model Harmonium/brage-v1 --backend brage
