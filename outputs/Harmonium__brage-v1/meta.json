@@ -1,0 +1,18 @@
+{
+  "model": "Harmonium/brage-v1",
+  "model_link": "[Harmonium/brage-v1](https://huggingface.co/Harmonium/brage-v1)",
+  "params_b": 1.543,
+  "access": "open",
+  "submitted": "2026-10-06",
+  "unicode_form": "NFKC",
+  "number_words": true,
+  "filler_words": true,
+  "speed_x": 17.8,
+  "datasets": [
+    "coral_read_aloud",
+    "coral_conversation",
+    "cv17_da",
+    "fleurs_da",
+    "ftspeech"
+  ]
+}

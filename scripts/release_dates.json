@@ -191,5 +191,9 @@
   "nvidia/nemotron-3.5-asr-streaming-0.6b": {
     "released": "2026-05-15",
     "source": "huggingface"
+  },
+  "Harmonium/brage-v1": {
+    "released": "2026-10-05",
+    "source": "huggingface"
   }
 }
