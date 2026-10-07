@@ -1,0 +1,36 @@
+{
+  "model": "Harmonium/brage-v1",
+  "date": "2026-10-07",
+  "hardware": "NVIDIA A100 80GB PCIe",
+  "model_revision": "f8eb64d83e6f32090a272a369b3f5930b326289f",
+  "munin_revision": "52dfaa51e4a19c3215e61b3ea6b4dc2150dadf10",
+  "batch_size": 16,
+  "checkpoint_size": 512,
+  "audio_seconds": 150792.34843749995,
+  "inference_seconds": 12078.64913554769,
+  "speed_x": 12.5,
+  "rows": 26780,
+  "datasets": {
+    "coral_conversation": {
+      "rows": 8438,
+      "hypotheses_changed": 91
+    },
+    "coral_read_aloud": {
+      "rows": 9122,
+      "hypotheses_changed": 53
+    },
+    "cv17_da": {
+      "rows": 2756,
+      "hypotheses_changed": 21
+    },
+    "fleurs_da": {
+      "rows": 930,
+      "hypotheses_changed": 12
+    },
+    "ftspeech": {
+      "rows": 5534,
+      "hypotheses_changed": 28
+    }
+  },
+  "id_mapping": "Retained PR #90 clip IDs and exact references after checking each rerun clip basename and reference in order; hypotheses come from the independent Box 2 rerun."
+}

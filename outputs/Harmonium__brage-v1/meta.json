@@ -3,16 +3,25 @@
   "model_link": "[Harmonium/brage-v1](https://huggingface.co/Harmonium/brage-v1)",
   "params_b": 1.543,
   "access": "open",
-  "submitted": "2026-10-06",
+  "submitted": "2026-10-07",
   "unicode_form": "NFKC",
   "number_words": true,
+  "spoken_numbers": true,
   "filler_words": true,
-  "speed_x": 17.8,
+  "speed_x": 12.5,
   "datasets": [
-    "coral_read_aloud",
     "coral_conversation",
+    "coral_read_aloud",
     "cv17_da",
     "fleurs_da",
     "ftspeech"
-  ]
+  ],
+  "model_revision": "f8eb64d83e6f32090a272a369b3f5930b326289f",
+  "munin_revision": "52dfaa51e4a19c3215e61b3ea6b4dc2150dadf10",
+  "batch_size": 16,
+  "checkpoint_size": 512,
+  "speed_hardware": "NVIDIA A100 80GB PCIe",
+  "speed_audio_seconds": 150792.34843749995,
+  "speed_inference_seconds": 12078.64913554769,
+  "speed_timings": "benchmark_runs/Harmonium__brage-v1_2026-10-07/timings.jsonl"
 }
