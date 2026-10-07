@@ -12,7 +12,7 @@
 {"id": "cv_da/test/audio/common_voice_da_27814901.wav", "reference": "Rav er den dejligste røgelse", "hypothesis": "Rav er den dejligste røgelse."}
 {"id": "cv_da/test/audio/common_voice_da_27814907.wav", "reference": "Der kogte gryden over", "hypothesis": "Der kogte gryden over."}
 {"id": "cv_da/test/audio/common_voice_da_27814908.wav", "reference": "Der etableres endvidere ledelinjer til passagen.", "hypothesis": "Der etableredes endvidere ledelinjer til passagen."}
-{"id": "cv_da/test/audio/common_voice_da_27814909.wav", "reference": "Manden var en af byens toogtredve mænd, og det var en udmærkelse", "hypothesis": "Manden var en af byens toogtredive mænd, og det var en udmærkelse."}
+{"id": "cv_da/test/audio/common_voice_da_27814909.wav", "reference": "Manden var en af byens toogtredve mænd, og det var en udmærkelse", "hypothesis": "Manden var en af byens to og tredive mænd, og det var en udmærkelse."}
 {"id": "cv_da/test/audio/common_voice_da_27814911.wav", "reference": "Den ene var hvid, i den lå prinsessen", "hypothesis": "den ene var hvid, i den lå prinsessen."}
 {"id": "cv_da/test/audio/common_voice_da_27814912.wav", "reference": "Såfremt køreprøven ikke bestås, inddrages kørekortet", "hypothesis": "Såfremt køreprøven ikke bestås, inddrages kørekortet."}
 {"id": "cv_da/test/audio/common_voice_da_27858997.wav", "reference": "De nævnte retningslinjer indsendes til sundheds- og ældreministeren", "hypothesis": "De nævnte retningslinier indsendes til sundheds- og ældreministeren."}
@@ -219,7 +219,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28205253.wav", "reference": "Det var en morsom musik.", "hypothesis": "De var en morsom musik!"}
 {"id": "cv_da/test/audio/common_voice_da_28205269.wav", "reference": "Madammen har ånd og stor dannelse", "hypothesis": "Madammen har ond og stor dannelse"}
 {"id": "cv_da/test/audio/common_voice_da_28205270.wav", "reference": "De styrtede frem, havkatten foran", "hypothesis": "De stortræder frem, og katten foran"}
-{"id": "cv_da/test/audio/common_voice_da_28205271.wav", "reference": "Nøglen havde sagt det, og kammerråden havde sagt det", "hypothesis": "Nøglen havde sagt de, og kameraer oven havde sagt de."}
+{"id": "cv_da/test/audio/common_voice_da_28205271.wav", "reference": "Nøglen havde sagt det, og kammerråden havde sagt det", "hypothesis": "Nøglen havde sagt de, og kameraåren havde sagt de."}
 {"id": "cv_da/test/audio/common_voice_da_28205272.wav", "reference": "Jeg bor lige over porten", "hypothesis": "Jeg bor lige over for Aarhus"}
 {"id": "cv_da/test/audio/common_voice_da_28205273.wav", "reference": "Han kunne aldrig tåle at se degne.", "hypothesis": "Han kunne aldrig have troet at se tegne."}
 {"id": "cv_da/test/audio/common_voice_da_28205284.wav", "reference": "sagde den portugisiske, han trænger til hvile og pleje.", "hypothesis": "Siger den portugisiske, han trænger til filer og pleje."}
@@ -227,7 +227,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28205286.wav", "reference": "Vinden kan rigtignok bide liv i én!", "hypothesis": "Vinden kan, vigtigt nok, spille det ind."}
 {"id": "cv_da/test/audio/common_voice_da_28205287.wav", "reference": "Herregud, det har jeg i mange tider ikke tænkt på!", "hypothesis": "Herregud, de har jeg i mange tider ikke tænkt på!"}
 {"id": "cv_da/test/audio/common_voice_da_28205288.wav", "reference": "De træer er nu fuglenes arvegods, lad dem beholde det, min gode larsen", "hypothesis": "De tre er nu fuglenes arvegods, lad dem beholde de, min golde larsen"}
-{"id": "cv_da/test/audio/common_voice_da_28205315.wav", "reference": "Så slog han ild.", "hypothesis": "Så slår han ild"}
+{"id": "cv_da/test/audio/common_voice_da_28205315.wav", "reference": "Så slog han ild.", "hypothesis": "Så slår han ihjel"}
 {"id": "cv_da/test/audio/common_voice_da_28205319.wav", "reference": "blomster og store slotte, hvor dørene kunne lukkes op.", "hypothesis": "Blomster og store slotte, hvor dørene kunne løbes op"}
 {"id": "cv_da/test/audio/common_voice_da_28205321.wav", "reference": "Jeg har nogle ting i kan sige til jeres forældre", "hypothesis": "Jeg har nogle ting i kan sige til jeres forældre."}
 {"id": "cv_da/test/audio/common_voice_da_28205322.wav", "reference": "Troldmanden i posen havde hekset til dem.", "hypothesis": "Tog manden i posen herved, ikke så tog den"}
@@ -248,7 +248,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28308820.wav", "reference": "Svinepolisk og drillevorn er han", "hypothesis": "Signe brodisk og dviler vågen af hende."}
 {"id": "cv_da/test/audio/common_voice_da_28440421.wav", "reference": "Undskyld, at jeg ikke ytrer mig om det britiske oksekød.", "hypothesis": "Jeg tror ikke jeg tror mig om de britiske oksekød"}
 {"id": "cv_da/test/audio/common_voice_da_28440422.wav", "reference": "Der er navnlig tale om madæbler.", "hypothesis": "Det er der navnlig tale om med æbler."}
-{"id": "cv_da/test/audio/common_voice_da_28440423.wav", "reference": "På dette område ligger der for mig et uvurderligt potentiale.", "hypothesis": "Dette område ligner det for mig at være et potentiale."}
+{"id": "cv_da/test/audio/common_voice_da_28440423.wav", "reference": "På dette område ligger der for mig et uvurderligt potentiale.", "hypothesis": "Dette område ligner det for mig at være et potentiale"}
 {"id": "cv_da/test/audio/common_voice_da_28440424.wav", "reference": "Selv afgrøderne skal affugtes.", "hypothesis": "Selv alkoholene skal affyres"}
 {"id": "cv_da/test/audio/common_voice_da_28440431.wav", "reference": "Området trues imidlertid af byplanlæggere, der ønsker at bygge huse.", "hypothesis": "Om året tøs imidlertid et byplanlægger, der ønsker at bygge huse."}
 {"id": "cv_da/test/audio/common_voice_da_28440432.wav", "reference": "Dens morderiske angreb har ikke forbedret deres situation en tøddel.", "hypothesis": "Den nordiske angreb har ikke forbedret deres situation i Tulum."}
@@ -343,7 +343,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28523609.wav", "reference": "Med hensyn til handlingsplanen om energieffektivitet fik vi en temmelig lunken start.", "hypothesis": "Med hensyn til handlingsplanen om energieffektivitet fik vi en temmelig lunken start"}
 {"id": "cv_da/test/audio/common_voice_da_28523610.wav", "reference": "Jeg vil hævde, at obligatorisk oprindelsesmærkning er et tydeligt eksempel på dette.", "hypothesis": "Jeg vil hævde, at obligatorisk oprindelsesmærkning er et tydeligt eksempel på dette."}
 {"id": "cv_da/test/audio/common_voice_da_28523611.wav", "reference": "Vi ser disse personligheder foran os og midt iblandt os her i dag.", "hypothesis": "Vi ser disse personligheder foran os og midt iblandt os her i dag"}
-{"id": "cv_da/test/audio/common_voice_da_28523612.wav", "reference": "Livtaget med den er først og fremmest en opgave for de arabiske samfund selv.", "hypothesis": "Livtaget med den er først og fremmest en opgave for de arabiske samfund selv"}
+{"id": "cv_da/test/audio/common_voice_da_28523612.wav", "reference": "Livtaget med den er først og fremmest en opgave for de arabiske samfund selv.", "hypothesis": "Livtaget med den er først og fremmest en opgave for det arabiske samfund selv"}
 {"id": "cv_da/test/audio/common_voice_da_28533748.wav", "reference": "Således trak den en enorm mængde rubler ud af landets offentlige pengeomløb.", "hypothesis": "Således trak den en enorm mængde rubler ud af landets offentlige pengeomløb"}
 {"id": "cv_da/test/audio/common_voice_da_28533750.wav", "reference": "Der kan konstateres en særlig aversion mod de slaviske sprog og kulturer.", "hypothesis": "Der kan konstateres en særlig aversion mod de slaviske sprog og kulturer"}
 {"id": "cv_da/test/audio/common_voice_da_28533752.wav", "reference": "Vi ved, at den har været omtvistet i årevis.", "hypothesis": "Vi ved at den har været omtestet i årevis"}
@@ -557,7 +557,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28661913.wav", "reference": "Der er tale om lovlige, halvlovlige og ulovlige immigranter.", "hypothesis": "Der er tale om lovlige, halvlovlige og ulovlige immigranter."}
 {"id": "cv_da/test/audio/common_voice_da_28661914.wav", "reference": "Formand, jeg finder dette uelegant.", "hypothesis": "Formand, jeg finder dette uelegant."}
 {"id": "cv_da/test/audio/common_voice_da_28661915.wav", "reference": "Parlamentet har et meget stort ansvar i denne proces.", "hypothesis": "Parlamentet har et meget stort ansvar i denne proces"}
-{"id": "cv_da/test/audio/common_voice_da_28661916.wav", "reference": "Metalgrupperne med Perseus og med Sabinerindernes Rov stod kun alt for levende.", "hypothesis": "Metalgruberne med Perseus og mezzaninernes vrog stod kun alt for levende"}
+{"id": "cv_da/test/audio/common_voice_da_28661916.wav", "reference": "Metalgrupperne med Perseus og med Sabinerindernes Rov stod kun alt for levende.", "hypothesis": "Metalgruberne med Perseus og med sabinerens vrog stod kun alt for levende"}
 {"id": "cv_da/test/audio/common_voice_da_28661917.wav", "reference": "Man må også teste det tappede blod.", "hypothesis": "Man må også teste det tappede blod"}
 {"id": "cv_da/test/audio/common_voice_da_28661918.wav", "reference": "Denne betænkning dækker over et intellektuelt fupnummer.", "hypothesis": "Denne betænkning dækker over et intellektuelt fupnummer"}
 {"id": "cv_da/test/audio/common_voice_da_28661919.wav", "reference": "Han har vundet den store gevinst!", "hypothesis": "Han har vundet den store gevinst!"}
@@ -676,7 +676,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28803260.wav", "reference": "Det har været en lang drægtighedsperiode.", "hypothesis": "Det har været en lang drægtighedsperiode"}
 {"id": "cv_da/test/audio/common_voice_da_28803262.wav", "reference": "Nu sidder han bag tremmer.", "hypothesis": "Nu sidder han bag tremmer"}
 {"id": "cv_da/test/audio/common_voice_da_28803264.wav", "reference": "Jeg tror, at vi alle sammen følte et behageligt sus under formiddagens møde.", "hypothesis": "Jeg tror, at vi alle sammen følte et behageligt sus under formiddagens møde."}
-{"id": "cv_da/test/audio/common_voice_da_28803268.wav", "reference": "Hun ængstedes alligevel.", "hypothesis": "Hun ængstes alligevel"}
+{"id": "cv_da/test/audio/common_voice_da_28803268.wav", "reference": "Hun ængstedes alligevel.", "hypothesis": "Hun ængstedes alligevel"}
 {"id": "cv_da/test/audio/common_voice_da_28803287.wav", "reference": "Denne forklaring er en kimære.", "hypothesis": "Denne forklaring er en kimære."}
 {"id": "cv_da/test/audio/common_voice_da_28803290.wav", "reference": "En foranstaltning som denne kan måske finansiere et fartøjs turomkostninger og faste omkostninger.", "hypothesis": "En foranstaltning som denne kan måske finansiere et fartøjs turomkostninger og faste omkostninger"}
 {"id": "cv_da/test/audio/common_voice_da_28803298.wav", "reference": "Her kan du se!", "hypothesis": "Her kan du se"}
@@ -692,7 +692,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28803372.wav", "reference": "Utæmmet konkurrence og kapløbet om rentabilitet er imidlertid uacceptabelt i denne forbindelse.", "hypothesis": "Utæmmet konkurrence og kapløbet om rentabilitet er imidlertid uacceptabelt i denne forbindelse"}
 {"id": "cv_da/test/audio/common_voice_da_28803373.wav", "reference": "Agenturerne skyder imidlertid op som paddehatte.", "hypothesis": "Agenturet skyder imidlertid op som paddehatte"}
 {"id": "cv_da/test/audio/common_voice_da_28803376.wav", "reference": "sagde han, men han måtte drikke med dem.", "hypothesis": "sagde han, men han måtte drikke med dem."}
-{"id": "cv_da/test/audio/common_voice_da_28803377.wav", "reference": "Det er adgangsstyring til digitalt tv.", "hypothesis": "Det er adgangsstyring til digitalt TV"}
+{"id": "cv_da/test/audio/common_voice_da_28803377.wav", "reference": "Det er adgangsstyring til digitalt tv.", "hypothesis": "Det er adgangsstyring til digitalt tv"}
 {"id": "cv_da/test/audio/common_voice_da_28803378.wav", "reference": "De har ikke behov for encifrede procentvise forøgelser af indkomsten, mens de er arbejdsløse.", "hypothesis": "De har ikke behov for encifrede procentvise forøgelser af indkomsten mens de er arbejdsløse"}
 {"id": "cv_da/test/audio/common_voice_da_28803379.wav", "reference": "Meduser, som halvgennemsigtige blomster, der lod sig bære og føre af strømningerne", "hypothesis": "Medusa som halvgennemsigtige blomster der lod sig bære og føre af strømningerne"}
 {"id": "cv_da/test/audio/common_voice_da_28803380.wav", "reference": "De skal til omeksamen i juni.", "hypothesis": "De skal til omeksamen i juni."}
@@ -922,7 +922,7 @@
 {"id": "cv_da/test/audio/common_voice_da_28929811.wav", "reference": "Med henblik herpå skal den optages i traktaterne.", "hypothesis": "Med henblik herpå skal den optages i traktaterne"}
 {"id": "cv_da/test/audio/common_voice_da_28929812.wav", "reference": "Det vil også være en hjælp i den tyske diskussion om den nye postlov.", "hypothesis": "Det vil også være en hjælp i den tyske diskussion om den nye postlov"}
 {"id": "cv_da/test/audio/common_voice_da_28930487.wav", "reference": "Der er ikke råd til nonchalance.", "hypothesis": "Der er ikke råd til nonchalance."}
-{"id": "cv_da/test/audio/common_voice_da_28930488.wav", "reference": "Tante sprang op, kom i skoene, kom i klæderne, kom ind til mig", "hypothesis": "Kante sprang op, kom i skåne, kom i klæderne, kom ind til mig"}
+{"id": "cv_da/test/audio/common_voice_da_28930488.wav", "reference": "Tante sprang op, kom i skoene, kom i klæderne, kom ind til mig", "hypothesis": "Kante sprang op, kom i skoene, kom i klæderne, kom ind til mig"}
 {"id": "cv_da/test/audio/common_voice_da_28930489.wav", "reference": "Vi danner en ny hær af nyfattige!", "hypothesis": "Vi danner en ny hær af nyfærdige"}
 {"id": "cv_da/test/audio/common_voice_da_28930490.wav", "reference": "Hun foreslår, at differencen skal betales ud af de nuværende kvoteejeres lommer.", "hypothesis": "Hun foreslår at differencen skal betales ud af de nuværende kvoteejeres lommer"}
 {"id": "cv_da/test/audio/common_voice_da_28930491.wav", "reference": "Der bør opmuntres til udenlandske studier.", "hypothesis": "Der bør opmuntres til udenlandske studier"}
@@ -971,7 +971,7 @@
 {"id": "cv_da/test/audio/common_voice_da_29203949.wav", "reference": "jeg imponerer med næbbet og kan slå en 'vits!", "hypothesis": "Jeg imponerer med næbbet og kan slå en vits"}
 {"id": "cv_da/test/audio/common_voice_da_29203950.wav", "reference": "Dogmefilm er ikke for folk med sarte sjæle.", "hypothesis": "Dogmefilm er ikke for folk med sarte sjæle."}
 {"id": "cv_da/test/audio/common_voice_da_29203952.wav", "reference": "\"Oh, jeg er slet ikke bange, hvorledes kan han vel se ud?\"", "hypothesis": "Oh, jeg er slet ikke bange, hvorledes kan han vel se ud."}
-{"id": "cv_da/test/audio/common_voice_da_29203966.wav", "reference": "Et sidste element, som visse parter insisterer på, er dræn til drivhusgassen.", "hypothesis": "Et sidste element som visse parter insisterer på er dræn til drivhusgassen"}
+{"id": "cv_da/test/audio/common_voice_da_29203966.wav", "reference": "Et sidste element, som visse parter insisterer på, er dræn til drivhusgassen.", "hypothesis": "Et sidste element, som visse parter insisterer på, er dræn til drivhusgassen."}
 {"id": "cv_da/test/audio/common_voice_da_29203967.wav", "reference": "Franz legede aldrig, bandede aldrig og røg ikke.", "hypothesis": "Frans legede aldrig, vandede aldrig og røg ikke."}
 {"id": "cv_da/test/audio/common_voice_da_29203968.wav", "reference": "Ja, det er rigtignok næsten alt for eventyrligt, og dog er det sandt", "hypothesis": "Ja, det er rigtignok næsten alt for eventyrligt, og dog er det sandt."}
 {"id": "cv_da/test/audio/common_voice_da_29203969.wav", "reference": "Jeg må for min fader", "hypothesis": "Jeg må for min fader!"}
@@ -1314,7 +1314,7 @@
 {"id": "cv_da/test/audio/common_voice_da_30023188.wav", "reference": "Man er ved at forberede en bistandspakke, der skal søsættes snarest muligt.", "hypothesis": "Man er ved at forberede en bistandspakke, der skal søsættes snarest muligt."}
 {"id": "cv_da/test/audio/common_voice_da_30023191.wav", "reference": "I nat kommer timen, da vænø henter glænø", "hypothesis": "I nat kommer timen da Vænø henter Glænø"}
 {"id": "cv_da/test/audio/common_voice_da_30023259.wav", "reference": "Det er altid en velstand!", "hypothesis": "Det er altid en velstand!"}
-{"id": "cv_da/test/audio/common_voice_da_30023260.wav", "reference": "\"Skrålhans!\" sagde fruen og kastede et hvidt lommetørklæde over buret.", "hypothesis": "Skrål hans, sagde fruen og kastede et hvidt lommetørklæde over buret"}
+{"id": "cv_da/test/audio/common_voice_da_30023260.wav", "reference": "\"Skrålhans!\" sagde fruen og kastede et hvidt lommetørklæde over buret.", "hypothesis": "Skrålhals, sagde fruen og kastede et hvidt lommetørklæde over buret."}
 {"id": "cv_da/test/audio/common_voice_da_30023262.wav", "reference": "Humleranker og snerler snoede et net mellem træer og buske", "hypothesis": "Humleranker og snerler snoede et net mellem træer og buske"}
 {"id": "cv_da/test/audio/common_voice_da_30023263.wav", "reference": "Det er at lade ræven vogte gæs.", "hypothesis": "Det er at lade ræven vogte gæs"}
 {"id": "cv_da/test/audio/common_voice_da_30023264.wav", "reference": "Vi burde holde os for gode til at kolportere rygter på plenarforsamlingen.", "hypothesis": "Vi burde holde os for gode til at kolportere rygter på plenarforsamlingen."}
@@ -1740,7 +1740,7 @@
 {"id": "cv_da/test/audio/common_voice_da_32390109.wav", "reference": "Til hove for at snakke os kongedatteren til", "hypothesis": "Til hove for at snakke os kongedatteren til"}
 {"id": "cv_da/test/audio/common_voice_da_32503838.wav", "reference": "Næste dag ja næste dag kan vi springe over", "hypothesis": "Næste dag, ja næste dag kan vi springe over"}
 {"id": "cv_da/test/audio/common_voice_da_32503840.wav", "reference": "Går et af spilleværkerne i stykker, så har vi nok alligevel", "hypothesis": "Gå et af spilleværkerne i stykker, så har vi nok alligevel."}
-{"id": "cv_da/test/audio/common_voice_da_32503842.wav", "reference": "Jeg vil male den med æblegrenen", "hypothesis": "Jeg vil male den med æblegrenen."}
+{"id": "cv_da/test/audio/common_voice_da_32503842.wav", "reference": "Jeg vil male den med æblegrenen", "hypothesis": "Jeg vil male den med æblegranen."}
 {"id": "cv_da/test/audio/common_voice_da_32503854.wav", "reference": "Nu gad jeg vide hvem af os der driver det videst!", "hypothesis": "Nu gav jeg vide, hvem af os, der driver det, vides!"}
 {"id": "cv_da/test/audio/common_voice_da_32503856.wav", "reference": "dig har jeg jaget fra mit land og rige!", "hypothesis": "Dig har jeg jaget fra mit land og rige"}
 {"id": "cv_da/test/audio/common_voice_da_32503858.wav", "reference": "Han fik nu et stort værksted med svende og drenge.", "hypothesis": "Han fik nu et stort værksted med svende og drenge"}
@@ -2071,11 +2071,11 @@
 {"id": "cv_da/test/audio/common_voice_da_36996569.wav", "reference": "vil du hente kaffen til mig", "hypothesis": "Bør du hente kaffen til mig?"}
 {"id": "cv_da/test/audio/common_voice_da_36996570.wav", "reference": "Mange tilføjer rå blegselleri til salater", "hypothesis": "Mange tilføjer rå blegselleri til salater"}
 {"id": "cv_da/test/audio/common_voice_da_36996571.wav", "reference": "Stor poet, stor musik!", "hypothesis": "Stor poet, stor musik"}
-{"id": "cv_da/test/audio/common_voice_da_36996572.wav", "reference": "Slamkisten er et lyst Pragtgemak mod Mosekonens Bryggeri!", "hypothesis": "Slamkisten er et lyst pragtgemak mod motorgådens bryggeri"}
+{"id": "cv_da/test/audio/common_voice_da_36996572.wav", "reference": "Slamkisten er et lyst Pragtgemak mod Mosekonens Bryggeri!", "hypothesis": "Slamkisten er et lyst pragtgemak mod motorgrundens bryggeri"}
 {"id": "cv_da/test/audio/common_voice_da_36996573.wav", "reference": "Hvem var den fuldeste i selskabet?", "hypothesis": "Hvem var den fuldeste i selskabet?"}
 {"id": "cv_da/test/audio/common_voice_da_36996577.wav", "reference": "Sammen kørte de til Sunds", "hypothesis": "Sammen kørte de til Sunds"}
 {"id": "cv_da/test/audio/common_voice_da_36996578.wav", "reference": "den sandhed er os givet.", "hypothesis": "Den sandhed er os givet"}
-{"id": "cv_da/test/audio/common_voice_da_36996579.wav", "reference": "Else nævnede han slet ikke.", "hypothesis": "Else nævnte han slet ikke"}
+{"id": "cv_da/test/audio/common_voice_da_36996579.wav", "reference": "Else nævnede han slet ikke.", "hypothesis": "Else nævner han slet ikke"}
 {"id": "cv_da/test/audio/common_voice_da_36996593.wav", "reference": "Her skinner åndens sol ind i et fredet åndens hjem, opliver og levendegør.", "hypothesis": "Herskende åndens sol ind i et fredet åndens hjem oplever og levende gør"}
 {"id": "cv_da/test/audio/common_voice_da_36996595.wav", "reference": "Det var som gik der en gloende syl ind i kindbenet.", "hypothesis": "Det var som gik der en gloende syl enken vindet"}
 {"id": "cv_da/test/audio/common_voice_da_36996596.wav", "reference": "Tak, du gode sjæl!", "hypothesis": "Tak, du gode sjæl!"}
@@ -2108,7 +2108,7 @@
 {"id": "cv_da/test/audio/common_voice_da_36996963.wav", "reference": "Hvor her lugter sødt og hvor her er kønt!", "hypothesis": "Hvor her lugter sødt, og hvor her er kønt"}
 {"id": "cv_da/test/audio/common_voice_da_36996964.wav", "reference": "jeg fór lige i det og læste.", "hypothesis": "Jeg for lige i det og læste"}
 {"id": "cv_da/test/audio/common_voice_da_36996965.wav", "reference": "Vinden suser i det gamle piletræ!", "hypothesis": "Vinden suser i det gamle piletræ"}
-{"id": "cv_da/test/audio/common_voice_da_36996966.wav", "reference": "se, det gav murstenene af sig.", "hypothesis": "Se, det gav murstenene af sig!"}
+{"id": "cv_da/test/audio/common_voice_da_36996966.wav", "reference": "se, det gav murstenene af sig.", "hypothesis": "Se, det gav murstenene af sig"}
 {"id": "cv_da/test/audio/common_voice_da_36996974.wav", "reference": "Den fik besøg af en flue.", "hypothesis": "Den fik besøg af en flue."}
 {"id": "cv_da/test/audio/common_voice_da_36996975.wav", "reference": "fiskene i den stod i stime belyst af solstrålerne.", "hypothesis": "Fiskene i den stod i stime, belyst af solstrålerne."}
 {"id": "cv_da/test/audio/common_voice_da_36996976.wav", "reference": "Nu kom våren med varmere solskin.", "hypothesis": "Nu kom våren med varmere solskin."}
@@ -2183,7 +2183,7 @@
 {"id": "cv_da/test/audio/common_voice_da_37300901.wav", "reference": "han lod mig krybe i sit Skjæg, kaldte mig sin lille Ven.", "hypothesis": "han lod mig krybe i sit skæg, kaldte mig sin lille ven."}
 {"id": "cv_da/test/audio/common_voice_da_37300903.wav", "reference": "sagde Prindsessen, og saa gik hun.", "hypothesis": "sagde prinsessen, og så gik hun."}
 {"id": "cv_da/test/audio/common_voice_da_37300905.wav", "reference": "Du er ældre på gården end jeg, kender du demdet gør jeg", "hypothesis": "du er ældre på gården end jeg, kender du dem? Det gør jeg."}
-{"id": "cv_da/test/audio/common_voice_da_37300907.wav", "reference": "enhver Bog i Skabet kjender dem vel!", "hypothesis": "Enhver bog i skabet kender dem vel!"}
+{"id": "cv_da/test/audio/common_voice_da_37300907.wav", "reference": "enhver Bog i Skabet kjender dem vel!", "hypothesis": "Enhver bog i skabet kender dem vel"}
 {"id": "cv_da/test/audio/common_voice_da_37300928.wav", "reference": "Alle tre læste vi stille vor bøn.", "hypothesis": "alle tre læste vi vor stille bøn."}
 {"id": "cv_da/test/audio/common_voice_da_37300930.wav", "reference": "klang det hen over markerne fra den højeste banke, belagt med sne.", "hypothesis": "klang det hen over markerne fra den højeste banke, belagt med sne."}
 {"id": "cv_da/test/audio/common_voice_da_37300931.wav", "reference": "Musene ere et oplyst Folkefærd og Musekongen er over dem Allesammen.", "hypothesis": "Musene er et oplyst folkefærd, og musekongen er over dem alle sammen."}
@@ -2405,7 +2405,7 @@
 {"id": "cv_da/test/audio/common_voice_da_38148402.wav", "reference": "Det kan være herligt i indledningen", "hypothesis": "Det kan være herligt i indledningen."}
 {"id": "cv_da/test/audio/common_voice_da_38148403.wav", "reference": "Der var taget både det udvendige og indvendige tøj af sørgekareten.", "hypothesis": "Der var taget både det udvendige og indvendige tøj af sørgekareten"}
 {"id": "cv_da/test/audio/common_voice_da_38148404.wav", "reference": "Sushi er originalt fra Japan, men fås i dag nok over hele verden.", "hypothesis": "Sushi er originalt fra Japan, men fås i dag nok over hele verden."}
-{"id": "cv_da/test/audio/common_voice_da_38148405.wav", "reference": "Her lå den hele natten, den var så træt og sorrigfuld.", "hypothesis": "her lå den hele natten, den var så træt og sorgfuld."}
+{"id": "cv_da/test/audio/common_voice_da_38148405.wav", "reference": "Her lå den hele natten, den var så træt og sorrigfuld.", "hypothesis": "Her lå den hele natten, den var så træt og sorgfuld."}
 {"id": "cv_da/test/audio/common_voice_da_38148432.wav", "reference": "en yndig ung, lille gulerod", "hypothesis": "En yndig, ung, lille gulerod"}
 {"id": "cv_da/test/audio/common_voice_da_38148434.wav", "reference": "De holdt stille ved et lille hus.", "hypothesis": "De holdt stille ved et lille hus."}
 {"id": "cv_da/test/audio/common_voice_da_38148435.wav", "reference": "Storke, storke stejeflyv hjem til dit eje", "hypothesis": "Storke, storke stege fløj hjem til dit eje"}
@@ -2425,7 +2425,7 @@
 {"id": "cv_da/test/audio/common_voice_da_38148486.wav", "reference": "og han gik hjem, mest for at blive slået ihjel.", "hypothesis": "Og han gik hjem, mens jeg blev slået ihjel."}
 {"id": "cv_da/test/audio/common_voice_da_38148494.wav", "reference": "Ja det er lærerigt!", "hypothesis": "Ja, det er lærerigt."}
 {"id": "cv_da/test/audio/common_voice_da_38322557.wav", "reference": "Det er alene for mig!", "hypothesis": "Det er alene for mig"}
-{"id": "cv_da/test/audio/common_voice_da_38322559.wav", "reference": "ingen havde den hele dag købt af hende.", "hypothesis": "Ingen havde den hele dag købt af hende"}
+{"id": "cv_da/test/audio/common_voice_da_38322559.wav", "reference": "ingen havde den hele dag købt af hende.", "hypothesis": "Ingen havde den hele dag købt af hende."}
 {"id": "cv_da/test/audio/common_voice_da_38322560.wav", "reference": "Og dr sidder den", "hypothesis": "og det er så den."}
 {"id": "cv_da/test/audio/common_voice_da_38322588.wav", "reference": "Virker det for dig?", "hypothesis": "Virker det for dig?"}
 {"id": "cv_da/test/audio/common_voice_da_38322589.wav", "reference": "Det var så stille, at man knap nok kunne se vandkanten bevæge sig.", "hypothesis": "Der var så stille, at man knap nok kunne se vandkanten bevæge sig."}
@@ -2651,13 +2651,13 @@
 {"id": "cv_da/test/audio/common_voice_da_42580040.wav", "reference": "det skulle have været mig, da var det ikke sket!", "hypothesis": "Det skulle have været mig, da var det ikke sket"}
 {"id": "cv_da/test/audio/common_voice_da_42580164.wav", "reference": "Men den kunne komme, Lotte-Lene havde en fremtid.", "hypothesis": "men den kunne komme, lotte lene havde en fremtid."}
 {"id": "cv_da/test/audio/common_voice_da_42580172.wav", "reference": "Farvel du kære fader!", "hypothesis": "Farvel, du kære fader"}
-{"id": "cv_da/test/audio/common_voice_da_42580175.wav", "reference": "og så hældte han lidt pludder af lommen.", "hypothesis": "og så hældte han lidt pludder af lommen."}
+{"id": "cv_da/test/audio/common_voice_da_42580175.wav", "reference": "og så hældte han lidt pludder af lommen.", "hypothesis": "og så hældte han lidt pluder af lommen."}
 {"id": "cv_da/test/audio/common_voice_da_42580193.wav", "reference": "lad os gå mellem gravene!", "hypothesis": "lad os gå mellem kravene!"}
 {"id": "cv_da/test/audio/common_voice_da_42580217.wav", "reference": "– jeg gør det!", "hypothesis": "Jeg gør det"}
 {"id": "cv_da/test/audio/common_voice_da_42580256.wav", "reference": "Jeg lavede alle beregningerne i skyen.", "hypothesis": "Jeg lavede alle beregningerne i skyen."}
 {"id": "cv_da/test/audio/common_voice_da_42580963.wav", "reference": "Desuden stiger antallet af langtidsledige og antallet af ledige unge stadig.", "hypothesis": "Desuden stiger antallet af langtidsledige og antallet af unge ledige skadet"}
 {"id": "cv_da/test/audio/common_voice_da_42581331.wav", "reference": "han havde selv digtet den og sagde, at den var så udmærket.", "hypothesis": "Han havde selv digtet den og sagde at den var så udmærket"}
-{"id": "cv_da/test/audio/common_voice_da_42581379.wav", "reference": "Det må være en dejlig bevidsthed at glæde så mange, som De gør!", "hypothesis": "Det må være en dejlig bevidsthed at glæde så mange som de gør."}
+{"id": "cv_da/test/audio/common_voice_da_42581379.wav", "reference": "Det må være en dejlig bevidsthed at glæde så mange, som De gør!", "hypothesis": "Det må være en dejlig bevidsthed at glæde så mange, som de gør!"}
 {"id": "cv_da/test/audio/common_voice_da_42581381.wav", "reference": "Medierne var også medvirkende til panikken.", "hypothesis": "Medierne var også medvirkende til Pernille"}
 {"id": "cv_da/test/audio/common_voice_da_42581398.wav", "reference": "Ligeledes er konkurrencen heller ikke fuldt ud garanteret i hvert hjørne af energisektoren.", "hypothesis": "Ligeledes er konkurrencen heller ikke fuldt ud garanteret i hvert hjørne af energisektoren"}
 {"id": "cv_da/test/audio/common_voice_da_42581426.wav", "reference": "men det må man!", "hypothesis": "Det må man"}
@@ -2726,7 +2726,7 @@
 {"id": "cv_da/test/audio/common_voice_da_42691156.wav", "reference": "Det var et af den tids herbergsteder, en art ølhus.", "hypothesis": "Det var et af den tids kærbogssteder i en art bølgehus"}
 {"id": "cv_da/test/audio/common_voice_da_42711627.wav", "reference": "Vi er i klemme mellem det vi gerne vil og det vi må.", "hypothesis": "Vi er i klemme mellem det, vi gerne vil, og det, vi må."}
 {"id": "cv_da/test/audio/common_voice_da_42711649.wav", "reference": "hele selskabet gjorde skrig og skrål og jagthundene gøede, det var rigtignok.", "hypothesis": "Hele selskabet gjorde skrig og skrål, og jagthundene gøede, det var rigtigt nok."}
-{"id": "cv_da/test/audio/common_voice_da_42711921.wav", "reference": "Vi ved jo, hvem der oftest bliver ramt af sygdommen tinnitus.", "hypothesis": "Vi ved jo, hvem der oftest bliver ramt af sygdommen tinnitus."}
+{"id": "cv_da/test/audio/common_voice_da_42711921.wav", "reference": "Vi ved jo, hvem der oftest bliver ramt af sygdommen tinnitus.", "hypothesis": "Vi ved jo hvem der oftest bliver ramt af sygdommen tinnitus"}
 {"id": "cv_da/test/audio/common_voice_da_42711933.wav", "reference": "den var nu en guldtop og sprang, så det snurrede efter.", "hypothesis": "Den var nu et guldtop og sprang så det snurrede efter"}
 {"id": "cv_da/test/audio/common_voice_da_42712753.wav", "reference": "hun kom som fattig Karl og tog Hyre hos Skipperen.", "hypothesis": "Hun kom som fattigkarl og tog hyre hos skipperen"}
 {"id": "cv_da/test/audio/common_voice_da_42816348.wav", "reference": "ét, som indtil denne stund kun Gud og jeg ved!", "hypothesis": "Et, som indtil denne stund kun Gud og jeg ved"}
