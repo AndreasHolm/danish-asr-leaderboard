@@ -973,12 +973,12 @@
       width: 20px; height: 20px; margin-top: -6px;
       appearance: none; -webkit-appearance: none;
       border: 3px solid var(--page-accent); border-radius: 50%;
-      background: var(--surf); box-shadow: 0 1px 5px rgba(0,0,0,.18);
+      background: var(--page-accent); box-shadow: 0 1px 5px rgba(0,0,0,.18);
       pointer-events: auto;
     }
     .time-range-track input[type="range"]::-moz-range-thumb {
       width: 14px; height: 14px; border: 3px solid var(--page-accent);
-      border-radius: 50%; background: var(--surf);
+      border-radius: 50%; background: var(--page-accent);
       box-shadow: 0 1px 5px rgba(0,0,0,.18); pointer-events: auto;
     }
     #time-from { z-index: 2; }
@@ -1631,22 +1631,34 @@
       #tab-compare .compare-summary th { display: table-cell; padding: 9px 7px; }
     }
 
-    /* Settings live in a modal sheet, with the same controls in a bottom drawer
-       on phones. The native dialog supplies focus containment and Escape. */
+    /* Native dialog supplies focus containment and Escape. Desktop slides in
+       from the right; phones use the same controls in a bottom drawer. */
     dialog.settings-sheet {
       position: fixed;
-      inset: 0;
-      width: min(680px, calc(100vw - 32px));
+      inset: 0 0 0 auto;
+      width: min(440px, calc(100vw - 32px));
+      height: 100dvh;
       max-width: none;
-      max-height: min(80dvh, 720px);
-      margin: auto;
+      max-height: none;
+      margin: 0;
       padding: 0;
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-top: 0;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 0;
       background: var(--surf);
       color: var(--text);
-      box-shadow: 0 24px 80px rgba(0, 0, 0, .38);
+      box-shadow: -24px 0 80px rgba(0, 0, 0, .38);
       overflow: hidden;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s ease,
+        display .28s allow-discrete, overlay .28s allow-discrete;
+    }
+    dialog.settings-sheet[open] { display: flex; flex-direction: column; transform: translateX(0); opacity: 1; }
+    @starting-style {
+      dialog.settings-sheet[open] { transform: translateX(100%); opacity: 0; }
     }
     dialog.settings-sheet::backdrop { background: rgba(3, 6, 18, .64); }
     .settings-sheet-head {
@@ -1676,9 +1688,10 @@
     .settings-sheet .toolbar,
     .chart-page .page-hero .settings-sheet .toolbar {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr);
       gap: 10px;
-      max-height: calc(min(80dvh, 720px) - 136px);
+      flex: 1 1 auto;
+      min-height: 0;
       margin: 0;
       padding: 18px 20px;
       overflow-y: auto;
@@ -1736,6 +1749,7 @@
     .settings-sheet-foot {
       display: flex;
       justify-content: flex-end;
+      margin-top: auto;
       padding: 12px 20px;
       border-top: 1px solid var(--border);
     }
@@ -1753,10 +1767,18 @@
       dialog.settings-sheet {
         inset: auto 0 0;
         width: 100%;
+        height: auto;
         max-height: min(88dvh, 760px);
         margin: 0;
         border-radius: 18px 18px 0 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
         border-bottom: 0;
+        transform: translateY(100%);
+      }
+      dialog.settings-sheet[open] { transform: translateY(0); }
+      @starting-style {
+        dialog.settings-sheet[open] { transform: translateY(100%); opacity: 0; }
       }
       .settings-sheet-head { padding: 17px 16px 14px; }
       .settings-sheet .toolbar,
@@ -1772,6 +1794,9 @@
         order: 3;
         max-width: none;
       }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      dialog.settings-sheet { transition: none; }
     }
 
   </style>
