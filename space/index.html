@@ -1851,9 +1851,11 @@
       font-weight: 700;
       cursor: pointer;
     }
-    .settings-sheet-clear { border: 1px solid var(--border); background: var(--surf2); color: var(--text); }
+    .settings-sheet-clear { border: 1px solid transparent; background: transparent; color: var(--muted); }
+    .settings-sheet-clear:hover { background: var(--surf2); color: var(--text); }
     .settings-sheet-clear[hidden] { display: none; }
-    .settings-sheet-done { border: 0; background: var(--link); color: #0f1117; }
+    .settings-sheet-done { border: 1px solid var(--border); background: var(--surf2); color: var(--text); }
+    .settings-sheet-done:hover { border-color: color-mix(in srgb, var(--text) 30%, var(--border)); }
     @media (max-width: 700px) {
       dialog.settings-sheet {
         inset: auto 0 0;
