@@ -773,6 +773,12 @@
       font-size: 17px;
       font-weight: 750;
     }
+    .chart-page .chart-subtitle {
+      margin: -8px 0 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
     .chart-title-icon {
       flex: none;
       display: inline-grid;
@@ -1915,7 +1921,7 @@
     <header class="page-hero">
       <p class="page-eyebrow">Model tradeoffs</p>
       <h2>Pareto frontier</h2>
-      <p class="page-intro">See how scores change with model size. Dark blue points mark open models on the frontier, with no smaller, better-scoring open alternative on the selected metric; lighter blue points fall below it. <span id="pareto-cutoff-note">Models above 20% mean WER are omitted from this plot and its CSV; change the limit in Settings.</span></p>
+      <p class="page-intro">See how scores change with model size. Dark blue points mark open models on the frontier, with no smaller, better-scoring open alternative on the selected metric; lighter blue points fall below it.</p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -1943,9 +1949,9 @@
         </select>
       </label>
       <label class="size-filter">Max mean WER
-        <select id="wer-limit-analysis" aria-label="Pareto maximum mean WER" data-default="20">
-          <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option>
-          <option value="25">25%</option><option value="30">30%</option><option value="40">40%</option>
+        <select id="wer-limit-analysis" aria-label="Pareto maximum mean WER" data-default="30">
+          <option value="10">10%</option><option value="15">15%</option><option value="20">20%</option>
+          <option value="25">25%</option><option value="30" selected>30%</option><option value="40">40%</option>
           <option value="50">50%</option><option value="75">75%</option><option value="100">100%</option>
           <option value="">No limit</option>
         </select>
@@ -1955,6 +1961,7 @@
     </header>
     <div class="chart-section">
       <h3 id="analysis-chart-title"><span class="chart-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 16 4-5 3 3 5-7"/></svg></span><span class="chart-title-text">Performance vs. Model Size</span></h3>
+      <p class="chart-subtitle" id="pareto-cutoff-note">Models above 30% mean WER are omitted from this plot and its CSV; change the limit in Settings.</p>
       <div class="chart-with-panel">
         <div id="size-chart-wrap-analysis" class="chart-plot-wrap">
           <svg id="size-chart-analysis" style="width:100%;display:block;overflow:visible"></svg>
@@ -1997,9 +2004,9 @@
         </select>
       </label>
       <label class="size-filter">Max mean WER
-        <select id="wer-limit-time" aria-label="Over Time maximum mean WER" data-default="20">
-          <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option>
-          <option value="25">25%</option><option value="30">30%</option><option value="40">40%</option>
+        <select id="wer-limit-time" aria-label="Over Time maximum mean WER" data-default="30">
+          <option value="10">10%</option><option value="15">15%</option><option value="20">20%</option>
+          <option value="25">25%</option><option value="30" selected>30%</option><option value="40">40%</option>
           <option value="50">50%</option><option value="75">75%</option><option value="100">100%</option>
           <option value="">No limit</option>
         </select>
@@ -2019,11 +2026,11 @@
     </header>
     <div class="chart-section">
       <h3 id="time-chart-title"><span class="chart-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="chart-title-text">Performance Over Time</span></h3>
+      <p class="chart-subtitle" id="time-cutoff-note">Models above 30% mean WER are excluded; change the limit in Settings.</p>
       <div class="chart-legend">
         <span><i class="legend-dot" style="background:var(--link)"></i>Open weights</span>
         <span><i class="legend-dot" style="background:#94a3b8"></i>Proprietary API</span>
         <span><i class="legend-line"></i>Best at date</span>
-        <span id="time-cutoff-note">Models above 20% mean WER are excluded; change the limit in Settings.</span>
       </div>
       <div class="chart-with-panel">
         <div id="time-chart-wrap-time" class="chart-plot-wrap">
@@ -4725,8 +4732,8 @@ async function init() {
     const methodFor = (metric) => (metric === 'wer' ? werMethod : cerMethod);
     const paretoWerLimit = document.getElementById('wer-limit-analysis');
     const timeWerLimit = document.getElementById('wer-limit-time');
-    paretoWerLimit.value = '20';
-    timeWerLimit.value = '20';
+    paretoWerLimit.value = paretoWerLimit.dataset.default;
+    timeWerLimit.value = timeWerLimit.dataset.default;
     paretoWerLimit.dispatchEvent(new Event('change', { bubbles: true }));
     timeWerLimit.dispatchEvent(new Event('change', { bubbles: true }));
     const werLimit = select => select.value === '' ? Infinity : Number(select.value);
