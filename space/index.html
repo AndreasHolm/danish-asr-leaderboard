@@ -386,10 +386,6 @@
     .download-csv:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .download-csv:disabled { opacity: 0.5; cursor: not-allowed; }
     .download-csv svg { width: 14px; height: 14px; flex: 0 0 auto; }
-    @media (max-width: 700px) {
-      .filter-summary .search-wrap { display: none; }
-      .filter-summary.open .search-wrap { display: block; }
-    }
     .toolbar {
       display: none;
       align-items: center;
@@ -397,7 +393,6 @@
       gap: 8px 10px;
       margin-bottom: 12px;
     }
-    .toolbar.open { display: flex; }
     .search-wrap {
       position: relative;
       display: block;
@@ -1636,6 +1631,149 @@
       #tab-compare .compare-summary th { display: table-cell; padding: 9px 7px; }
     }
 
+    /* Settings live in a modal sheet, with the same controls in a bottom drawer
+       on phones. The native dialog supplies focus containment and Escape. */
+    dialog.settings-sheet {
+      position: fixed;
+      inset: 0;
+      width: min(680px, calc(100vw - 32px));
+      max-width: none;
+      max-height: min(80dvh, 720px);
+      margin: auto;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surf);
+      color: var(--text);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .38);
+      overflow: hidden;
+    }
+    dialog.settings-sheet::backdrop { background: rgba(3, 6, 18, .64); }
+    .settings-sheet-head {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-sheet-title { flex: 1; font-size: 17px; font-weight: 700; }
+    .settings-sheet-close {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surf2);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .settings-sheet-close:hover { color: var(--text); }
+    .settings-sheet-close:focus-visible,
+    .settings-sheet-done:focus-visible,
+    .filters-toggle:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+    .settings-sheet-close svg { width: 16px; height: 16px; }
+    .settings-sheet .toolbar,
+    .chart-page .page-hero .settings-sheet .toolbar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      max-height: calc(min(80dvh, 720px) - 136px);
+      margin: 0;
+      padding: 18px 20px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .settings-sheet .toolbar > *:not(.search-wrap) { min-width: 0; }
+    .settings-sheet .tog-wrap,
+    .settings-sheet .size-filter,
+    .settings-sheet .ci-btn {
+      min-height: 74px;
+      height: auto;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surf2);
+    }
+    .settings-sheet .tog-wrap { align-content: center; flex-wrap: wrap; gap: 6px 3px; }
+    .settings-sheet .tog-label {
+      display: flex;
+      align-items: center;
+      flex: 0 0 100%;
+      gap: 8px;
+      padding: 0 0 3px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .settings-sheet .tog-btn { flex: 1 1 auto; padding: 6px 8px; }
+    .settings-sheet .tog-btn.active {
+      background: var(--surf);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--link) 35%, var(--border));
+    }
+    .settings-sheet .size-filter {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 8px;
+      white-space: normal;
+    }
+    .settings-field-title { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-weight: 650; }
+    .settings-sheet .size-filter select {
+      width: 100%;
+      max-width: none;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surf);
+    }
+    .settings-sheet .ci-btn { width: 100%; text-align: left; white-space: normal; }
+    .settings-sheet .ci-text { flex: 1; line-height: 1.3; }
+    .settings-sheet .ci-switch { order: 2; }
+    .settings-icon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--link); }
+    .settings-sheet-foot {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .settings-sheet-done {
+      padding: 8px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--link);
+      color: #0f1117;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    @media (max-width: 700px) {
+      dialog.settings-sheet {
+        inset: auto 0 0;
+        width: 100%;
+        max-height: min(88dvh, 760px);
+        margin: 0;
+        border-radius: 18px 18px 0 0;
+        border-bottom: 0;
+      }
+      .settings-sheet-head { padding: 17px 16px 14px; }
+      .settings-sheet .toolbar,
+      .chart-page .page-hero .settings-sheet .toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        max-height: calc(min(88dvh, 760px) - 132px);
+        padding: 14px 16px;
+      }
+      .settings-sheet-foot { padding: 12px 16px max(12px, env(safe-area-inset-bottom)); }
+      .filter-summary .search-wrap {
+        display: block;
+        flex: 0 0 100%;
+        order: 3;
+        max-width: none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2705,8 +2843,37 @@ window.addEventListener('resize', () => {
   fitTimer = setTimeout(fitModelNames, 150);
 });
 
+/* Give each setting a distinct outline icon without changing the existing
+   controls or their event handlers. */
+function decorateSettings(bar) {
+  const glyphs = {
+    metric: ['M3 17l5-5 4 3 8-9', 'M3 3v18h18'],
+    rank: ['M8 21h8', 'M12 17v4', 'M7 4h10v5a5 5 0 0 1-10 0V4Z', 'M5 6H3v2a4 4 0 0 0 4 4', 'M19 6h2v2a4 4 0 0 1-4 4'],
+    confidence: ['M5 5v14', 'M2 5h6', 'M2 19h6', 'M19 5v14', 'M16 5h6', 'M16 19h6', 'M8 12h8'],
+    open: ['M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z', 'M8 11V7a4 4 0 0 1 8 0'],
+    size: ['M12 3 3 7.5 12 12l9-4.5L12 3z', 'M3 12l9 4.5 9-4.5', 'M3 16.5 12 21l9-4.5'],
+    limit: ['M4 5h16', 'M7 11h10', 'M10 17h4', 'M12 17v4'],
+  };
+  const icon = kind => _icon(glyphs[kind], 'settings-icon');
+  bar.querySelectorAll('.tog-wrap').forEach(wrap => {
+    const label = wrap.querySelector('.tog-label');
+    if (label) label.prepend(icon(label.textContent.trim().startsWith('Metric') ? 'metric' : 'rank'));
+  });
+  bar.querySelectorAll('.ci-btn').forEach(button => {
+    button.prepend(icon(button.id.includes('ci-') ? 'confidence' : 'open'));
+  });
+  bar.querySelectorAll('.size-filter').forEach(field => {
+    const textNode = [...field.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    if (!textNode) return;
+    const title = document.createElement('span');
+    title.className = 'settings-field-title';
+    title.append(icon(field.querySelector('select')?.id.startsWith('wer-limit-') ? 'limit' : 'size'), textNode.textContent.trim());
+    textNode.replaceWith(title);
+  });
+}
+
 /* Keep filter controls out of the table's scanning path until a user asks for
-  them. The button carries an active-filter count while the toolbar is closed. */
+   them. The button carries an active-filter count while the sheet is closed. */
 function initFilterToggles() {
   for (const bar of document.querySelectorAll('.toolbar')) {
     // Scoped to the pane rather than previousElementSibling: the sort control
@@ -2724,6 +2891,34 @@ function initFilterToggles() {
     const count = document.createElement('span');
     count.className = 'filters-count';
     btn.append(ICON_FILTER(), 'Settings ', caret, count);
+
+    const paneName = { wer: 'Leaderboard', analysis: 'Pareto', time: 'Over Time' }[paneFor?.id.replace('tab-', '')] || 'View';
+    const sheet = document.createElement('dialog');
+    sheet.className = 'settings-sheet';
+    sheet.id = `settings-${paneFor?.id.replace('tab-', '')}`;
+    sheet.setAttribute('aria-labelledby', `${sheet.id}-title`);
+    const head = document.createElement('div');
+    head.className = 'settings-sheet-head';
+    const heading = document.createElement('h2');
+    heading.className = 'settings-sheet-title';
+    heading.id = `${sheet.id}-title`;
+    heading.textContent = `${paneName} settings`;
+    const close = document.createElement('button');
+    close.className = 'settings-sheet-close';
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Close settings');
+    close.append(_icon(['M5 5l14 14', 'M19 5 5 19'], ''));
+    head.append(heading, close);
+    const foot = document.createElement('div');
+    foot.className = 'settings-sheet-foot';
+    const done = document.createElement('button');
+    done.className = 'settings-sheet-done';
+    done.type = 'button';
+    done.textContent = 'Done';
+    foot.append(done);
+    btn.setAttribute('aria-haspopup', 'dialog');
+    btn.setAttribute('aria-controls', sheet.id);
+    decorateSettings(bar);
 
     /* Counts the controls that are not at their default, so a collapsed
        toolbar still says whether anything is filtering the table. Within
@@ -2749,7 +2944,7 @@ function initFilterToggles() {
     };
 
     const label = () => {
-      const open = bar.classList.contains('open');
+      const open = sheet.open;
       caret.textContent = open ? '▴' : '▾';
       btn.setAttribute('aria-expanded', String(open));
       const n = activeCount();
@@ -2760,12 +2955,13 @@ function initFilterToggles() {
     };
 
     btn.addEventListener('click', () => {
-      bar.classList.toggle('open');
-      summary.classList.toggle('open', bar.classList.contains('open'));
+      sheet.showModal();
       label();
-      // A newly revealed toolbar may change the name column's width.
-      fitModelNames();
     });
+    close.addEventListener('click', () => sheet.close());
+    done.addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
+    sheet.addEventListener('close', label);
     // Keep the count live as the controls inside the toolbar are used.
     bar.addEventListener('input', label);
     bar.addEventListener('change', label);
@@ -2776,21 +2972,16 @@ function initFilterToggles() {
     const download = bar.querySelector('.download-csv');
     if (download) summary.append(download);
     bar.parentNode.insertBefore(summary, bar);
+    bar.replaceWith(sheet);
+    sheet.append(head, bar, foot);
     const search = summary.querySelector('.search');
     if (search) search.addEventListener('input', label);
     label();
   }
 }
-/* Crossing the breakpoint resets the optional toolbar to its closed state. */
+/* Close a sheet when switching between desktop and phone layouts. */
 NARROW.addEventListener('change', () => {
-  document.querySelectorAll('.toolbar').forEach(bar => bar.classList.remove('open'));
-  document.querySelectorAll('.filter-summary').forEach(summary => summary.classList.remove('open'));
-  document.querySelectorAll('.filters-toggle').forEach(b => {
-    const open = false;
-    const caret = b.querySelector('span');
-    if (caret) caret.textContent = open ? '▴' : '▾';
-    b.setAttribute('aria-expanded', String(open));
-  });
+  document.querySelectorAll('.settings-sheet[open]').forEach(sheet => sheet.close());
   fitModelNames();
 });
 /* This script runs at the end of the body, so DOMContentLoaded may already
@@ -4711,6 +4902,7 @@ async function init() {
 
 document.querySelectorAll('.tab-btn').forEach(btn =>
   btn.addEventListener('click', () => {
+    document.querySelectorAll('.settings-sheet[open]').forEach(sheet => sheet.close());
     document.querySelectorAll('.tab-btn, .tab-pane')
             .forEach(el => el.classList.remove('active'));
     btn.classList.add('active');
