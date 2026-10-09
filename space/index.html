@@ -938,6 +938,55 @@
     .period-reset:hover { border-color: var(--link); }
     .period-reset:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
     .period-reset[hidden] { display: none; }
+    .time-range {
+      margin-top: 16px;
+      padding: 15px 18px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--surf);
+    }
+    .time-range-head { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .time-range-head strong { font-weight: 700; }
+    .time-range-value { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .time-range-head .period-reset { margin-left: auto; }
+    .time-range-track { position: relative; height: 36px; margin: 10px 9px 0; cursor: pointer; touch-action: none; }
+    .time-range-rail, .time-range-selection { position: absolute; height: 6px; border-radius: 99px; }
+    .time-range-rail { top: 15px; left: 10px; right: 10px; background: var(--border); }
+    .time-range-selection {
+      left: var(--range-from, 0%); right: calc(100% - var(--range-through, 100%));
+      background: var(--page-accent);
+    }
+    .time-range-track input[type="range"] {
+      position: absolute; inset: 0; width: 100%; height: 36px; margin: 0;
+      appearance: none; -webkit-appearance: none; background: transparent;
+      pointer-events: none; cursor: grab;
+    }
+    .time-range-track input[type="range"]:active { cursor: grabbing; }
+    .time-range-track input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: transparent; }
+    .time-range-track input[type="range"]::-moz-range-track { height: 6px; background: transparent; }
+    .time-range-track input[type="range"]::-webkit-slider-thumb {
+      width: 20px; height: 20px; margin-top: -7px;
+      appearance: none; -webkit-appearance: none;
+      border: 3px solid var(--page-accent); border-radius: 50%;
+      background: var(--surf); box-shadow: 0 1px 5px rgba(0,0,0,.18);
+      pointer-events: auto;
+    }
+    .time-range-track input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px; border: 3px solid var(--page-accent);
+      border-radius: 50%; background: var(--surf);
+      box-shadow: 0 1px 5px rgba(0,0,0,.18); pointer-events: auto;
+    }
+    #time-from { z-index: 2; }
+    #time-through { z-index: 3; }
+    .time-range-track input[type="range"]:focus-visible { outline: none; }
+    .time-range-track input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--link); outline-offset: 3px; }
+    .time-range-track input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--link); outline-offset: 3px; }
+    .time-range-years { position: relative; height: 16px; margin: 0 19px; color: var(--muted); font-size: 10px; }
+    .time-range-years span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+    @media (max-width: 700px) {
+      .time-range { padding: 13px 14px 9px; }
+      .time-range-head { flex-wrap: wrap; }
+    }
 
     /* ── Rank delta cell ────────────────────────────────────────────── */
     .delta-up { color: #4ade80; font-weight: 700; }
@@ -1735,14 +1784,16 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
-      <label class="size-filter">From
-        <select id="time-from" aria-label="Period start month and year"><option value="">Earliest</option></select>
-      </label>
-      <label class="size-filter">Through
-        <select id="time-through" aria-label="Period end month and year"><option value="">Latest</option></select>
-      </label>
-      <button class="period-reset" id="time-reset" type="button" hidden>All time</button>
       <button class="download-csv" id="download-time" type="button" aria-label="Download Over Time CSV" data-tip="Download plotted history as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
+    </div>
+    <div class="time-range" aria-label="Displayed period">
+      <div class="time-range-head"><strong>Period</strong><span class="time-range-value" id="time-range-value">All time</span><button class="period-reset" id="time-reset" type="button" hidden>All time</button></div>
+      <div class="time-range-track" id="time-range-track">
+        <div class="time-range-rail" aria-hidden="true"><div class="time-range-selection"></div></div>
+        <input type="range" id="time-from" aria-label="Start month" min="0" max="0" value="0">
+        <input type="range" id="time-through" aria-label="End month" min="0" max="0" value="0">
+      </div>
+      <div class="time-range-years" id="time-range-years" aria-hidden="true"></div>
     </div>
     </header>
     <div class="chart-section">
@@ -4290,40 +4341,99 @@ async function init() {
     let lbMetric = 'wer', analysisMetric = 'wer', timeMetric = 'wer';
     let timePeriod = { from: '', through: '' };
 
-    /* Offer months that actually contain a model or score snapshot. Separate
-       start/end selectors let a reader zoom to one month or a longer period. */
-    const timeMonths = [...new Set([...data.wer, ...data.cer]
+    /* Include every month between the first and last model or score snapshot,
+       so the two handles move through a continuous calendar timeline. */
+    const datedMonths = [...new Set([...data.wer, ...data.cer]
       .flatMap(r => [r.released, ...(r.history || []).map(h => h.submitted)])
       .map(parseISODate).filter(t => t != null)
       .map(t => new Date(t).toISOString().slice(0, 7)))].sort();
-    const fromSelect = document.getElementById('time-from');
-    const throughSelect = document.getElementById('time-through');
+    const timeMonths = [];
+    if (datedMonths.length) {
+      const last = monthStart(datedMonths.at(-1));
+      for (let ms = monthStart(datedMonths[0]); ms <= last;) {
+        const date = new Date(ms);
+        timeMonths.push(`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`);
+        ms = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
+      }
+    }
+    const fromRange = document.getElementById('time-from');
+    const throughRange = document.getElementById('time-through');
+    const rangeTrack = document.getElementById('time-range-track');
+    const rangeValue = document.getElementById('time-range-value');
+    const rangeYears = document.getElementById('time-range-years');
     const resetPeriod = document.getElementById('time-reset');
-    for (const month of timeMonths) {
-      const label = `${MONTHS_ABBR[Number(month.slice(5)) - 1]} ${month.slice(0, 4)}`;
-      for (const select of [fromSelect, throughSelect]) {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = label;
-        select.add(option);
-      }
+    const lastMonth = Math.max(0, timeMonths.length - 1);
+    const monthLabel = month => `${MONTHS_ABBR[Number(month.slice(5)) - 1]} ${month.slice(0, 4)}`;
+    for (const input of [fromRange, throughRange]) {
+      input.max = String(lastMonth);
+      input.disabled = !timeMonths.length;
     }
-    function updateTimePeriod(changed) {
-      if (fromSelect.value && throughSelect.value && fromSelect.value > throughSelect.value) {
-        if (changed === 'from') throughSelect.value = fromSelect.value;
-        else fromSelect.value = throughSelect.value;
+    fromRange.value = '0';
+    throughRange.value = String(lastMonth);
+    timeMonths.forEach((month, i) => {
+      if (!month.endsWith('-01')) return;
+      const tick = document.createElement('span');
+      tick.style.left = `${lastMonth ? i / lastMonth * 100 : 0}%`;
+      tick.textContent = month.slice(0, 4);
+      rangeYears.append(tick);
+    });
+    function updateTimePeriod(changed, render = true) {
+      let from = Number(fromRange.value), through = Number(throughRange.value);
+      if (from > through) {
+        if (changed === 'from') from = through;
+        else through = from;
       }
-      timePeriod = { from: fromSelect.value, through: throughSelect.value };
+      fromRange.value = String(from);
+      throughRange.value = String(through);
+      const fromMonth = timeMonths[from], throughMonth = timeMonths[through];
+      timePeriod = {
+        from: from > 0 ? fromMonth : '',
+        through: through < lastMonth ? throughMonth : '',
+      };
+      rangeTrack.style.setProperty('--range-from', `${lastMonth ? from / lastMonth * 100 : 0}%`);
+      rangeTrack.style.setProperty('--range-through', `${lastMonth ? through / lastMonth * 100 : 100}%`);
+      rangeValue.textContent = fromMonth && throughMonth
+        ? `${monthLabel(fromMonth)} – ${monthLabel(throughMonth)}` : 'No dates available';
+      fromRange.setAttribute('aria-valuetext', fromMonth ? monthLabel(fromMonth) : 'No dates available');
+      throughRange.setAttribute('aria-valuetext', throughMonth ? monthLabel(throughMonth) : 'No dates available');
       resetPeriod.hidden = !timePeriod.from && !timePeriod.through;
-      applyTime();
+      if (render) applyTime();
     }
-    fromSelect.addEventListener('change', () => updateTimePeriod('from'));
-    throughSelect.addEventListener('change', () => updateTimePeriod('through'));
+    fromRange.addEventListener('input', () => updateTimePeriod('from'));
+    throughRange.addEventListener('input', () => updateTimePeriod('through'));
+    function moveHandle(event, handle) {
+      const rect = rangeTrack.getBoundingClientRect();
+      const fraction = Math.min(1, Math.max(0, (event.clientX - rect.left - 10) / Math.max(1, rect.width - 20)));
+      const index = Math.round(fraction * lastMonth);
+      (handle === 'from' ? fromRange : throughRange).value = String(index);
+      updateTimePeriod(handle);
+    }
+    rangeTrack.addEventListener('pointerdown', event => {
+      if (event.target.matches('input') || !timeMonths.length) return;
+      const rect = rangeTrack.getBoundingClientRect();
+      const index = Math.round(Math.min(1, Math.max(0, (event.clientX - rect.left - 10) / Math.max(1, rect.width - 20))) * lastMonth);
+      const from = Number(fromRange.value), through = Number(throughRange.value);
+      const handle = index < from ? 'from' : index > through ? 'through'
+        : index - from <= through - index ? 'from' : 'through';
+      rangeTrack.setPointerCapture(event.pointerId);
+      moveHandle(event, handle);
+      const onMove = e => moveHandle(e, handle);
+      const onEnd = e => {
+        rangeTrack.removeEventListener('pointermove', onMove);
+        rangeTrack.removeEventListener('pointerup', onEnd);
+        rangeTrack.removeEventListener('pointercancel', onEnd);
+        if (rangeTrack.hasPointerCapture(e.pointerId)) rangeTrack.releasePointerCapture(e.pointerId);
+      };
+      rangeTrack.addEventListener('pointermove', onMove);
+      rangeTrack.addEventListener('pointerup', onEnd);
+      rangeTrack.addEventListener('pointercancel', onEnd);
+    });
     resetPeriod.addEventListener('click', () => {
-      fromSelect.value = '';
-      throughSelect.value = '';
+      fromRange.value = '0';
+      throughRange.value = String(lastMonth);
       updateTimePeriod('reset');
     });
+    updateTimePeriod('reset', false);
 
     const methodFor = (metric) => (metric === 'wer' ? werMethod : cerMethod);
     document.getElementById('download-csv').addEventListener('click', () => {
