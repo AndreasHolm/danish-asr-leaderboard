@@ -1095,6 +1095,10 @@
       display: flex;
       min-height: 430px;
     }
+    #size-chart-analysis .pareto-frontier-point {
+      filter: drop-shadow(0 0 4px color-mix(in srgb, var(--link) 80%, transparent))
+              drop-shadow(0 0 9px color-mix(in srgb, var(--link) 55%, transparent));
+    }
     /* Side panel next to a chart: the Pareto list on the Pareto tab and the
        record-holder list on the Over Time tab share these styles. */
     .pareto-panel {
@@ -3861,6 +3865,7 @@ function _drawChart(rows, method, tab) {
       stroke: 'var(--bg)', 'stroke-width': '1.5',
       style: 'cursor:pointer',
     }, svgEl);
+    if (frontierPoints.has(point)) circ.classList.add('pareto-frontier-point');
     chartPointByName.set(r.name, { circ, tipHTML });
     circ.addEventListener('mouseenter', () => { CTIP.innerHTML = tipHTML; CTIP.classList.add('show'); });
     circ.addEventListener('mousemove', e => positionChartTip(e.clientX, e.clientY));
