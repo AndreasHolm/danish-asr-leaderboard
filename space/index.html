@@ -925,6 +925,19 @@
     .size-filter select option { background: var(--surf); color: var(--text); }
     :root[data-theme="light"] .size-filter select { color-scheme: light; }
     .size-filter select:focus-visible { outline: 2px solid var(--link); }
+    .period-reset {
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surf);
+      color: var(--link);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .period-reset:hover { border-color: var(--link); }
+    .period-reset:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+    .period-reset[hidden] { display: none; }
 
     /* ── Rank delta cell ────────────────────────────────────────────── */
     .delta-up { color: #4ade80; font-weight: 700; }
@@ -1649,7 +1662,7 @@
     <header class="page-hero">
       <p class="page-eyebrow">Model tradeoffs</p>
       <h2>Pareto frontier</h2>
-      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric.</p>
+      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. Models above 50% mean WER are excluded so the frontier stays readable.</p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -1722,6 +1735,13 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
+      <label class="size-filter">From
+        <select id="time-from" aria-label="Period start month and year"><option value="">Earliest</option></select>
+      </label>
+      <label class="size-filter">Through
+        <select id="time-through" aria-label="Period end month and year"><option value="">Latest</option></select>
+      </label>
+      <button class="period-reset" id="time-reset" type="button" hidden>All time</button>
       <button class="download-csv" id="download-time" type="button" aria-label="Download Over Time CSV" data-tip="Download plotted history as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
     </header>
@@ -2174,6 +2194,12 @@ function visible(rows) {
     const size = parseFloat(r.size);
     return Number.isFinite(size) && size <= maxSizeB;
   });
+}
+
+// The two chart views omit outliers that make the useful score range hard to see.
+// The leaderboard table remains complete.
+function chartWerRows(rows) {
+  return rows.filter(r => r.mean_wer == null || r.mean_wer <= 50);
 }
 
 const ANALYSIS_PANEL_HEIGHT = 430;
@@ -3574,6 +3600,18 @@ function parseISODate(str) {
   return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : null;
 }
 
+function monthStart(str) {
+  const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(String(str || ''));
+  return m ? Date.UTC(+m[1], +m[2] - 1, 1) : null;
+}
+
+function monthEnd(str) {
+  const start = monthStart(str);
+  if (start == null) return null;
+  const date = new Date(start);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
+}
+
 function fmtDate(ms) {
   const d = new Date(ms);
   return `${d.getUTCDate()} ${MONTHS_ABBR[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
@@ -3616,15 +3654,23 @@ function computeRecords(pts, yUp) {
   return records;
 }
 
-function timeChartData(rows, metric, method) {
+function timeChartData(rows, metric, method, period = {}) {
   const key = chartScoreKey(metric, method);
   const yUp = method === 'bt';
   const dated = rows.map(r => ({ r, t: parseISODate(r.released), yv: r[key] }))
     .filter(({ yv }) => Number.isFinite(yv));
+  const allPts = dated.filter(p => p.t != null)
+    .sort((a, b) => a.t - b.t || (yUp ? b.yv - a.yv : a.yv - b.yv));
+  const from = monthStart(period.from) ?? -Infinity;
+  const through = monthEnd(period.through) ?? Infinity;
+  const allRecords = computeRecords(allPts, yUp);
   return {
     undated: dated.filter(p => p.t == null).length,
-    pts: dated.filter(p => p.t != null)
-      .sort((a, b) => a.t - b.t || (yUp ? b.yv - a.yv : a.yv - b.yv)),
+    pts: allPts.filter(p => p.t >= from && p.t < through),
+    records: allRecords.filter(p => p.t >= from && p.t < through),
+    priorRecord: Number.isFinite(from) ? allRecords.filter(p => p.t < from).at(-1) : null,
+    from: Number.isFinite(from) ? from : null,
+    through: Number.isFinite(through) ? through : null,
   };
 }
 
@@ -3635,9 +3681,9 @@ const TIME_CSV_FIELDS = [
   ['score', 'score'], ['score_unit', 'score_unit'],
   ['ci_low', 'ci_low'], ['ci_high', 'ci_high'], ['record_at_date', 'record_at_date'],
 ];
-function makeTimeCsv(rows, metric, method, includeCI) {
-  const { pts } = timeChartData(rows, metric, method);
-  const records = new Set(computeRecords(pts, method === 'bt'));
+function makeTimeCsv(rows, metric, method, includeCI, period = {}) {
+  const { pts, records } = timeChartData(rows, metric, method, period);
+  const recordSet = new Set(records);
   const ciKey = chartScoreKey(metric, method) + '_ci';
   return makeCsv(TIME_CSV_FIELDS, pts.map(p => ({
     date: new Date(p.t).toISOString().slice(0, 10), date_basis: p.r.date_basis,
@@ -3646,11 +3692,11 @@ function makeTimeCsv(rows, metric, method, includeCI) {
     score: p.yv, score_unit: CHART_SCORE_UNIT[method],
     ci_low: includeCI ? p.r[ciKey]?.lo : null,
     ci_high: includeCI ? p.r[ciKey]?.hi : null,
-    record_at_date: records.has(p),
+    record_at_date: recordSet.has(p),
   })));
 }
 
-function updateRecordPanel(records, metricLbl, fmt, method, undated = 0) {
+function updateRecordPanel(records, metricLbl, fmt, method, undated = 0, period = {}, priorRecord = null) {
   const yUp = method === 'bt';
   const panel = document.getElementById('record-panel-time');
   if (!panel) return;
@@ -3662,8 +3708,7 @@ function updateRecordPanel(records, metricLbl, fmt, method, undated = 0) {
     panel.appendChild(el);
   };
   if (!records.length) {
-    footnote('No release dates to plot.');
-    return;
+    footnote(period.from || period.through ? 'No new records in this period.' : 'No release dates to plot.');
   }
   for (const p of [...records].reverse()) {
     const item = document.createElement('div');
@@ -3687,16 +3732,19 @@ function updateRecordPanel(records, metricLbl, fmt, method, undated = 0) {
       + `${method === 'borda' ? 'places' : 'points'}${rel} `
       + `between ${fmtDate(first.t)} and ${fmtDate(last.t)}.`);
   }
+  if (priorRecord)
+    footnote(`The best score entering this period was ${fmt(priorRecord.yv)} `
+      + `by ${priorRecord.r.name} (${fmtDate(priorRecord.t)}).`);
   /* Named rather than silently dropped: a model missing from the plot is not
      evidence of anything about the model. */
-  if (undated)
+  if (undated && !period.from && !period.through)
     footnote(`${undated} model${undated > 1 ? 's have' : ' has'} no published `
       + `release date and ${undated > 1 ? 'are' : 'is'} not plotted.`);
   if (method !== 'mean')
     footnote('Earlier evaluation snapshots are shown with mean WER/CER only.');
 }
 
-function _drawTimeChart(rows, metric, method) {
+function _drawTimeChart(rows, metric, method, period = {}) {
   const wrap  = document.getElementById('time-chart-wrap-time');
   const svgEl = document.getElementById('time-chart-time');
   const panel = document.getElementById('record-panel-time');
@@ -3729,21 +3777,23 @@ function _drawTimeChart(rows, metric, method) {
   /* Ties on a date are ordered best-first so the day's best model is the one
      that takes the record, instead of a worse model on the same day taking it
      and producing two steps at the same x. */
-  const { pts, undated } = timeChartData(rows, metric, method);
+  const { pts, records, priorRecord, undated, from, through } = timeChartData(rows, metric, method, period);
 
-  if (pts.length < 2) {
-    tx('Not enough release dates to plot.', { x: W / 2, y: H / 2, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': '13' }, svgEl);
-    updateRecordPanel([], metricLbl, fmt, method, undated);
+  if (!pts.length) {
+    tx(period.from || period.through ? 'No models in this period.' : 'No release dates to plot.',
+      { x: W / 2, y: H / 2, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': '13' }, svgEl);
+    updateRecordPanel(records, metricLbl, fmt, method, undated, period, priorRecord);
     return;
   }
 
   /* ── scales ── */
   const tMin = pts[0].t, tMax = pts[pts.length - 1].t;
-  const tPad = (tMax - tMin) * 0.05 || DAY_MS;
-  const tL = tMin - tPad, tR = tMax + tPad;
+  const tPad = Math.max((tMax - tMin) * 0.05, DAY_MS);
+  const tL = from ?? tMin - tPad, tR = through ?? tMax + tPad;
   const sx = t => ML + (t - tL) / (tR - tL) * cW;
 
   const yVals = pts.map(d => d.yv);
+  if (priorRecord) yVals.push(priorRecord.yv);
   const yDMin = Math.min(...yVals), yDMax = Math.max(...yVals);
   const ySpan = yDMax - yDMin || 1;
   const yLo = yDMin - ySpan * 0.18;
@@ -3778,16 +3828,17 @@ function _drawTimeChart(rows, metric, method) {
   mk('line', { x1: ML, y1: MT + cH, x2: ML + cW, y2: MT + cH, stroke: 'var(--border)', 'stroke-width': '1' }, svgEl);
 
   /* ── best-so-far step line ── */
-  const records = computeRecords(pts, yUp);
   const recordSet = new Set(records);
-  if (records.length) {
-    let d = `M ${sx(records[0].t).toFixed(1)} ${sy(records[0].yv).toFixed(1)}`;
-    for (let i = 1; i < records.length; i++)
+  if (priorRecord || records.length) {
+    let d = priorRecord
+      ? `M ${ML} ${sy(priorRecord.yv).toFixed(1)}`
+      : `M ${sx(records[0].t).toFixed(1)} ${sy(records[0].yv).toFixed(1)}`;
+    for (let i = priorRecord ? 0 : 1; i < records.length; i++)
       d += ` H ${sx(records[i].t).toFixed(1)} V ${sy(records[i].yv).toFixed(1)}`;
     d += ` H ${(ML + cW).toFixed(1)}`;
     mk('path', { d, fill: 'none', stroke: 'var(--link)', 'stroke-width': '2', opacity: '0.75' }, svgEl);
   }
-  updateRecordPanel(records, metricLbl, fmt, method, undated);
+  updateRecordPanel(records, metricLbl, fmt, method, undated, period, priorRecord);
 
   /* ── data points ── */
   const CTIP = document.getElementById('chart-tip');
@@ -3841,9 +3892,9 @@ function _drawTimeChart(rows, metric, method) {
     fill: 'var(--muted)', 'font-size': '10' }, svgEl);
 }
 
-function renderTimeChart(rows, metric, method) {
-  _chartState.time = { ..._chartState.time, rows, sourceTab: metric, method };
-  requestAnimationFrame(() => _drawTimeChart(rows, metric, method));
+function renderTimeChart(rows, metric, method, period = {}) {
+  _chartState.time = { ..._chartState.time, rows, sourceTab: metric, method, period };
+  requestAnimationFrame(() => _drawTimeChart(rows, metric, method, period));
 }
 
 /* One entry point per tab, so the resize and tab-switch handlers do not have to
@@ -3851,7 +3902,7 @@ function renderTimeChart(rows, metric, method) {
 function redrawChart(tab) {
   const st = _chartState[tab];
   if (!st) return;
-  if (tab === 'time') _drawTimeChart(st.rows, st.sourceTab, st.method);
+  if (tab === 'time') _drawTimeChart(st.rows, st.sourceTab, st.method, st.period);
   else                _drawChart(st.rows, st.method, tab);
 }
 
@@ -4237,6 +4288,42 @@ async function init() {
        and CER restores the method that metric was last ranked by. */
     let werMethod = 'mean', cerMethod = 'mean';
     let lbMetric = 'wer', analysisMetric = 'wer', timeMetric = 'wer';
+    let timePeriod = { from: '', through: '' };
+
+    /* Offer months that actually contain a model or score snapshot. Separate
+       start/end selectors let a reader zoom to one month or a longer period. */
+    const timeMonths = [...new Set([...data.wer, ...data.cer]
+      .flatMap(r => [r.released, ...(r.history || []).map(h => h.submitted)])
+      .map(parseISODate).filter(t => t != null)
+      .map(t => new Date(t).toISOString().slice(0, 7)))].sort();
+    const fromSelect = document.getElementById('time-from');
+    const throughSelect = document.getElementById('time-through');
+    const resetPeriod = document.getElementById('time-reset');
+    for (const month of timeMonths) {
+      const label = `${MONTHS_ABBR[Number(month.slice(5)) - 1]} ${month.slice(0, 4)}`;
+      for (const select of [fromSelect, throughSelect]) {
+        const option = document.createElement('option');
+        option.value = month;
+        option.textContent = label;
+        select.add(option);
+      }
+    }
+    function updateTimePeriod(changed) {
+      if (fromSelect.value && throughSelect.value && fromSelect.value > throughSelect.value) {
+        if (changed === 'from') throughSelect.value = fromSelect.value;
+        else fromSelect.value = throughSelect.value;
+      }
+      timePeriod = { from: fromSelect.value, through: throughSelect.value };
+      resetPeriod.hidden = !timePeriod.from && !timePeriod.through;
+      applyTime();
+    }
+    fromSelect.addEventListener('change', () => updateTimePeriod('from'));
+    throughSelect.addEventListener('change', () => updateTimePeriod('through'));
+    resetPeriod.addEventListener('click', () => {
+      fromSelect.value = '';
+      throughSelect.value = '';
+      updateTimePeriod('reset');
+    });
 
     const methodFor = (metric) => (metric === 'wer' ? werMethod : cerMethod);
     document.getElementById('download-csv').addEventListener('click', () => {
@@ -4254,9 +4341,9 @@ async function init() {
         `danish-asr-pareto-${data.updated || 'results'}.csv`);
     });
     document.getElementById('download-time').addEventListener('click', () => {
-      const { rows, method, sourceTab } = _chartState.time;
-      if (!rows || timeChartData(rows, sourceTab, method).pts.length < 2) return;
-      downloadCsv(makeTimeCsv(rows, sourceTab, method, showCI),
+      const { rows, method, sourceTab, period } = _chartState.time;
+      if (!rows || !timeChartData(rows, sourceTab, method, period).pts.length) return;
+      downloadCsv(makeTimeCsv(rows, sourceTab, method, showCI, period),
         `danish-asr-over-time-${data.updated || 'results'}.csv`);
     });
     /* Which metric each tab is showing; its Rank by group acts on that one. */
@@ -4265,28 +4352,27 @@ async function init() {
     function applyTime(metric = timeMetric) {
       timeMetric = metric;
       const isWer = metric === 'wer';
-      const rows = (isWer ? visible(data.wer) : visible(data.cer))
+      const rows = chartWerRows((isWer ? visible(data.wer) : visible(data.cer))
         .flatMap(r => methodFor(metric) === 'mean'
           ? [...(r.history || []).map(h => ({
               ...r, ...h, released: h.submitted, date_basis: 'score',
               mean_wer_ci: null, mean_cer_ci: null,
             })), r]
-          : [r])
-        .filter(r => r.mean_wer == null || r.mean_wer <= 50);
+          : [r]));
       document.getElementById('tog-time-wer').classList.toggle('active', isWer);
       document.getElementById('tog-time-cer').classList.toggle('active', !isWer);
       document.querySelector('#time-chart-title .chart-title-text').textContent =
         `Performance Over Time (${isWer ? 'WER' : 'CER'})`;
       document.getElementById('download-time').disabled =
-        timeChartData(rows, metric, methodFor(metric)).pts.length < 2;
-      renderTimeChart(rows, metric, methodFor(metric));
+        !timeChartData(rows, metric, methodFor(metric), timePeriod).pts.length;
+      renderTimeChart(rows, metric, methodFor(metric), timePeriod);
       syncMethodBtns();
     }
 
     function applyAnalysis(metric = analysisMetric) {
       analysisMetric = metric;
       const isWer = metric === 'wer';
-      const rows = isWer ? _chartState.wer.rows : _chartState.cer.rows;
+      const rows = chartWerRows(isWer ? _chartState.wer.rows : _chartState.cer.rows);
       _chartState.analysis = {
         ..._chartState.analysis,
         rows,
