@@ -295,9 +295,11 @@ def test_index_html_still_has_the_marker_and_head():
     assert "</head>" in src
 
 
-def test_methodology_has_its_own_tab_with_data_changes():
+def test_methodology_is_reachable_under_info_with_data_changes():
     src = SPACE_INDEX.read_text(encoding="utf-8")
-    assert 'data-tab="methodology"' in src
+    assert 'data-tab="info"' in src
+    assert 'data-info-tab="methodology"' in src
+    assert 'data-info-tab="about"' in src
     assert 'id="tab-methodology"' in src
     assert src.index('id="tab-methodology"') < src.index("Methodology &amp; data changes")
 
