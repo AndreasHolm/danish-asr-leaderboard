@@ -1691,6 +1691,7 @@
     }
     .settings-sheet-close:hover { color: var(--text); }
     .settings-sheet-close:focus-visible,
+    .settings-sheet-clear:focus-visible,
     .settings-sheet-done:focus-visible,
     .filters-toggle:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
     .settings-sheet-close svg { width: 16px; height: 16px; }
@@ -1780,20 +1781,22 @@
     .settings-sheet-foot {
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
       margin-top: auto;
       padding: 12px 20px;
       border-top: 1px solid var(--border);
     }
+    .settings-sheet-clear,
     .settings-sheet-done {
       padding: 8px 18px;
-      border: 0;
       border-radius: 8px;
-      background: var(--link);
-      color: #0f1117;
       font: inherit;
       font-weight: 700;
       cursor: pointer;
     }
+    .settings-sheet-clear { border: 1px solid var(--border); background: var(--surf2); color: var(--text); }
+    .settings-sheet-clear[hidden] { display: none; }
+    .settings-sheet-done { border: 0; background: var(--link); color: #0f1117; }
     @media (max-width: 700px) {
       dialog.settings-sheet {
         inset: auto 0 0;
@@ -2975,11 +2978,15 @@ function initFilterToggles() {
     head.append(heading, close);
     const foot = document.createElement('div');
     foot.className = 'settings-sheet-foot';
+    const clear = document.createElement('button');
+    clear.className = 'settings-sheet-clear';
+    clear.type = 'button';
+    clear.textContent = 'Clear';
     const done = document.createElement('button');
     done.className = 'settings-sheet-done';
     done.type = 'button';
     done.textContent = 'Done';
-    foot.append(done);
+    foot.append(clear, done);
     btn.setAttribute('aria-haspopup', 'dialog');
     btn.setAttribute('aria-controls', sheet.id);
     decorateSettings(bar);
@@ -3013,6 +3020,7 @@ function initFilterToggles() {
       const n = activeCount();
       count.textContent = n ? String(n) : '';
       btn.classList.toggle('has-filters', n > 0);
+      clear.hidden = n === 0;
       btn.setAttribute('aria-label',
         n ? 'Settings, ' + n + ' active' : 'Settings');
     };
@@ -3026,6 +3034,33 @@ function initFilterToggles() {
     });
     close.addEventListener('click', () => sheet.close());
     done.addEventListener('click', () => sheet.close());
+    clear.addEventListener('click', () => {
+      const search = summary.querySelector('.search');
+      if (search?.value) {
+        search.value = '';
+        search.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // Rank method is shared by metric. Reset the visible method before
+      // switching back to WER, then reset WER's method if it also changed.
+      const groups = [...bar.querySelectorAll('.tog-wrap')];
+      const metricDefault = groups[0]?.querySelector('.tog-btn');
+      const rankDefault = groups[1]?.querySelector('.tog-btn');
+      if (rankDefault && !rankDefault.classList.contains('active')) rankDefault.click();
+      if (metricDefault && !metricDefault.classList.contains('active')) metricDefault.click();
+      if (rankDefault && !rankDefault.classList.contains('active')) rankDefault.click();
+
+      bar.querySelectorAll('.ci-btn').forEach(toggle => {
+        if (toggle.getAttribute('aria-pressed') === 'true') toggle.click();
+      });
+      bar.querySelectorAll('.size-filter select').forEach(select => {
+        const defaultValue = select.dataset.default ?? '';
+        if (select.value === defaultValue) return;
+        select.value = defaultValue;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      refreshSettingsButtons();
+    });
     sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
     sheet.addEventListener('close', () => {
       TIP.classList.remove('show');
