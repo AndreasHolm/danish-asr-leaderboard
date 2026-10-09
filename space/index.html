@@ -353,6 +353,21 @@
       flex: 0 0 auto;
       opacity: 0.75;
     }
+    .filters-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--link);
+      color: #0f1117;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .filters-count:empty { display: none; }
     .filter-summary {
       display: flex;
       align-items: center;
@@ -1606,23 +1621,6 @@
         cursor: pointer;
       }
 
-      /* Collapsing the filters hides whether any are set, so the button carries
-         a count of the non-default controls. */
-      .filters-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 17px;
-        height: 17px;
-        padding: 0 5px;
-        border-radius: 999px;
-        background: var(--link);
-        color: #0f1117;
-        font-size: 11px;
-        font-weight: 700;
-        line-height: 1;
-      }
-      .filters-count:empty { display: none; }
       /* Confidence intervals go under the value, not beside it. */
       tbody td .ci-val { display: block; font-size: 10px; font-weight: 400; }
 
@@ -2937,6 +2935,10 @@ function decorateSettings(bar) {
 
 /* Keep filter controls out of the table's scanning path until a user asks for
    them. The button carries an active-filter count while the sheet is closed. */
+const settingsLabels = [];
+function refreshSettingsButtons() {
+  settingsLabels.forEach(label => label());
+}
 function initFilterToggles() {
   for (const bar of document.querySelectorAll('.toolbar')) {
     // Scoped to the pane rather than previousElementSibling: the sort control
@@ -2950,10 +2952,9 @@ function initFilterToggles() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'filters-toggle';
-    const caret = document.createElement('span');
     const count = document.createElement('span');
     count.className = 'filters-count';
-    btn.append(ICON_FILTER(), 'Settings ', caret, count);
+    btn.append(ICON_FILTER(), 'Settings', count);
 
     const paneName = { wer: 'Leaderboard', analysis: 'Pareto', time: 'Over Time' }[paneFor?.id.replace('tab-', '')] || 'View';
     const sheet = document.createElement('dialog');
@@ -3008,7 +3009,6 @@ function initFilterToggles() {
 
     const label = () => {
       const open = sheet.open;
-      caret.textContent = open ? '▴' : '▾';
       btn.setAttribute('aria-expanded', String(open));
       const n = activeCount();
       count.textContent = n ? String(n) : '';
@@ -3047,6 +3047,7 @@ function initFilterToggles() {
     sheet.append(head, bar, foot);
     const search = summary.querySelector('.search');
     if (search) search.addEventListener('input', label);
+    settingsLabels.push(label);
     label();
   }
 }
@@ -4860,6 +4861,7 @@ async function init() {
           const b = document.getElementById(`tog-${tab}-${m}`);
           if (b) b.classList.toggle('active', m === methodFor(tm[tab]));
         }
+      refreshSettingsButtons();
     }
     function applyMethod(tab, m) {
       if (tabMetric()[tab] === 'wer') werMethod = m; else cerMethod = m;
@@ -4905,6 +4907,7 @@ async function init() {
         b.classList.toggle('active', showCI);
         b.setAttribute('aria-pressed', String(showCI));
       }
+      refreshSettingsButtons();
     }
     function toggleCI() {
       showCI = !showCI;
@@ -4927,6 +4930,7 @@ async function init() {
         b.classList.toggle('active', openOnly);
         b.setAttribute('aria-pressed', String(openOnly));
       }
+      refreshSettingsButtons();
     }
     function toggleOpen() {
       openOnly = !openOnly;
