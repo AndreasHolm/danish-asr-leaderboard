@@ -649,6 +649,7 @@
       transition: opacity 0.12s;
     }
     #col-tip.show { opacity: 1; }
+    dialog.settings-sheet #col-tip { position: absolute; }
 
     /* ── Footer ─────────────────────────────────────────────────────── */
     .site-footer {
@@ -3017,13 +3018,21 @@ function initFilterToggles() {
     };
 
     btn.addEventListener('click', () => {
+      TIP.classList.remove('show');
+      tipActive = false;
+      sheet.append(TIP);
       sheet.showModal();
       label();
     });
     close.addEventListener('click', () => sheet.close());
     done.addEventListener('click', () => sheet.close());
     sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
-    sheet.addEventListener('close', label);
+    sheet.addEventListener('close', () => {
+      TIP.classList.remove('show');
+      tipActive = false;
+      document.body.append(TIP);
+      label();
+    });
     // Keep the count live as the controls inside the toolbar are used.
     bar.addEventListener('input', label);
     bar.addEventListener('change', label);
@@ -5010,9 +5019,17 @@ document.addEventListener('mouseout', e => {
 document.addEventListener('mousemove', e => {
   if (!tipActive) return;
   const w = TIP.offsetWidth, h = TIP.offsetHeight;
-  let x = e.clientX + 14, y = e.clientY + 14;
-  if (x + w > window.innerWidth  - 8) x = e.clientX - w - 14;
-  if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+  const sheet = TIP.closest('dialog.settings-sheet[open]');
+  const bounds = sheet?.getBoundingClientRect();
+  const left = bounds?.left ?? 0, top = bounds?.top ?? 0;
+  const width = bounds?.width ?? window.innerWidth;
+  const height = bounds?.height ?? window.innerHeight;
+  const px = e.clientX - left, py = e.clientY - top;
+  let x = px + 14, y = py + 14;
+  if (x + w > width - 8) x = px - w - 14;
+  if (y + h > height - 8) y = py - h - 14;
+  x = Math.max(8, Math.min(x, width - w - 8));
+  y = Math.max(8, Math.min(y, height - h - 8));
   TIP.style.left = x + 'px';
   TIP.style.top  = y + 'px';
 });
