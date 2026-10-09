@@ -1809,17 +1809,14 @@
       .settings-sheet-head { padding: 17px 16px 14px; }
       .settings-sheet .toolbar,
       .chart-page .page-hero .settings-sheet .toolbar {
-        grid-template-columns: minmax(0, 1fr);
         max-height: calc(min(88dvh, 760px) - 132px);
         padding: 14px 16px;
       }
       .settings-sheet .ci-btn {
-        display: flex;
-        align-items: center;
-        min-height: 74px;
+        min-height: 112px;
+        padding: 10px;
+        column-gap: 6px;
       }
-      .settings-sheet .ci-text { flex: 1; }
-      .settings-sheet .ci-switch { order: 2; }
       .settings-sheet-foot { padding: 12px 16px max(12px, env(safe-area-inset-bottom)); }
       .filter-summary .search-wrap {
         display: block;
