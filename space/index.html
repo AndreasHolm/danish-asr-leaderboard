@@ -39,6 +39,7 @@
       --muted:   #8892aa;
       --accent:  #22c55e;
       --link:    #60a5fa;
+      --pareto-below: #93c5fd;
       --red:     #c60c30;
       --r:       10px;
     }
@@ -51,6 +52,7 @@
       --text:  #1e293b;
       --muted: #64748b;
       --link:  #2563eb;
+      --pareto-below: #60a5fa;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -1711,7 +1713,7 @@
     <header class="page-hero">
       <p class="page-eyebrow">Model tradeoffs</p>
       <h2>Pareto frontier</h2>
-      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. <span id="pareto-cutoff-note">Models above 20% mean WER are omitted from this plot and its CSV; change the limit in Settings.</span></p>
+      <p class="page-intro">See how scores change with model size. Dark blue points mark open models on the frontier, with no smaller, better-scoring open alternative on the selected metric; lighter blue points fall below it. <span id="pareto-cutoff-note">Models above 20% mean WER are omitted from this plot and its CSV; change the limit in Settings.</span></p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -3587,6 +3589,9 @@ function _drawChart(rows, method, tab) {
   /* ── Pareto frontier (open models only) ── */
   const openPts = pts.filter(p => p.r.access === 'open');
   const pareto  = computePareto(openPts, yUp);
+  const frontierPoints = new Set(pareto);
+  const pointColor = p => p.r.access !== 'open' ? '#94a3b8'
+    : frontierPoints.has(p) ? 'var(--link)' : 'var(--pareto-below)';
   if (pareto.length >= 2) {
     let d = `M ${ML} ${sy(pareto[0].yv).toFixed(1)} H ${sx(pareto[0].sz).toFixed(1)}`;
     for (let i = 1; i < pareto.length; i++)
@@ -3598,7 +3603,8 @@ function _drawChart(rows, method, tab) {
 
   /* ── data points ── */
   const CTIP = document.getElementById('chart-tip');
-  for (const { r, sz, yv } of pts) {
+  for (const point of pts) {
+    const { r, sz, yv } = point;
     const xc = sx(sz), yc = sy(yv);
     if (xc < ML - 8 || xc > ML + cW + 8 || yc < MT - 8 || yc > MT + cH + 8) continue;
 
@@ -3611,7 +3617,7 @@ function _drawChart(rows, method, tab) {
         const yt = Math.max(MT, rawYt);
         const yb = Math.min(MT + cH, rawYb);
         if (yb > yt) {
-          const ecol = r.access === 'open' ? 'var(--link)' : '#94a3b8';
+          const ecol = pointColor(point);
           mk('line', { x1: xc, y1: yt, x2: xc, y2: yb, stroke: ecol, 'stroke-width': '1.5', opacity: '0.45' }, svgEl);
           if (rawYt >= MT)    mk('line', { x1: xc-4, y1: yt, x2: xc+4, y2: yt, stroke: ecol, 'stroke-width': '1.5', opacity: '0.45' }, svgEl);
           if (rawYb <= MT+cH) mk('line', { x1: xc-4, y1: yb, x2: xc+4, y2: yb, stroke: ecol, 'stroke-width': '1.5', opacity: '0.45' }, svgEl);
@@ -3625,7 +3631,7 @@ function _drawChart(rows, method, tab) {
 
     const circ = mk('circle', {
       cx: xc, cy: yc, r: '6',
-      fill: r.access === 'open' ? 'var(--link)' : '#94a3b8',
+      fill: pointColor(point),
       stroke: 'var(--bg)', 'stroke-width': '1.5',
       style: 'cursor:pointer',
     }, svgEl);
