@@ -1711,7 +1711,7 @@
     <header class="page-hero">
       <p class="page-eyebrow">Model tradeoffs</p>
       <h2>Pareto frontier</h2>
-      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. Models above 30% mean WER are omitted from this plot and its CSV to keep it readable; they remain on the leaderboard.</p>
+      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. <span id="pareto-cutoff-note">Models above 20% mean WER are omitted from this plot and its CSV; change the limit in Settings.</span></p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -1736,6 +1736,14 @@
           <option value="3">≤ 3B</option>
           <option value="5">≤ 5B</option>
           <option value="10">≤ 10B</option>
+        </select>
+      </label>
+      <label class="size-filter">Max mean WER
+        <select id="wer-limit-analysis" aria-label="Pareto maximum mean WER" data-default="20">
+          <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option>
+          <option value="25">25%</option><option value="30">30%</option><option value="40">40%</option>
+          <option value="50">50%</option><option value="75">75%</option><option value="100">100%</option>
+          <option value="">No limit</option>
         </select>
       </label>
       <button class="download-csv" id="download-pareto" type="button" aria-label="Download Pareto CSV" data-tip="Download plotted Pareto data as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
@@ -1784,6 +1792,14 @@
           <option value="10">≤ 10B</option>
         </select>
       </label>
+      <label class="size-filter">Max mean WER
+        <select id="wer-limit-time" aria-label="Over Time maximum mean WER" data-default="20">
+          <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option>
+          <option value="25">25%</option><option value="30">30%</option><option value="40">40%</option>
+          <option value="50">50%</option><option value="75">75%</option><option value="100">100%</option>
+          <option value="">No limit</option>
+        </select>
+      </label>
       <button class="download-csv" id="download-time" type="button" aria-label="Download Over Time CSV" data-tip="Download plotted history as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
     <div class="time-range" aria-label="Displayed period">
@@ -1802,7 +1818,7 @@
         <span><i class="legend-dot" style="background:var(--link)"></i>Open weights</span>
         <span><i class="legend-dot" style="background:#94a3b8"></i>Proprietary API</span>
         <span><i class="legend-line"></i>Best at date</span>
-        <span>Models with mean WER &gt; 50% are excluded.</span>
+        <span id="time-cutoff-note">Models above 20% mean WER are excluded; change the limit in Settings.</span>
       </div>
       <div class="chart-with-panel">
         <div id="time-chart-wrap-time" class="chart-plot-wrap">
@@ -2714,7 +2730,9 @@ function initFilterToggles() {
         const active = togs.find(b => b.classList.contains('active'));
         if (active && togs.indexOf(active) > 0) n++;
       });
-      if (bar.querySelector('.size-filter select')?.value) n++;
+      bar.querySelectorAll('.size-filter select').forEach(select => {
+        if (select.value !== (select.dataset.default ?? '')) n++;
+      });
       return n;
     };
 
@@ -2738,6 +2756,7 @@ function initFilterToggles() {
     });
     // Keep the count live as the controls inside the toolbar are used.
     bar.addEventListener('input', label);
+    bar.addEventListener('change', label);
     bar.addEventListener('click', () => setTimeout(label, 0));
 
     summary.append(btn);
@@ -4436,6 +4455,13 @@ async function init() {
     updateTimePeriod('reset', false);
 
     const methodFor = (metric) => (metric === 'wer' ? werMethod : cerMethod);
+    const paretoWerLimit = document.getElementById('wer-limit-analysis');
+    const timeWerLimit = document.getElementById('wer-limit-time');
+    paretoWerLimit.value = '20';
+    timeWerLimit.value = '20';
+    paretoWerLimit.dispatchEvent(new Event('change', { bubbles: true }));
+    timeWerLimit.dispatchEvent(new Event('change', { bubbles: true }));
+    const werLimit = select => select.value === '' ? Infinity : Number(select.value);
     document.getElementById('download-csv').addEventListener('click', () => {
       const viewRows = [...werEl.tBodies[0].rows]
         .filter(tr => !tr.classList.contains('hidden'))
@@ -4462,13 +4488,17 @@ async function init() {
     function applyTime(metric = timeMetric) {
       timeMetric = metric;
       const isWer = metric === 'wer';
+      const limit = werLimit(timeWerLimit);
       const rows = chartWerRows((isWer ? visible(data.wer) : visible(data.cer))
         .flatMap(r => methodFor(metric) === 'mean'
           ? [...(r.history || []).map(h => ({
               ...r, ...h, released: h.submitted, date_basis: 'score',
               mean_wer_ci: null, mean_cer_ci: null,
             })), r]
-          : [r]), 50);
+          : [r]), limit);
+      document.getElementById('time-cutoff-note').textContent = Number.isFinite(limit)
+        ? `Models above ${limit}% mean WER are excluded; change the limit in Settings.`
+        : 'No mean WER limit is applied.';
       document.getElementById('tog-time-wer').classList.toggle('active', isWer);
       document.getElementById('tog-time-cer').classList.toggle('active', !isWer);
       document.querySelector('#time-chart-title .chart-title-text').textContent =
@@ -4482,7 +4512,11 @@ async function init() {
     function applyAnalysis(metric = analysisMetric) {
       analysisMetric = metric;
       const isWer = metric === 'wer';
-      const rows = chartWerRows(isWer ? _chartState.wer.rows : _chartState.cer.rows, 30);
+      const limit = werLimit(paretoWerLimit);
+      const rows = chartWerRows(isWer ? _chartState.wer.rows : _chartState.cer.rows, limit);
+      document.getElementById('pareto-cutoff-note').textContent = Number.isFinite(limit)
+        ? `Models above ${limit}% mean WER are omitted from this plot and its CSV; change the limit in Settings.`
+        : 'No mean WER limit is applied to this plot or its CSV.';
       _chartState.analysis = {
         ..._chartState.analysis,
         rows,
@@ -4575,6 +4609,8 @@ async function init() {
     document.getElementById('tog-analysis-cer').addEventListener('click', () => applyAnalysis('cer'));
     document.getElementById('tog-time-wer').addEventListener('click', () => applyTime('wer'));
     document.getElementById('tog-time-cer').addEventListener('click', () => applyTime('cer'));
+    paretoWerLimit.addEventListener('change', () => applyAnalysis());
+    timeWerLimit.addEventListener('change', () => applyTime());
 
     /* CI toggle */
     const CI_BTNS = ['tog-ci-wer', 'tog-ci-analysis', 'tog-ci-time'];
