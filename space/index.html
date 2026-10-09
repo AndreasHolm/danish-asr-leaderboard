@@ -410,6 +410,28 @@
       min-width: 0;
       max-width: 300px;
     }
+    .period-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surf);
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .period-toggle:hover, .period-toggle[aria-expanded="true"] { color: var(--text); }
+    .period-toggle.has-range { border-color: color-mix(in srgb, var(--link) 55%, var(--border)); }
+    .period-toggle:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+    .period-toggle svg { width: 14px; height: 14px; flex: none; }
+    .period-toggle-label { font-weight: 600; }
+    .period-toggle-value { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .period-toggle-chevron { transition: transform .15s ease; }
+    .period-toggle[aria-expanded="true"] .period-toggle-chevron { transform: rotate(180deg); }
     .download-csv {
       display: inline-flex;
       align-items: center;
@@ -992,6 +1014,7 @@
       border-radius: var(--r);
       background: var(--surf);
     }
+    .time-range[hidden] { display: none; }
     .time-range-head { display: flex; align-items: center; gap: 10px; font-size: 13px; }
     .time-range-head strong { font-weight: 700; }
     .time-range-value { color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -1313,6 +1336,8 @@
       .banner { padding: 15px 12px; gap: 8px; }
       .banner h1 { font-size: clamp(12px, 3.5vw, 15px); }
       .tab-btn { padding: 10px 11px 9px; font-size: 13px; }
+      .period-toggle { gap: 4px; padding: 0 7px; font-size: 12px; }
+      .period-toggle svg { width: 12px; height: 12px; }
       .filter-summary .search {
         width: 100%;
         height: 34px;
@@ -2046,7 +2071,8 @@
       </label>
       <button class="download-csv" id="download-time" type="button" aria-label="Download Over Time CSV" data-tip="Download plotted history as CSV" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v4h16v-4"/></svg></button>
     </div>
-    <div class="time-range" aria-label="Displayed period">
+    <button class="period-toggle" id="time-period-toggle" type="button" aria-controls="time-range" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg><span class="period-toggle-label">Period</span><span class="period-toggle-value" id="time-period-summary">Loading…</span><svg class="period-toggle-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="time-range" id="time-range" role="group" aria-label="Displayed period" hidden>
       <div class="time-range-head"><strong>Period</strong><span class="time-range-value" id="time-range-value">All time</span><button class="period-reset" id="time-reset" type="button" hidden>All time</button></div>
       <div class="time-range-track" id="time-range-track">
         <div class="time-range-rail" aria-hidden="true"><div class="time-range-selection"></div></div>
@@ -3114,6 +3140,7 @@ function initFilterToggles() {
     bar.addEventListener('click', () => setTimeout(label, 0));
 
     summary.append(btn);
+    if (paneFor?.id === 'tab-time') summary.append(document.getElementById('time-period-toggle'));
     if (searchWrap) summary.append(searchWrap);
     const download = bar.querySelector('.download-csv');
     if (download) summary.append(download);
@@ -4735,6 +4762,8 @@ async function init() {
     const rangeTrack = document.getElementById('time-range-track');
     const rangeTicks = document.getElementById('time-range-ticks');
     const rangeValue = document.getElementById('time-range-value');
+    const periodSummary = document.getElementById('time-period-summary');
+    const periodToggle = document.getElementById('time-period-toggle');
     const rangeYears = document.getElementById('time-range-years');
     const resetPeriod = document.getElementById('time-reset');
     const lastMonth = Math.max(0, timeMonths.length - 1);
@@ -4773,6 +4802,10 @@ async function init() {
       rangeTrack.style.setProperty('--range-through', `${lastMonth ? through / lastMonth * 100 : 100}%`);
       rangeValue.textContent = fromMonth && throughMonth
         ? `${monthLabel(fromMonth)} – ${monthLabel(throughMonth)}` : 'No dates available';
+      periodSummary.textContent = fromMonth && throughMonth
+        ? `${fromMonth.slice(5)}.${fromMonth.slice(0, 4)} – ${throughMonth.slice(5)}.${throughMonth.slice(0, 4)}`
+        : 'No dates available';
+      periodToggle.classList.toggle('has-range', !!(timePeriod.from || timePeriod.through));
       fromRange.setAttribute('aria-valuetext', fromMonth ? monthLabel(fromMonth) : 'No dates available');
       throughRange.setAttribute('aria-valuetext', throughMonth ? monthLabel(throughMonth) : 'No dates available');
       resetPeriod.hidden = !timePeriod.from && !timePeriod.through;
@@ -5090,6 +5123,20 @@ document.querySelectorAll('.info-tab-btn').forEach(btn =>
       pane.classList.toggle('active', pane.id === 'tab-' + btn.dataset.infoTab));
   })
 );
+
+const periodToggle = document.getElementById('time-period-toggle');
+const periodPanel = document.getElementById('time-range');
+periodToggle.addEventListener('click', () => {
+  const expanded = periodToggle.getAttribute('aria-expanded') !== 'true';
+  periodToggle.setAttribute('aria-expanded', String(expanded));
+  periodPanel.hidden = !expanded;
+});
+periodPanel.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  periodToggle.setAttribute('aria-expanded', 'false');
+  periodPanel.hidden = true;
+  periodToggle.focus();
+});
 
 /* Custom column tooltips */
 const TIP = document.getElementById('col-tip');
