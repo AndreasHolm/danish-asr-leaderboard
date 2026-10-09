@@ -1662,7 +1662,7 @@
     <header class="page-hero">
       <p class="page-eyebrow">Model tradeoffs</p>
       <h2>Pareto frontier</h2>
-      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. Models above 50% mean WER are excluded so the frontier stays readable.</p>
+      <p class="page-intro">See how scores change with model size. The frontier marks open models with no smaller, better-scoring open alternative on the selected metric. Models above 30% mean WER are omitted from this plot and its CSV to keep it readable; they remain on the leaderboard.</p>
     <div class="toolbar">
       <div class="tog-wrap">
         <span class="tog-label">Metric</span>
@@ -2198,8 +2198,8 @@ function visible(rows) {
 
 // The two chart views omit outliers that make the useful score range hard to see.
 // The leaderboard table remains complete.
-function chartWerRows(rows) {
-  return rows.filter(r => r.mean_wer == null || r.mean_wer <= 50);
+function chartWerRows(rows, cutoff) {
+  return rows.filter(r => r.mean_wer == null || r.mean_wer <= cutoff);
 }
 
 const ANALYSIS_PANEL_HEIGHT = 430;
@@ -4358,7 +4358,7 @@ async function init() {
               ...r, ...h, released: h.submitted, date_basis: 'score',
               mean_wer_ci: null, mean_cer_ci: null,
             })), r]
-          : [r]));
+          : [r]), 50);
       document.getElementById('tog-time-wer').classList.toggle('active', isWer);
       document.getElementById('tog-time-cer').classList.toggle('active', !isWer);
       document.querySelector('#time-chart-title .chart-title-text').textContent =
@@ -4372,7 +4372,7 @@ async function init() {
     function applyAnalysis(metric = analysisMetric) {
       analysisMetric = metric;
       const isWer = metric === 'wer';
-      const rows = chartWerRows(isWer ? _chartState.wer.rows : _chartState.cer.rows);
+      const rows = chartWerRows(isWer ? _chartState.wer.rows : _chartState.cer.rows, 30);
       _chartState.analysis = {
         ..._chartState.analysis,
         rows,
