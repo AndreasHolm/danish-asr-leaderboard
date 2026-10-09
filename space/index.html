@@ -42,6 +42,11 @@
       --pareto-below: #93c5fd;
       --red:     #c60c30;
       --r:       10px;
+      --brand-mesh:
+        radial-gradient(115% 520% at  0% 125%, rgba(216, 20,  58, .56) 0%, rgba(216, 20,  58, 0) 52%),
+        radial-gradient( 95% 460% at 34% 150%, rgba(152, 20,  74, .32) 0%, rgba(152, 20,  74, 0) 58%),
+        radial-gradient( 80% 480% at 74% -55%, rgba( 92, 26, 104, .34) 0%, rgba( 92, 26, 104, 0) 60%),
+        radial-gradient( 85% 520% at 100% -30%, rgba( 58, 24, 106, .48) 0%, rgba( 58, 24, 106, 0) 58%);
     }
     :root[data-theme="light"] {
       color-scheme: light;
@@ -76,12 +81,7 @@
     .banner {
       /* Same mesh as the social cover (scripts/update_space.py): a crimson
          bloom low-left, a violet counter-tone top-right, over near-black. */
-      background:
-        radial-gradient(115% 520% at  0% 125%, rgba(216, 20,  58, .56) 0%, rgba(216, 20,  58, 0) 52%),
-        radial-gradient( 95% 460% at 34% 150%, rgba(152, 20,  74, .32) 0%, rgba(152, 20,  74, 0) 58%),
-        radial-gradient( 80% 480% at 74% -55%, rgba( 92, 26, 104, .34) 0%, rgba( 92, 26, 104, 0) 60%),
-        radial-gradient( 85% 520% at 100% -30%, rgba( 58, 24, 106, .48) 0%, rgba( 58, 24, 106, 0) 58%),
-        #09080d;
+      background: var(--brand-mesh), #09080d;
       border: 0;
       border-radius: 0;
       padding: 19px max(16px, calc(50vw - 734px));
@@ -96,7 +96,7 @@
     /* Film grain. Also a dither: a gradient this dark bands visibly on 8-bit
        displays, and the noise breaks the contours up. Inline SVG keeps the
        page self-contained — no external asset to fetch. */
-    .banner::after, .site-footer::after {
+    .banner::after, .site-footer::after, .time-range-selection::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -952,22 +952,30 @@
     .time-range-value { color: var(--muted); font-variant-numeric: tabular-nums; }
     .time-range-head .period-reset { margin-left: auto; }
     .time-range-track { position: relative; height: 36px; margin: 10px 9px 0; cursor: pointer; touch-action: none; }
-    .time-range-rail, .time-range-selection { position: absolute; height: 6px; border-radius: 99px; }
-    .time-range-rail { top: 15px; left: 10px; right: 10px; background: var(--border); }
+    .time-range-rail, .time-range-selection { position: absolute; height: 8px; border-radius: 99px; }
+    .time-range-rail { top: 14px; left: 10px; right: 10px; background: var(--border); }
     .time-range-selection {
       left: var(--range-from, 0%); right: calc(100% - var(--range-through, 100%));
-      background: var(--page-accent);
+      background: var(--brand-mesh), linear-gradient(90deg, #84233c, #492367);
+      overflow: hidden;
     }
+    .time-range-ticks { position: absolute; inset: 0 10px; pointer-events: none; }
+    .time-range-ticks span {
+      position: absolute; top: 14px; width: 1px; height: 8px;
+      transform: translateX(-50%); background: var(--text); opacity: .32;
+    }
+    .time-range-ticks span.quarter { top: 12px; height: 12px; opacity: .46; }
+    .time-range-ticks span.year { top: 10px; height: 16px; opacity: .65; }
     .time-range-track input[type="range"] {
       position: absolute; inset: 0; width: 100%; height: 36px; margin: 0;
       appearance: none; -webkit-appearance: none; background: transparent;
       pointer-events: none; cursor: grab;
     }
     .time-range-track input[type="range"]:active { cursor: grabbing; }
-    .time-range-track input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: transparent; }
-    .time-range-track input[type="range"]::-moz-range-track { height: 6px; background: transparent; }
+    .time-range-track input[type="range"]::-webkit-slider-runnable-track { height: 8px; background: transparent; }
+    .time-range-track input[type="range"]::-moz-range-track { height: 8px; background: transparent; }
     .time-range-track input[type="range"]::-webkit-slider-thumb {
-      width: 20px; height: 20px; margin-top: -7px;
+      width: 20px; height: 20px; margin-top: -6px;
       appearance: none; -webkit-appearance: none;
       border: 3px solid var(--page-accent); border-radius: 50%;
       background: var(--surf); box-shadow: 0 1px 5px rgba(0,0,0,.18);
@@ -988,6 +996,7 @@
     @media (max-width: 700px) {
       .time-range { padding: 13px 14px 9px; }
       .time-range-head { flex-wrap: wrap; }
+      .time-range-ticks span.month { display: none; }
     }
 
     /* ── Rank delta cell ────────────────────────────────────────────── */
@@ -1808,6 +1817,7 @@
       <div class="time-range-head"><strong>Period</strong><span class="time-range-value" id="time-range-value">All time</span><button class="period-reset" id="time-reset" type="button" hidden>All time</button></div>
       <div class="time-range-track" id="time-range-track">
         <div class="time-range-rail" aria-hidden="true"><div class="time-range-selection"></div></div>
+        <div class="time-range-ticks" id="time-range-ticks" aria-hidden="true"></div>
         <input type="range" id="time-from" aria-label="Start month" min="0" max="0" value="0">
         <input type="range" id="time-through" aria-label="End month" min="0" max="0" value="0">
       </div>
@@ -4384,6 +4394,7 @@ async function init() {
     const fromRange = document.getElementById('time-from');
     const throughRange = document.getElementById('time-through');
     const rangeTrack = document.getElementById('time-range-track');
+    const rangeTicks = document.getElementById('time-range-ticks');
     const rangeValue = document.getElementById('time-range-value');
     const rangeYears = document.getElementById('time-range-years');
     const resetPeriod = document.getElementById('time-reset');
@@ -4396,6 +4407,10 @@ async function init() {
     fromRange.value = '0';
     throughRange.value = String(lastMonth);
     timeMonths.forEach((month, i) => {
+      const marker = document.createElement('span');
+      marker.className = month.endsWith('-01') ? 'year' : ['04', '07', '10'].includes(month.slice(5)) ? 'quarter' : 'month';
+      marker.style.left = `${lastMonth ? i / lastMonth * 100 : 0}%`;
+      rangeTicks.append(marker);
       if (!month.endsWith('-01')) return;
       const tick = document.createElement('span');
       tick.style.left = `${lastMonth ? i / lastMonth * 100 : 0}%`;
