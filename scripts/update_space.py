@@ -39,7 +39,7 @@ DATASET_DOWNLOAD_HISTORY_JSON = "https://huggingface.co/datasets/RyeAI/danish-as
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SPACE_DIR = REPO_ROOT / "huggingface" / "space"
 RESULTS_DIR = REPO_ROOT / "results"
-DOWNLOAD_HISTORY_PATH = Path(__file__).resolve().parent.parent / "history" / "hf_downloads.json"
+DOWNLOAD_HISTORY_PATH = REPO_ROOT / "huggingface" / "hf_downloads.json"
 DOWNLOAD_HISTORY_WINDOW = 90
 
 UPLOAD = ["index.html", "leaderboard.json", "models.py", "README.md", "cover.jpeg"]

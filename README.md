@@ -277,6 +277,7 @@ results/            # generated result JSONs (git-ignored)
 huggingface/
   space/            # Static HTML leaderboard (deployed to the HF Space)
   dataset_card.md   # Source for the published HF dataset README
+  hf_downloads.json # Fallback seed for Hub download history
 ```
 
 ## Adding a backend
