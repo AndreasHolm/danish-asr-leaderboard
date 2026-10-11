@@ -36,8 +36,9 @@ DATASET_PARQUET = "hf://datasets/RyeAI/danish-asr-leaderboard/data/results.parqu
 # scripts/compute_ci.py (too expensive to recompute on every deploy).
 DATASET_CI_JSON = "https://huggingface.co/datasets/RyeAI/danish-asr-leaderboard/resolve/main/data/ci.json"
 DATASET_DOWNLOAD_HISTORY_JSON = "https://huggingface.co/datasets/RyeAI/danish-asr-leaderboard/resolve/main/data/hf_downloads.json"
-SPACE_DIR = Path(__file__).resolve().parent.parent / "space"
-RESULTS_DIR = SPACE_DIR.parent / "results"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SPACE_DIR = REPO_ROOT / "huggingface" / "space"
+RESULTS_DIR = REPO_ROOT / "results"
 DOWNLOAD_HISTORY_PATH = Path(__file__).resolve().parent.parent / "history" / "hf_downloads.json"
 DOWNLOAD_HISTORY_WINDOW = 90
 

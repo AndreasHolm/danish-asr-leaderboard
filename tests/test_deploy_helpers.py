@@ -255,7 +255,7 @@ def test_generate_cover_image(tmp_path):
 # names. Structured data + a prose summary supply them without a second
 # renderer, and without the visible table-swap that baking the rows caused.
 
-SPACE_INDEX = Path(__file__).resolve().parent.parent / "space" / "index.html"
+SPACE_INDEX = Path(__file__).resolve().parent.parent / "huggingface" / "space" / "index.html"
 
 _ROWS = {
     "updated": "2026-09-05",
@@ -325,7 +325,7 @@ def test_methodology_is_reachable_under_info_with_data_changes():
 def test_every_release_date_is_empty_or_a_real_iso_date():
     """The Over Time chart plots `released`, so each value must parse as a date.
 
-    This used to read the generated space/leaderboard.json, which is no longer
+    This used to read the generated huggingface/space/leaderboard.json, which is no longer
     tracked. release_dates.json is the hand-maintained source, so a typo'd or
     half-written date is the regression that actually happens — and it would
     otherwise surface only as a model silently missing from the chart.
