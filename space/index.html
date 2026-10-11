@@ -799,6 +799,7 @@
       max-width: 320px;
       padding: 0;
       overflow: hidden;
+      pointer-events: auto;
       background: var(--surf);
       border-color: color-mix(in srgb, var(--link) 35%, var(--border));
       box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
@@ -823,6 +824,19 @@
     .open-legend svg { width: 13px; height: 13px; flex: 0 0 auto; color: var(--link); }
     .open-legend .unconfirmed { opacity: .4; }
     .open-legend .unconfirmed svg { color: var(--muted); }
+    .open-tip-issue {
+      display: block;
+      padding: 8px 13px 10px;
+      border-top: 1px solid var(--border);
+      color: var(--link);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .open-tip-issue:hover, .openness-drawer-issue:hover { text-decoration: underline; }
+    .open-tip-issue:focus-visible, .openness-drawer-issue:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: -3px;
+    }
 
     /* On phones, an openness icon opens this model-specific evidence drawer. */
     dialog.openness-drawer {
@@ -868,6 +882,7 @@
     .openness-drawer-model { margin: 0 0 5px; font-weight: 700; overflow-wrap: anywhere; }
     .openness-drawer-copy { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
     .openness-drawer-list { display: grid; gap: 8px; }
+    .openness-drawer-issue { display: inline-block; margin-top: 16px; color: var(--link); font-weight: 600; text-decoration: none; }
     .openness-drawer-row {
       display: grid;
       grid-template-columns: 22px minmax(0, 1fr) auto;
@@ -2762,6 +2777,7 @@
     <p class="openness-drawer-model"></p>
     <p class="openness-drawer-copy">Blue criteria link to supporting evidence. Faded criteria have no confirmed source. The licence point allows commercial reuse and redistribution; conditions may still apply.</p>
     <div class="openness-drawer-list"></div>
+    <a class="openness-drawer-issue" href="https://github.com/Rye-A1/danish-asr-leaderboard/issues/new" target="_blank" rel="noopener noreferrer">Did we miss something? Open an issue ↗</a>
   </div>
 </dialog>
 
@@ -3067,8 +3083,14 @@ function opennessLegend(row = null) {
     item.append(icon(), label);
     legend.appendChild(item);
   }
+  const issue = document.createElement('a');
+  issue.className = 'open-tip-issue';
+  issue.href = 'https://github.com/Rye-A1/danish-asr-leaderboard/issues/new';
+  issue.target = '_blank';
+  issue.rel = 'noopener noreferrer';
+  issue.textContent = 'Did we miss something? Open an issue ↗';
   const content = document.createDocumentFragment();
-  content.append(head, legend);
+  content.append(head, legend, issue);
   return content;
 }
 
@@ -5583,6 +5605,7 @@ const OPENNESS_DRAWER = document.getElementById('openness-drawer');
 let tipActive = false;
 let tipOwner = null;
 let tipPinned = false;
+let tipHideTimer = null;
 let opennessReturnFocus = null;
 
 function openOpennessDrawer(iconEl) {
@@ -5649,6 +5672,7 @@ function positionTip(clientX, clientY) {
 }
 
 function showTip(el, clientX, clientY, pinned = false) {
+  clearTimeout(tipHideTimer);
   tipOwner = el;
   tipPinned = pinned;
   const openness = el.dataset.key === 'openness_score';
@@ -5666,23 +5690,42 @@ function showTip(el, clientX, clientY, pinned = false) {
 }
 
 function hideTip() {
+  clearTimeout(tipHideTimer);
   TIP.classList.remove('show');
   tipActive = false;
   tipPinned = false;
   tipOwner = null;
 }
 
+function scheduleTipHide() {
+  clearTimeout(tipHideTimer);
+  const owner = tipOwner;
+  tipHideTimer = setTimeout(() => {
+    if (!tipPinned && tipOwner === owner && !TIP.matches(':hover') &&
+        !owner?.matches(':hover') && !TIP.contains(document.activeElement)) hideTip();
+  }, 180);
+}
+
 document.addEventListener('mouseover', e => {
+  if (TIP.contains(e.target)) { clearTimeout(tipHideTimer); return; }
   const el = e.target.closest('[data-tip]');
   if (el && !tipPinned && !(NARROW.matches && el.classList.contains('open-item')))
     showTip(el, e.clientX, e.clientY);
 });
 document.addEventListener('mouseout', e => {
-  if (tipPinned || !tipOwner || tipOwner.contains(e.relatedTarget)) return;
-  if (e.target.closest('[data-tip]') === tipOwner) hideTip();
+  if (tipPinned || !tipOwner) return;
+  if (TIP.contains(e.target)) {
+    if (!TIP.contains(e.relatedTarget) && !tipOwner.contains(e.relatedTarget)) scheduleTipHide();
+    return;
+  }
+  if (tipOwner.contains(e.relatedTarget) || TIP.contains(e.relatedTarget)) return;
+  if (e.target.closest('[data-tip]') === tipOwner) {
+    if (TIP.classList.contains('open-tip')) scheduleTipHide();
+    else hideTip();
+  }
 });
 document.addEventListener('mousemove', e => {
-  if (tipActive && !tipPinned) positionTip(e.clientX, e.clientY);
+  if (tipActive && !tipPinned && !TIP.classList.contains('open-tip')) positionTip(e.clientX, e.clientY);
 });
 document.addEventListener('focusin', e => {
   const el = e.target.closest('[data-tip]');
@@ -5690,7 +5733,8 @@ document.addEventListener('focusin', e => {
     showTip(el);
 });
 document.addEventListener('focusout', e => {
-  if (!tipPinned && tipOwner === e.target) hideTip();
+  if (!tipPinned && tipOwner === e.target && !TIP.contains(e.relatedTarget)) hideTip();
+  if (!tipPinned && TIP.contains(e.target) && !TIP.contains(e.relatedTarget)) hideTip();
 });
 document.addEventListener('click', e => {
   const icon = e.target.closest('.open-item');
