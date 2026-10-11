@@ -4162,7 +4162,7 @@ function _drawChart(rows, method, tab) {
   if (pareto.length >= 2) {
     let d = `M ${ML} ${sy(pareto[0].yv).toFixed(1)} H ${sx(pareto[0].sz).toFixed(1)}`;
     for (let i = 1; i < pareto.length; i++)
-      d += ` V ${sy(pareto[i].yv).toFixed(1)} H ${sx(pareto[i].sz).toFixed(1)}`;
+      d += ` H ${sx(pareto[i].sz).toFixed(1)} V ${sy(pareto[i].yv).toFixed(1)}`;
     d += ` H ${ML + cW}`;
     mk('path', { d, fill: 'none', stroke: 'var(--link)', 'stroke-width': '1.5', opacity: '0.5' }, svgEl);
   }
