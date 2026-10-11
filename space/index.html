@@ -781,19 +781,115 @@
       justify-content: center;
       width: 20px;
       height: 20px;
+      padding: 0;
+      border: 0;
       border-radius: 5px;
+      background: transparent;
     }
     .open-item svg { width: 13px; height: 13px; }
     a.open-item {
-      color: var(--accent);
-      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      color: var(--link);
+      background: color-mix(in srgb, var(--link) 14%, transparent);
     }
-    a.open-item:hover { background: color-mix(in srgb, var(--accent) 28%, transparent); }
-    span.open-item { color: var(--muted); opacity: 0.35; }
-    /* Icon legend appended to the Openness header tooltip. */
-    .open-legend { display: grid; gap: 4px; margin-top: 7px; }
-    .open-legend div { display: flex; align-items: center; gap: 7px; }
-    .open-legend svg { width: 13px; height: 13px; flex: 0 0 auto; color: var(--accent); }
+    a.open-item:hover { background: color-mix(in srgb, var(--link) 28%, transparent); }
+    button.open-item { color: var(--muted); opacity: 0.35; cursor: pointer; }
+    /* The Openness tooltip uses the same blue, softly bordered cards as the page. */
+    #col-tip.open-tip {
+      width: min(320px, calc(100vw - 24px));
+      max-width: 320px;
+      padding: 0;
+      overflow: hidden;
+      background: var(--surf);
+      border-color: color-mix(in srgb, var(--link) 35%, var(--border));
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
+    }
+    .open-tip-head {
+      padding: 11px 13px 9px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--link) 12%, var(--surf)), var(--surf));
+    }
+    .open-tip-title { display: block; font-weight: 700; font-size: 13px; }
+    .open-tip-model { display: block; margin-top: 3px; overflow-wrap: anywhere; font-weight: 600; }
+    .open-tip-copy { display: block; margin-top: 3px; color: var(--muted); }
+    .open-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px; }
+    .open-legend div {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px;
+      border-radius: 6px;
+      background: var(--surf2);
+    }
+    .open-legend svg { width: 13px; height: 13px; flex: 0 0 auto; color: var(--link); }
+    .open-legend .unconfirmed { opacity: .4; }
+    .open-legend .unconfirmed svg { color: var(--muted); }
+
+    /* On phones, an openness icon opens this model-specific evidence drawer. */
+    dialog.openness-drawer {
+      position: fixed;
+      inset: auto 0 0;
+      width: 100%;
+      max-width: none;
+      max-height: min(85dvh, 680px);
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-bottom: 0;
+      border-radius: 18px 18px 0 0;
+      background: var(--surf);
+      color: var(--text);
+      box-shadow: 0 -20px 70px rgba(0, 0, 0, .3);
+      overflow: hidden;
+    }
+    dialog.openness-drawer[open] { display: flex; flex-direction: column; }
+    dialog.openness-drawer::backdrop { background: rgba(3, 6, 18, .64); }
+    .openness-drawer-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      background: var(--brand-mesh), #09080d;
+      color: #fff;
+    }
+    .openness-drawer-head strong { flex: 1; font-size: 17px; }
+    .openness-drawer-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      font-size: 23px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .openness-drawer-close:hover { background: rgba(255, 255, 255, .18); }
+    .openness-drawer-body { overflow-y: auto; padding: 16px 20px max(20px, env(safe-area-inset-bottom)); }
+    .openness-drawer-model { margin: 0 0 5px; font-weight: 700; overflow-wrap: anywhere; }
+    .openness-drawer-copy { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
+    .openness-drawer-list { display: grid; gap: 8px; }
+    .openness-drawer-row {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surf2);
+      color: var(--text);
+      text-decoration: none;
+    }
+    .openness-drawer-row svg { width: 18px; height: 18px; color: var(--muted); }
+    a.openness-drawer-row svg, a.openness-drawer-row .openness-drawer-status { color: var(--link); }
+    a.openness-drawer-row:hover { border-color: var(--link); }
+    .openness-drawer-row.unconfirmed { opacity: .5; }
+    .openness-drawer-row.selected { border-color: color-mix(in srgb, var(--link) 65%, var(--border)); }
+    .openness-drawer-status { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .openness-drawer-close:focus-visible,
+    .open-item:focus-visible,
+    .openness-drawer-row:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
     /* ── Custom tooltip ─────────────────────────────────────────────── */
     #col-tip {
@@ -1492,7 +1588,7 @@
       }
       tbody tr:last-child { border-bottom: none; }
       tbody tr:nth-child(even) td { background-color: transparent; }
-      :root[data-theme="light"] tbody tr:nth-child(even) td:is([data-key="#"], [data-key="model"], [data-key="openness_score"]) {
+      :root[data-theme="light"] tbody tr:nth-child(even) td:is([data-key="#"], [data-key="model"]) {
         background-color: transparent;
       }
       tbody tr:hover td { background-image: none; }
@@ -1707,7 +1803,14 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        padding: 9px;
+        background: var(--surf2);
+        border-radius: 8px;
       }
+      tbody td[data-key="openness_score"] .open-wrap { margin-left: auto; }
+      tbody td[data-key="openness_score"] .open-wrap { gap: 4px; }
+      tbody td[data-key="openness_score"] .open-item { width: 23px; height: 23px; }
+      tbody td[data-key="openness_score"] .open-item svg { width: 15px; height: 15px; }
       tbody tr td[data-key="openness_score"]::before {
         content: attr(data-label);
         color: var(--muted);
@@ -2650,6 +2753,17 @@
 <div id="col-tip"></div>
 <div id="chart-tip"></div>
 <div id="model-preview" class="model-preview" role="tooltip" hidden></div>
+<dialog id="openness-drawer" class="openness-drawer" aria-labelledby="openness-drawer-title">
+  <div class="openness-drawer-head">
+    <strong id="openness-drawer-title">Openness</strong>
+    <button type="button" class="openness-drawer-close" aria-label="Close openness details">&times;</button>
+  </div>
+  <div class="openness-drawer-body">
+    <p class="openness-drawer-model"></p>
+    <p class="openness-drawer-copy">Blue criteria link to supporting evidence. Faded criteria have no confirmed source. The licence point allows commercial reuse and redistribution; conditions may still apply.</p>
+    <div class="openness-drawer-list"></div>
+  </div>
+</dialog>
 
 <script>
 const MEDALS = ['🥇','🥈','🥉'];
@@ -2685,9 +2799,7 @@ function appendCI(td, ci, fmt) {
 }
 
 const OPENNESS_TIP =
-  'How open the model is. A lit icon means the criterion is met and links to the evidence; '
-  + 'a faded icon means it is not. An open licence permits commercial use and redistribution '
-  + 'without use restrictions.';
+  'Blue icons link to supporting evidence. Faded icons have no confirmed source. The licence point allows commercial reuse and redistribution; conditions may still apply.';
 
 const WER_COLS = [
   { key:'#',                      label:'#',             cls:'c-rank',
@@ -2929,32 +3041,68 @@ function downloadCell(td, value, history) {
   td.appendChild(wrap);
 }
 
-/* Icon key for the Openness header tooltip. */
-function opennessLegend() {
+/* The header shows the key; a model icon shows that row's actual status. */
+function opennessLegend(row = null) {
   const legend = document.createElement('div');
   legend.className = 'open-legend';
-  for (const [, label, icon] of OPENNESS) {
+  const head = document.createElement('div');
+  head.className = 'open-tip-head';
+  const title = document.createElement('strong');
+  title.className = 'open-tip-title';
+  title.textContent = 'Openness';
+  const copy = document.createElement('span');
+  copy.className = 'open-tip-copy';
+  copy.textContent = OPENNESS_TIP;
+  head.appendChild(title);
+  if (row) {
+    const model = document.createElement('span');
+    model.className = 'open-tip-model';
+    model.textContent = row.name;
+    head.appendChild(model);
+  }
+  head.appendChild(copy);
+  for (const [key, label, icon] of OPENNESS) {
     const item = document.createElement('div');
+    if (row && !row.openness[key]) item.classList.add('unconfirmed');
     item.append(icon(), label);
     legend.appendChild(item);
   }
-  return legend;
+  const content = document.createDocumentFragment();
+  content.append(head, legend);
+  return content;
 }
 
 /* Openness cell: one icon per criterion, linked to its evidence when met. */
+const OPENNESS_ROWS = new WeakMap();
+function setOpenIconA11y(el) {
+  const label = el.dataset.opennessLabel;
+  const hasProof = el.tagName === 'A';
+  if (NARROW.matches) {
+    el.setAttribute('aria-label', `${label}, ${hasProof ? 'proof available' : 'not confirmed'}, open details`);
+    el.setAttribute('aria-haspopup', 'dialog');
+  } else {
+    el.setAttribute('aria-label', `${label}, ${hasProof ? 'view proof' : 'not confirmed'}`);
+    el.removeAttribute('aria-haspopup');
+  }
+}
 function openCell(td, row) {
   const o = row.openness;
   if (!o) { td.textContent = '—'; return; }
+  OPENNESS_ROWS.set(td, row);
   const wrap = document.createElement('span');
   wrap.className = 'open-wrap';
   for (const [key, label, icon] of OPENNESS) {
     const url = o[key];
-    const el = document.createElement(url ? 'a' : 'span');
+    const el = document.createElement(url ? 'a' : 'button');
     el.className = 'open-item';
-    el.title = (url ? '✓ ' : '✗ ') + label;
-    el.setAttribute('aria-label', (url ? '' : 'No ') + label);
+    if (!url) el.type = 'button';
+    el.dataset.key = 'openness_score';
+    el.dataset.opennessKey = key;
+    el.dataset.opennessLabel = label;
+    el.dataset.tip = OPENNESS_TIP;
     if (url) { el.href = url; el.target = '_blank'; el.rel = 'noopener noreferrer'; }
     el.appendChild(icon());
+    setOpenIconA11y(el);
     wrap.appendChild(el);
   }
   td.appendChild(wrap);
@@ -3663,7 +3811,7 @@ if (document.readyState === 'loading') {
 }
 document.addEventListener('click', ev => {
   if (!NARROW.matches) return;
-  if (ev.target.closest('a')) return;
+  if (ev.target.closest('a, .open-item')) return;
   const tr = ev.target.closest('tbody tr');
   if (!tr || !tr.closest('.table-scroll')) return;
   tr.classList.toggle('expanded');
@@ -5431,38 +5579,134 @@ periodPanel.addEventListener('keydown', event => {
 
 /* Custom column tooltips */
 const TIP = document.getElementById('col-tip');
+const OPENNESS_DRAWER = document.getElementById('openness-drawer');
 let tipActive = false;
+let tipOwner = null;
+let tipPinned = false;
+let opennessReturnFocus = null;
 
-document.addEventListener('mouseover', e => {
-  const el = e.target.closest('[data-tip]');
-  if (!el) return;
-  TIP.textContent = el.dataset.tip;
-  if (el.dataset.key === 'openness_score') TIP.appendChild(opennessLegend());
-  TIP.classList.add('show');
-  tipActive = true;
+function openOpennessDrawer(iconEl) {
+  const td = iconEl.closest('td[data-key="openness_score"]');
+  const row = OPENNESS_ROWS.get(td);
+  if (!row) return;
+  const list = OPENNESS_DRAWER.querySelector('.openness-drawer-list');
+  const model = OPENNESS_DRAWER.querySelector('.openness-drawer-model');
+  model.textContent = row.name;
+  list.replaceChildren();
+  for (const [key, label, icon] of OPENNESS) {
+    const url = row.openness[key];
+    const item = document.createElement(url ? 'a' : 'div');
+    item.className = 'openness-drawer-row';
+    if (!url) item.classList.add('unconfirmed');
+    if (key === iconEl.dataset.opennessKey) item.classList.add('selected');
+    if (url) {
+      item.href = url;
+      item.target = '_blank';
+      item.rel = 'noopener noreferrer';
+      item.setAttribute('aria-label', label + ', view proof');
+    }
+    const text = document.createElement('span');
+    text.textContent = label;
+    const status = document.createElement('span');
+    status.className = 'openness-drawer-status';
+    status.textContent = url ? 'View proof ↗' : 'Not confirmed';
+    item.append(icon(), text, status);
+    list.appendChild(item);
+  }
+  opennessReturnFocus = iconEl;
+  OPENNESS_DRAWER.showModal();
+  OPENNESS_DRAWER.querySelector('.openness-drawer-close').focus();
+}
+
+OPENNESS_DRAWER.querySelector('.openness-drawer-close').addEventListener('click', () => OPENNESS_DRAWER.close());
+OPENNESS_DRAWER.addEventListener('click', e => {
+  if (e.target === OPENNESS_DRAWER || e.target.closest('a.openness-drawer-row')) OPENNESS_DRAWER.close();
 });
-document.addEventListener('mouseout', e => {
-  if (!e.target.closest('[data-tip]')) return;
-  TIP.classList.remove('show');
-  tipActive = false;
+OPENNESS_DRAWER.addEventListener('close', () => {
+  if (opennessReturnFocus?.isConnected) opennessReturnFocus.focus();
+  opennessReturnFocus = null;
 });
-document.addEventListener('mousemove', e => {
-  if (!tipActive) return;
+NARROW.addEventListener('change', e => {
+  if (!e.matches && OPENNESS_DRAWER.open) OPENNESS_DRAWER.close();
+  document.querySelectorAll('.open-item').forEach(setOpenIconA11y);
+});
+
+function positionTip(clientX, clientY) {
   const w = TIP.offsetWidth, h = TIP.offsetHeight;
   const sheet = TIP.closest('dialog.settings-sheet[open]');
   const bounds = sheet?.getBoundingClientRect();
   const left = bounds?.left ?? 0, top = bounds?.top ?? 0;
   const width = bounds?.width ?? window.innerWidth;
   const height = bounds?.height ?? window.innerHeight;
-  const px = e.clientX - left, py = e.clientY - top;
+  const px = clientX - left, py = clientY - top;
   let x = px + 14, y = py + 14;
   if (x + w > width - 8) x = px - w - 14;
   if (y + h > height - 8) y = py - h - 14;
   x = Math.max(8, Math.min(x, width - w - 8));
   y = Math.max(8, Math.min(y, height - h - 8));
   TIP.style.left = x + 'px';
-  TIP.style.top  = y + 'px';
+  TIP.style.top = y + 'px';
+}
+
+function showTip(el, clientX, clientY, pinned = false) {
+  tipOwner = el;
+  tipPinned = pinned;
+  const openness = el.dataset.key === 'openness_score';
+  TIP.classList.toggle('open-tip', openness);
+  if (openness) {
+    const td = el.closest('td[data-key="openness_score"]');
+    TIP.replaceChildren(opennessLegend(td ? OPENNESS_ROWS.get(td) : null));
+  }
+  else TIP.textContent = el.dataset.tip;
+  TIP.classList.add('show');
+  tipActive = true;
+  const rect = el.getBoundingClientRect();
+  positionTip(clientX ?? rect.left + rect.width / 2,
+              clientY ?? rect.bottom);
+}
+
+function hideTip() {
+  TIP.classList.remove('show');
+  tipActive = false;
+  tipPinned = false;
+  tipOwner = null;
+}
+
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-tip]');
+  if (el && !tipPinned && !(NARROW.matches && el.classList.contains('open-item')))
+    showTip(el, e.clientX, e.clientY);
 });
+document.addEventListener('mouseout', e => {
+  if (tipPinned || !tipOwner || tipOwner.contains(e.relatedTarget)) return;
+  if (e.target.closest('[data-tip]') === tipOwner) hideTip();
+});
+document.addEventListener('mousemove', e => {
+  if (tipActive && !tipPinned) positionTip(e.clientX, e.clientY);
+});
+document.addEventListener('focusin', e => {
+  const el = e.target.closest('[data-tip]');
+  if (el && !tipPinned && !(NARROW.matches && el.classList.contains('open-item')))
+    showTip(el);
+});
+document.addEventListener('focusout', e => {
+  if (!tipPinned && tipOwner === e.target) hideTip();
+});
+document.addEventListener('click', e => {
+  const icon = e.target.closest('.open-item');
+  if (icon && NARROW.matches) {
+    e.preventDefault();
+    hideTip();
+    openOpennessDrawer(icon);
+  } else if (icon?.tagName === 'BUTTON') {
+    if (tipPinned && tipOwner === icon) hideTip();
+    else showTip(icon, undefined, undefined, true);
+  } else if (tipPinned) hideTip();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && tipActive) hideTip();
+});
+window.addEventListener('resize', hideTip);
 
 init();
 </script>

@@ -68,13 +68,13 @@ that is met links to its evidence, so every claim can be checked in one click:
 | Criterion | Source | Counts when… |
 |---|---|---|
 | Open weights | derived | the weights are downloadable from a Hugging Face repo (gated repos count unless access needs manual approval) |
-| Open licence | derived | the repo's licence tag is in `OPEN_LICENSES` in `scripts/update_space.py`: it allows use, modification and redistribution, commercial use included, with no use restrictions (so not CC BY-NC, OpenRAIL or bespoke vendor licences) |
+| Open licence | derived, with reviewed exceptions | the published model terms permit commercial reuse and redistribution. Attribution or use conditions may still apply; the evidence link shows the actual terms. NC licences do not qualify. Standard tags are listed in `OPEN_LICENSES`; reviewed custom terms need a `license_evidence` URL in `scripts/model_metadata.json` |
 | Open training code | `training_code` | the code used to train this checkpoint is public (fine-tuning code for a fine-tune). |
 | Open training data | `training_data` | all data used to train this checkpoint is public (the fine-tuning data for a fine-tune). |
 | Model card | `model_card` | there is a filled-in model card, a release blog post, or a detailed documentation page dedicated to the model (e.g. a provider's per-model reference page for a hosted API). An auto-generated "more information needed" card, a generic API reference, or a page that only lists the model's name does not count |
 | Paper | `paper` | there is a paper or a technical report. |
 
-The four annotated fields can be found in `scripts/model_metadata.json` and includes a an evidence URL (which is its
+The four annotated fields can be found in `scripts/model_metadata.json` and include an evidence URL (which is their
 source), or `null` when the criterion is not met:
 
 ```json

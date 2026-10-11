@@ -1,5 +1,6 @@
 {
   "3dio-ai/svale-110M": {
+    "license_evidence": "https://huggingface.co/3dio-ai/svale-110M#licence",
     "released": {
       "date": "2026-09-09",
       "source": "huggingface"
@@ -10,6 +11,7 @@
     "paper": null
   },
   "3dio-ai/svale-600M": {
+    "license_evidence": "https://huggingface.co/3dio-ai/svale-600M#licence",
     "released": {
       "date": "2026-09-09",
       "source": "huggingface"
@@ -40,6 +42,7 @@
     "paper": null
   },
   "CoRal-project/roest-v2-wav2vec2-1B": {
+    "license_evidence": "https://huggingface.co/CoRal-project/roest-v2-wav2vec2-1B#model-details",
     "released": {
       "date": "2025-04-25",
       "source": "huggingface"
@@ -50,6 +53,7 @@
     "paper": null
   },
   "CoRal-project/roest-v2-wav2vec2-2B": {
+    "license_evidence": "https://huggingface.co/CoRal-project/roest-v2-wav2vec2-2B#model-details",
     "released": {
       "date": "2025-06-23",
       "source": "huggingface"
@@ -60,6 +64,7 @@
     "paper": null
   },
   "CoRal-project/roest-v3-wav2vec2-315m": {
+    "license_evidence": "https://huggingface.co/CoRal-project/roest-v3-wav2vec2-315m#model-details",
     "released": {
       "date": "2025-12-22",
       "source": "huggingface"
@@ -70,6 +75,7 @@
     "paper": null
   },
   "CoRal-project/roest-v3-whisper-1.5b": {
+    "license_evidence": "https://huggingface.co/CoRal-project/roest-v3-whisper-1.5b#model-details",
     "released": {
       "date": "2026-01-11",
       "source": "huggingface"
@@ -128,7 +134,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "model_card": null,
     "paper": null
   },
   "gpt-4o-mini-transcribe-benchmark": {
@@ -139,7 +145,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "model_card": null,
     "paper": null
   },
   "gpt-4o-transcribe": {
@@ -151,7 +157,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "model_card": null,
     "paper": null
   },
   "gpt-4o-transcribe-benchmark": {
@@ -162,7 +168,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://openai.com/index/introducing-our-next-generation-audio-models/",
+    "model_card": null,
     "paper": null
   },
   "gpt-transcribe": {
@@ -174,7 +180,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://developers.openai.com/api/docs/models/gpt-transcribe",
+    "model_card": null,
     "paper": null
   },
   "hinge/danstral-v1": {
@@ -238,6 +244,7 @@
     "paper": "https://arxiv.org/abs/2509.14128"
   },
   "nvidia/parakeet-rnnt-110m-da-dk": {
+    "license_evidence": "https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-open-model-license/",
     "released": {
       "date": "2025-05-28",
       "source": "huggingface"
@@ -339,6 +346,7 @@
     "paper": "https://arxiv.org/abs/2601.21337"
   },
   "RyeAI/ekko-v1-tiny": {
+    "license_evidence": "https://huggingface.co/RyeAI/ekko-v1-tiny/blob/main/MODEL_LICENSE.md",
     "released": {
       "date": "2026-10-09",
       "source": "leaderboard",
@@ -368,7 +376,7 @@
     },
     "training_code": null,
     "training_data": null,
-    "model_card": "https://elevenlabs.io/blog/introducing-scribe-v2",
+    "model_card": null,
     "paper": null
   },
   "syv-transcribe": {
@@ -464,6 +472,7 @@
     "paper": null
   },
   "nvidia/nemotron-3.5-asr-streaming-0.6b": {
+    "license_evidence": "https://openmdw.ai/license/1-1/",
     "released": {
       "date": "2026-05-15",
       "source": "huggingface"

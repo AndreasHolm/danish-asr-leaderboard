@@ -93,10 +93,10 @@ PROVIDER_HF_ORG: dict[str, str] = {
 MODEL_METADATA_PATH = Path(__file__).resolve().parent / "model_metadata.json"
 MODEL_METADATA = json.loads(MODEL_METADATA_PATH.read_text(encoding="utf-8"))
 
-# Licences counted as open: they allow use, modification and redistribution,
-# commercial use included, with no field-of-use restrictions. That leaves out
-# the NC Creative Commons variants, OpenRAIL (use restrictions) and bespoke
-# vendor licences (HF tag "other"). Keyed by HF licence tag -> licence text.
+# Licences counted here permit commercial reuse and redistribution of the model.
+# Attribution and use conditions may still apply. NC variants do not qualify;
+# model-specific OpenRAIL and composite terms need reviewed evidence below.
+# Keyed by HF licence tag -> terms.
 OPEN_LICENSES = {
     "apache-2.0": "https://www.apache.org/licenses/LICENSE-2.0",
     "mit": "https://opensource.org/license/mit",
@@ -109,6 +109,8 @@ OPEN_LICENSES = {
     "cc0-1.0": "https://creativecommons.org/publicdomain/zero/1.0/",
     "cc-by-4.0": "https://creativecommons.org/licenses/by/4.0/",
     "cc-by-sa-4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "nvidia-open-model-license": "https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-open-model-license/",
+    "openmdw-1.1": "https://openmdw.ai/license/1-1/",
     "unlicense": "https://unlicense.org/",
 }
 
@@ -294,17 +296,24 @@ def _model_downloads(model_id: str) -> int | None:
 def _openness(name: str, is_repo: bool, access: str, license: str) -> dict[str, str | None]:
     """Evidence link per openness criterion, or None where it is not met.
 
-    Open weights and open licence are derived -- an open HF repo that anyone
-    can download (no manual approval gate), and a licence tag in OPEN_LICENSES
-    -- so they cannot drift from the Hub. The other four come from the model's
-    entry in model_metadata.json.
+    Open weights and open licence use the live HF repo and licence tag. Reviewed
+    evidence for a model-specific licence is allowed only with the custom tags
+    below; a later NC tag will therefore remove the point. The other four
+    criteria come from model_metadata.json.
     """
+    if access == "proprietary":
+        return dict.fromkeys(OPENNESS_KEYS)
+
     downloadable = (is_repo and access == "open"
                     and _model_metadata(name).get("gated") != "manual")
     ann = MODEL_METADATA.get(name, {})
+    tag = license.lower().strip() if license else ""
+    license_url = OPEN_LICENSES.get(tag)
+    if not license_url and tag in {"other", "openrail", "ekko-composite-model-terms"}:
+        license_url = ann.get("license_evidence")
     return {
         "weights": f"https://huggingface.co/{name}" if downloadable else None,
-        "license": OPEN_LICENSES.get(license.lower()) if license else None,
+        "license": license_url if is_repo else None,
         **{key: ann.get(key) or None for key in ANNOTATED_OPENNESS_KEYS},
     }
 

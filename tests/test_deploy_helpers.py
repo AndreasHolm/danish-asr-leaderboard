@@ -21,6 +21,7 @@ from update_space import (
     _release_date,
     _fmt_size,
     _official_size,
+    _openness,
     _parse_model,
     _size_from_name,
     bake_seo,
@@ -29,6 +30,32 @@ from update_space import (
     generate_cover_image,
     load_leaderboard_df,
 )
+
+
+def test_proprietary_models_have_no_openness_points():
+    """API docs and product announcements are not model cards or open artifacts."""
+    openness = _openness("gpt-transcribe", False, "proprietary", "")
+    assert all(value is None for value in openness.values())
+
+
+@pytest.mark.parametrize("name, tag", [
+    ("RyeAI/ekko-v1-tiny", "ekko-composite-model-terms"),
+    ("3dio-ai/svale-110M", "other"),
+    ("3dio-ai/svale-600M", "nvidia-open-model-license"),
+    ("CoRal-project/roest-v2-wav2vec2-1B", "openrail"),
+    ("CoRal-project/roest-v2-wav2vec2-2B", "openrail"),
+    ("CoRal-project/roest-v3-wav2vec2-315m", "openrail"),
+    ("CoRal-project/roest-v3-whisper-1.5b", "openrail"),
+    ("nvidia/parakeet-rnnt-110m-da-dk", "other"),
+    ("nvidia/nemotron-3.5-asr-streaming-0.6b", "other"),
+])
+def test_reviewed_commercial_redistribution_licences(name, tag):
+    assert _openness(name, True, "open", tag)["license"].startswith("https://")
+
+
+def test_custom_licence_evidence_does_not_override_noncommercial_relicensing():
+    assert _openness("RyeAI/ekko-v1-tiny", True, "open", "cc-by-nc-4.0")["license"] is None
+    assert _openness("unreviewed/model", True, "open", "other")["license"] is None
 
 
 # ---------------------------------------------------------------------------
