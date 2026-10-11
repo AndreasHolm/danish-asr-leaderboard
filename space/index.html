@@ -793,7 +793,7 @@
     }
     a.open-item:hover { background: color-mix(in srgb, var(--link) 28%, transparent); }
     button.open-item { color: var(--muted); opacity: 0.35; cursor: pointer; }
-    /* The Openness tooltip uses the same blue, softly bordered cards as the page. */
+    /* The Openness tooltip keeps its evidence cards below a model-preview header. */
     #col-tip.open-tip {
       width: min(320px, calc(100vw - 24px));
       max-width: 320px;
@@ -805,13 +805,14 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
     }
     .open-tip-head {
-      padding: 11px 13px 9px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--link) 12%, var(--surf)), var(--surf));
+      background: var(--brand-mesh), #09080d;
+      color: #fff;
     }
+    .open-tip-head-model { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .open-tip-title { display: block; font-weight: 700; font-size: 13px; }
-    .open-tip-model { display: block; margin-top: 3px; overflow-wrap: anywhere; font-weight: 600; }
-    .open-tip-copy { display: block; margin-top: 3px; color: var(--muted); }
+    .open-tip-copy { display: block; margin-top: 3px; color: rgba(255, 255, 255, .72); }
     .open-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px; }
     .open-legend div {
       display: flex;
@@ -854,19 +855,50 @@
       color: var(--text);
       box-shadow: 0 -20px 70px rgba(0, 0, 0, .3);
       overflow: hidden;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s ease,
+        display .28s allow-discrete, overlay .28s allow-discrete;
     }
-    dialog.openness-drawer[open] { display: flex; flex-direction: column; }
+    dialog.openness-drawer[open] { display: flex; flex-direction: column; transform: translateY(0); opacity: 1; }
+    @starting-style {
+      dialog.openness-drawer[open] { transform: translateY(100%); opacity: 0; }
+    }
     dialog.openness-drawer::backdrop { background: rgba(3, 6, 18, .64); }
     .openness-drawer-head {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 18px 20px;
+      padding: 16px 20px;
       background: var(--brand-mesh), #09080d;
       color: #fff;
     }
-    .openness-drawer-head strong { flex: 1; font-size: 17px; }
+    .openness-drawer-avatar {
+      position: relative;
+      display: grid;
+      flex: 0 0 44px;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .14);
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .openness-drawer-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+    }
+    .openness-drawer-identity { flex: 1; min-width: 0; }
+    .openness-drawer-identity strong { display: block; overflow-wrap: anywhere; font-size: 16px; line-height: 1.3; }
+    .openness-drawer-context { color: rgba(255, 255, 255, .72); font-size: 12px; }
+    .openness-drawer-a11y { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .openness-drawer-close {
+      flex: 0 0 32px;
       width: 32px;
       height: 32px;
       border: 1px solid rgba(255, 255, 255, .22);
@@ -879,8 +911,6 @@
     }
     .openness-drawer-close:hover { background: rgba(255, 255, 255, .18); }
     .openness-drawer-body { overflow-y: auto; padding: 16px 20px max(20px, env(safe-area-inset-bottom)); }
-    .openness-drawer-model { margin: 0 0 5px; font-weight: 700; overflow-wrap: anywhere; }
-    .openness-drawer-copy { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
     .openness-drawer-list { display: grid; gap: 8px; }
     .openness-drawer-issue { display: inline-block; margin-top: 16px; color: var(--link); font-weight: 600; text-decoration: none; }
     .openness-drawer-row {
@@ -2130,6 +2160,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       dialog.settings-sheet { transition: none; }
+      dialog.openness-drawer { transition: none; }
     }
 
   </style>
@@ -2770,12 +2801,14 @@
 <div id="model-preview" class="model-preview" role="tooltip" hidden></div>
 <dialog id="openness-drawer" class="openness-drawer" aria-labelledby="openness-drawer-title">
   <div class="openness-drawer-head">
-    <strong id="openness-drawer-title">Openness</strong>
+    <span class="openness-drawer-avatar" aria-hidden="true"></span>
+    <div class="openness-drawer-identity">
+      <strong id="openness-drawer-title"><span class="openness-drawer-a11y">Openness details for </span><span class="openness-drawer-name"></span></strong>
+      <span class="openness-drawer-context"></span>
+    </div>
     <button type="button" class="openness-drawer-close" aria-label="Close openness details">&times;</button>
   </div>
   <div class="openness-drawer-body">
-    <p class="openness-drawer-model"></p>
-    <p class="openness-drawer-copy">Blue criteria link to supporting evidence. Faded criteria have no confirmed source. The licence point allows commercial reuse and redistribution; conditions may still apply.</p>
     <div class="openness-drawer-list"></div>
     <a class="openness-drawer-issue" href="https://github.com/Rye-A1/danish-asr-leaderboard/issues/new" target="_blank" rel="noopener noreferrer">Did we miss something? Open an issue ↗</a>
   </div>
@@ -2822,12 +2855,12 @@ const WER_COLS = [
     tip:'Rank by the selected method (Mean WER, Borda, or Bradley-Terry). Lower is better.' },
   { key:'model',                   label:'Model',         cls:'c-model',
     tip:'Hover or focus to preview the model; click to open its page in a new tab.' },
-  { key:'openness_score',          label:'Openness',       cls:'c-open',
-    tip:OPENNESS_TIP },
   { key:'mean_wer',               label:'Mean WER ↓',
     tip:'Word Error Rate, macro-averaged over the five test sets. Lower is better.' },
   { key:'mean_cer',               label:'Mean CER ↓',
     tip:'Character Error Rate, macro-averaged over the five test sets. Lower is better.' },
+  { key:'openness_score',          label:'Openness',       cls:'c-open',
+    tip:OPENNESS_TIP },
   { key:'speed_x',                label:'Speed (x) ↑',
     tip:'Audio seconds processed per wall-clock second on one NVIDIA A100 80 GB at batch size 16. '
       + 'Reflects the serving stack (vLLM >> plain transformers for the same model). '
@@ -2853,12 +2886,12 @@ const CER_COLS = [
     tip:'Rank by the selected method (Mean CER, Borda, or Bradley-Terry). Lower is better.' },
   { key:'model',                   label:'Model',          cls:'c-model',
     tip:'Hover or focus to preview the model; click to open its page in a new tab.' },
-  { key:'openness_score',          label:'Openness',       cls:'c-open',
-    tip:OPENNESS_TIP },
   { key:'mean_cer',               label:'Mean CER ↓',
     tip:'Character Error Rate, macro-averaged over the five test sets. Lower is better.' },
   { key:'mean_wer',               label:'Mean WER ↓',
     tip:'Word Error Rate, macro-averaged over the five test sets. Shown here for context alongside CER.' },
+  { key:'openness_score',          label:'Openness',       cls:'c-open',
+    tip:OPENNESS_TIP },
   { key:'speed_x',                label:'Speed (x) ↑',
     tip:'Audio seconds processed per wall-clock second on one NVIDIA A100 80 GB at batch size 16. '
       + 'Reflects the serving stack (vLLM >> plain transformers for the same model). '
@@ -3063,20 +3096,27 @@ function opennessLegend(row = null) {
   legend.className = 'open-legend';
   const head = document.createElement('div');
   head.className = 'open-tip-head';
-  const title = document.createElement('strong');
-  title.className = 'open-tip-title';
-  title.textContent = 'Openness';
-  const copy = document.createElement('span');
-  copy.className = 'open-tip-copy';
-  copy.textContent = OPENNESS_TIP;
-  head.appendChild(title);
   if (row) {
-    const model = document.createElement('span');
-    model.className = 'open-tip-model';
-    model.textContent = row.name;
-    head.appendChild(model);
+    head.classList.add('open-tip-head-model');
+    const identity = document.createElement('div');
+    identity.className = 'model-preview-identity';
+    const name = document.createElement('strong');
+    name.className = 'model-preview-name';
+    name.textContent = row.name;
+    const context = document.createElement('span');
+    context.className = 'model-preview-context';
+    context.textContent = modelSummary(row);
+    identity.append(name, context);
+    head.append(modelAvatar(row), identity);
+  } else {
+    const title = document.createElement('strong');
+    title.className = 'open-tip-title';
+    title.textContent = 'Openness';
+    const copy = document.createElement('span');
+    copy.className = 'open-tip-copy';
+    copy.textContent = OPENNESS_TIP;
+    head.append(title, copy);
   }
-  head.appendChild(copy);
   for (const [key, label, icon] of OPENNESS) {
     const item = document.createElement('div');
     if (row && !row.openness[key]) item.classList.add('unconfirmed');
@@ -3121,7 +3161,7 @@ function openCell(td, row) {
     el.dataset.key = 'openness_score';
     el.dataset.opennessKey = key;
     el.dataset.opennessLabel = label;
-    el.dataset.tip = OPENNESS_TIP;
+    el.dataset.tip = '';
     if (url) { el.href = url; el.target = '_blank'; el.rel = 'noopener noreferrer'; }
     el.appendChild(icon());
     setOpenIconA11y(el);
@@ -3177,6 +3217,25 @@ function positionModelPreview(link) {
   MODEL_PREVIEW.style.top = `${Math.max(edge, Math.min(top, innerHeight - height - edge))}px`;
 }
 
+function modelSummary(row) {
+  const size = Number.parseFloat(row.size);
+  return (row.access === 'open' ? 'Open weights' : 'Hosted API')
+    + (Number.isFinite(size) ? ` · ${row.size}B parameters` : '');
+}
+
+function modelAvatar(row) {
+  const mark = document.createElement('span');
+  mark.className = 'model-preview-mark';
+  mark.textContent = row.name.split('/').at(-1).charAt(0).toUpperCase();
+  if (!row.logo) return mark;
+  const logo = document.createElement('img');
+  logo.className = 'model-preview-logo';
+  logo.alt = '';
+  logo.src = row.logo;
+  logo.onerror = () => logo.replaceWith(mark);
+  return logo;
+}
+
 function showModelPreview(link, row) {
   if (NARROW.matches || !link.isConnected) return;
   if (previewLink && previewLink !== link) hideModelPreview();
@@ -3185,17 +3244,7 @@ function showModelPreview(link, row) {
 
   const head = document.createElement('div');
   head.className = 'model-preview-head';
-  const mark = document.createElement('span');
-  mark.className = 'model-preview-mark';
-  mark.textContent = row.name.split('/').at(-1).charAt(0).toUpperCase();
-  if (row.logo) {
-    const logo = document.createElement('img');
-    logo.className = 'model-preview-logo';
-    logo.alt = '';
-    logo.src = row.logo;
-    logo.onerror = () => logo.replaceWith(mark);
-    head.appendChild(logo);
-  } else head.appendChild(mark);
+  head.appendChild(modelAvatar(row));
   const identity = document.createElement('div');
   identity.className = 'model-preview-identity';
   const name = document.createElement('span');
@@ -3203,9 +3252,7 @@ function showModelPreview(link, row) {
   name.textContent = row.name;
   const context = document.createElement('span');
   context.className = 'model-preview-context';
-  const size = Number.parseFloat(row.size);
-  context.textContent = (row.access === 'open' ? 'Open weights' : 'Hosted API')
-    + (Number.isFinite(size) ? ` · ${row.size}B parameters` : '');
+  context.textContent = modelSummary(row);
   identity.append(name, context);
   head.appendChild(identity);
 
@@ -5613,8 +5660,17 @@ function openOpennessDrawer(iconEl) {
   const row = OPENNESS_ROWS.get(td);
   if (!row) return;
   const list = OPENNESS_DRAWER.querySelector('.openness-drawer-list');
-  const model = OPENNESS_DRAWER.querySelector('.openness-drawer-model');
-  model.textContent = row.name;
+  const avatar = OPENNESS_DRAWER.querySelector('.openness-drawer-avatar');
+  avatar.textContent = row.name.split('/').at(-1).charAt(0).toUpperCase();
+  if (row.logo) {
+    const logo = document.createElement('img');
+    logo.alt = '';
+    logo.src = row.logo;
+    logo.onerror = () => logo.remove();
+    avatar.appendChild(logo);
+  }
+  OPENNESS_DRAWER.querySelector('.openness-drawer-name').textContent = row.name;
+  OPENNESS_DRAWER.querySelector('.openness-drawer-context').textContent = modelSummary(row);
   list.replaceChildren();
   for (const [key, label, icon] of OPENNESS) {
     const url = row.openness[key];
