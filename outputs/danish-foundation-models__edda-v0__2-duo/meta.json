@@ -8,6 +8,7 @@
   "number_words": true,
   "filler_words": true,
   "speed_x": 17.0,
+  "model_revision": "fb0de9b0fd76386b2f475dee12eb65da25994060",
   "datasets": [
     "coral_conversation",
     "coral_read_aloud",

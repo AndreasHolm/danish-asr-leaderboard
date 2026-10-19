@@ -11,6 +11,9 @@ precision; on CPU everything runs in float32.
 """
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 from danish_asr_leaderboard.audio import load_audio_array
 from danish_asr_leaderboard.backends._torch_util import cuda_ok
 from danish_asr_leaderboard.backends.base import Backend, LoadOptions, register
@@ -38,16 +41,30 @@ class TransformersRemoteBackend(Backend):
         return self.transcribe_batch([audio_path], batch_size=1)[0]
 
 
+def _pinned_revision(model_ref: str, options: LoadOptions) -> str | None:
+    if Path(model_ref).is_dir():
+        return None
+    revision = options.model_revision
+    if not revision or not re.fullmatch(r"[0-9a-fA-F]{40}", revision):
+        raise ValueError(
+            "transformers-remote executes Hub code; pass --model-revision "
+            "with its full 40-character commit SHA"
+        )
+    return revision.lower()
+
+
 @register("transformers-remote")
 def load(model_ref: str, options: LoadOptions) -> Backend:
+    revision = _pinned_revision(model_ref, options)
     import torch
     from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 
     gpu = cuda_ok(options.device)
+    pinned = {"revision": revision} if revision else {}
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        model_ref, trust_remote_code=True, dtype="auto" if gpu else torch.float32
+        model_ref, trust_remote_code=True, dtype="auto" if gpu else torch.float32, **pinned
     )
     model = model.to("cuda" if gpu else "cpu").eval()
     print(f"  transformers-remote: {type(model).__name__}, dtype {model.dtype}")
-    processor = AutoProcessor.from_pretrained(model_ref, trust_remote_code=True)
+    processor = AutoProcessor.from_pretrained(model_ref, trust_remote_code=True, **pinned)
     return TransformersRemoteBackend(model, processor, options=options)

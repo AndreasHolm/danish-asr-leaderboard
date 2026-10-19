@@ -133,9 +133,11 @@ danish-asr-eval --model capacit-ai/saga-2-m --backend saga2
 # 1.543B in Brage plus 7.242B in the Munin rescoring model.
 danish-asr-eval --model Harmonium/brage-v1 --backend brage --params-b 8.785
 
-# Models whose decoding code ships in their own repo (trust_remote_code). The repo's config picks
-# the dtype; the model must expose model.transcribe(processor=, language=, audio_arrays=, sample_rates=).
-danish-asr-eval --model danish-foundation-models/edda-v0.2-duo --backend transformers-remote
+# Models whose decoding code ships in their own repo (trust_remote_code). This executes model-repo
+# Python, so use a reviewed commit SHA and run without unnecessary credentials. The repo's config
+# picks the dtype; the model must expose model.transcribe(processor=, language=, audio_arrays=, sample_rates=).
+danish-asr-eval --model danish-foundation-models/edda-v0.2-duo --backend transformers-remote \
+  --model-revision fb0de9b0fd76386b2f475dee12eb65da25994060
 
 # API backends (params not applicable → defaults to 0.0)
 danish-asr-eval --model chirp_3 --backend google-chirp --google-cloud-project my-gcp-project
