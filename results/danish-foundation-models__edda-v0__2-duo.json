@@ -1,7 +1,7 @@
 {
   "model": "[danish-foundation-models/edda-v0.2-duo](https://huggingface.co/danish-foundation-models/edda-v0.2-duo)",
   "params_b": 2.352,
-  "coral_conversation_wer": 14.2,
+  "coral_conversation_wer": 14.22,
   "coral_read_aloud_wer": 8.02,
   "cv17_da_wer": 4.89,
   "fleurs_da_wer": 5.98,
@@ -13,7 +13,7 @@
   "fleurs_da_cer": 2.22,
   "ftspeech_cer": 3.11,
   "mean_cer": 3.64,
-  "speed_x": 11.9,
+  "speed_x": 17.0,
   "submitted": "2026-10-10",
   "access": "open"
 }
