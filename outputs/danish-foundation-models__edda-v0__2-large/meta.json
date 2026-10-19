@@ -7,7 +7,7 @@
   "unicode_form": "NFKC",
   "number_words": true,
   "filler_words": true,
-  "speed_x": 9.1,
+  "speed_x": 13.9,
   "datasets": [
     "coral_conversation",
     "coral_read_aloud",
